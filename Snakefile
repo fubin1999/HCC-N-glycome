@@ -1,6 +1,7 @@
 rule all:
     input:
-        "results/data/raw_abundance.csv"
+        "results/data/raw_abundance.csv",
+        "results/data/groups.csv"
 
 rule build_db:
     input:
@@ -38,3 +39,11 @@ rule combine_plates:
         dfs = [pd.read_csv(f) for f in input]
         combined = pd.concat(dfs)
         combined.to_csv(output[0], index=False)
+
+rule get_groups:
+    input:
+        expand("data/plates/plate{no}.csv", no=range(1, 9))
+    output:
+        "results/data/groups.csv"
+    script:
+        "src/preprocess/prepare_groups.R"
