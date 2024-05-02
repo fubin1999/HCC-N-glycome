@@ -4,6 +4,7 @@ rule all:
         "results/data/groups.csv"
 
 rule build_db:
+    # Convert the serum glycan CSV file into a byonic database for GlyHunter.
     input:
         "data/human_serum_glycans.csv"
     output:
@@ -12,6 +13,7 @@ rule build_db:
         "src/preprocess/make_db.py"
 
 rule run_glyhunter:
+    # Run GlyHunter on each mass list file.
     input:
         mass_list="data/mass_list/plate{no}.xlsx",
         db="results/data/glycan_db.byonic"
@@ -22,6 +24,7 @@ rule run_glyhunter:
         "glyhunter run {input.mass_list} -d {input.db} -o {output}"
 
 rule assign_maldi_pos:
+    # Match the MALDI positions of GlyHunter results to samples.
     input:
         "data/MALDI_plate_position/plate{no}.csv",
         "results/data/glyhunter_results/plate{no}/"
@@ -32,6 +35,7 @@ rule assign_maldi_pos:
         "src/preprocess/assign_maldi_pos.R"
 
 rule combine_plates:
+    # Combine all GlyHunter results into a single file.
     input:
         expand("results/data/data_per_plate/plate{no}.csv", no=range(1, 9))
     output:
@@ -43,6 +47,7 @@ rule combine_plates:
         combined.to_csv(output[0], index=False)
 
 rule get_groups:
+    # Prepare the groups.
     input:
         expand("data/plates/plate{no}.csv", no=range(1, 9))
     output:
