@@ -1,7 +1,12 @@
+PREPARED_DIR = "results/data/prepared/"
+RAW_ABUNDANCE = PREPARED_DIR + "raw_abundance.csv"
+PROCESSED_ABUNDANCE = PREPARED_DIR + "processed_abundance.csv"
+GROUPS = PREPARED_DIR + "groups.csv"
+
 rule all:
     input:
-        "results/data/processed_abundance.csv",
-        "results/data/groups.csv"
+        PROCESSED_ABUNDANCE,
+        GROUPS
 
 rule build_db:
     # Convert the serum glycan CSV file into a byonic database for GlyHunter.
@@ -39,7 +44,7 @@ rule combine_plates:
     input:
         expand("results/data/data_per_plate/plate{no}.csv", no=range(1, 9))
     output:
-        "results/data/raw_abundance.csv"
+        RAW_ABUNDANCE
     run:
         import pandas as pd
         dfs = [pd.read_csv(f) for f in input]
@@ -49,9 +54,9 @@ rule combine_plates:
 rule preprocess:
     # Filter glycan, impute missing values, and normalize.
     input:
-        "results/data/raw_abundance.csv"
+        RAW_ABUNDANCE
     output:
-        "results/data/processed_abundance.csv"
+        PROCESSED_ABUNDANCE
     script:
         "src/preprocess/preprocess.R"
 
@@ -60,6 +65,6 @@ rule get_groups:
     input:
         expand("data/plates/plate{no}.csv", no=range(1, 9))
     output:
-        "results/data/groups.csv"
+        GROUPS
     script:
         "src/preprocess/prepare_groups.R"

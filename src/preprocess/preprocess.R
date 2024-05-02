@@ -3,7 +3,7 @@ source("renv/activate.R")
 library(tidyverse)
 
 raw_data <- read_csv(snakemake@input[[1]])
-raw_data <- read_csv("results/data/raw_abundance.csv")
+#raw_data <- read_csv("results/data/raw_abundance.csv")
 
 # 1. Convert glycans-----
 # Convert glycan strings from byonic format into condensed format.
