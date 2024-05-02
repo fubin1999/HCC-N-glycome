@@ -6,6 +6,7 @@ GROUPS = PREPARED_DIR + "groups.csv"
 rule all:
     input:
         PROCESSED_ABUNDANCE,
+        RAW_ABUNDANCE,
         GROUPS
 
 rule build_db:
@@ -45,11 +46,8 @@ rule combine_plates:
         expand("results/data/data_per_plate/plate{no}.csv", no=range(1, 9))
     output:
         RAW_ABUNDANCE
-    run:
-        import pandas as pd
-        dfs = [pd.read_csv(f) for f in input]
-        combined = pd.concat(dfs)
-        combined.to_csv(output[0], index=False)
+    script:
+        "src/preprocess/combine_plates.R"
 
 rule preprocess:
     # Filter glycan, impute missing values, and normalize.
