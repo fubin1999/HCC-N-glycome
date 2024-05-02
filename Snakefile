@@ -1,6 +1,6 @@
 rule all:
     input:
-        "results/data/raw_abundance.csv",
+        "results/data/processed_abundance.csv",
         "results/data/groups.csv"
 
 rule build_db:
@@ -45,6 +45,15 @@ rule combine_plates:
         dfs = [pd.read_csv(f) for f in input]
         combined = pd.concat(dfs)
         combined.to_csv(output[0], index=False)
+
+rule preprocess:
+    # Filter glycan, impute missing values, and normalize.
+    input:
+        "results/data/raw_abundance.csv"
+    output:
+        "results/data/processed_abundance.csv"
+    script:
+        "src/preprocess/preprocess.R"
 
 rule get_groups:
     # Prepare the groups.
