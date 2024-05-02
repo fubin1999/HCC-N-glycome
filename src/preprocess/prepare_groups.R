@@ -1,3 +1,5 @@
+source("renv/activate.R")
+
 library(tidyverse)
 
 files <- unlist(snakemake@input)
