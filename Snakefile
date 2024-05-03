@@ -40,14 +40,14 @@ rule assign_maldi_pos:
     script:
         "src/preprocess/assign_maldi_pos.R"
 
-rule combine_plates:
+rule combine_data_per_plate:
     # Combine all GlyHunter results into a single file.
     input:
         expand("results/data/data_per_plate/plate{no}.csv", no=range(1, 9))
     output:
         RAW_ABUNDANCE
     script:
-        "src/preprocess/combine_plates.R"
+        "src/preprocess/combine_data_per_plate.R"
 
 rule preprocess:
     # Filter glycan, impute missing values, and normalize.
