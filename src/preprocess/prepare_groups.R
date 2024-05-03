@@ -2,11 +2,10 @@ source("renv/activate.R")
 
 library(tidyverse)
 
-files <- unlist(snakemake@input)
-plates <- read_csv(files)
+plates <- read_csv(snakemake@input[[1]])
 groups <- plates |> 
     mutate(group = if_else(
-        raw == "QC", "QC", str_sub(raw, 1, 1)
+        raw_sample == "QC", "QC", str_sub(raw_sample, 1, 1)
     )) |> 
     select(sample, group)
 write_csv(groups, snakemake@output[[1]])

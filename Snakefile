@@ -80,7 +80,7 @@ rule preprocess:
 rule get_groups:
     # Prepare the groups.
     input:
-        expand("data/plates/plate{no}.csv", no=range(1, 9))
+        "results/data/plates.csv"
     output:
         GROUPS
     script:
