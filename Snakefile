@@ -49,25 +49,6 @@ rule combine_data_per_plate:
     script:
         "src/preprocess/combine_data_per_plate.R"
 
-rule combine_plates:
-    # Combine the plate files in "data/plates" into a single file.
-    # The plate files contain important information:
-    # 1. `raw`: Raw sample names provided by the hospital.
-    # 2. `position`: Sample positions on the MALDI plate.
-    # 3. `sample`: Sample names used in this study.
-    # Also, the file names indicate the plate number.
-    input:
-        "data/plates/"
-    output:
-        "results/data/plates.csv"
-        # This output file contains the following columns:
-        # 1. `plate`: The plate number.
-        # 2. `raw_sample`: The raw sample name provided by the hospital.
-        # 3. `sample`: The sample name used in this study.
-        # 4. `position`: The position on the MALDI plate.
-    script:
-        "src/preprocess/combine_plates.R"
-
 rule preprocess:
     # Filter glycan, impute missing values, and normalize.
     input:
@@ -80,7 +61,7 @@ rule preprocess:
 rule get_groups:
     # Prepare the groups.
     input:
-        "results/data/plates.csv"
+        "data/plates.csv"
     output:
         GROUPS
     script:
