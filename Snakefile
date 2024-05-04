@@ -2,12 +2,14 @@ PREPARED_DIR = "results/data/prepared/"
 RAW_ABUNDANCE = PREPARED_DIR + "raw_abundance.csv"
 PROCESSED_ABUNDANCE = PREPARED_DIR + "processed_abundance.csv"
 GROUPS = PREPARED_DIR + "groups.csv"
+CLINICAL = PREPARED_DIR + "clinical.csv"
 
 rule all:
     input:
         PROCESSED_ABUNDANCE,
         RAW_ABUNDANCE,
-        GROUPS
+        GROUPS,
+        CLINICAL
 
 rule build_db:
     # Convert the serum glycan CSV file into a byonic database for GlyHunter.
@@ -65,3 +67,14 @@ rule prepare_groups:
         GROUPS
     script:
         "src/preprocess/prepare_groups.R"
+
+rule prepare_clinical:
+    # Prepare the clinical information.
+    input:
+        clinical="data/clinical.csv",
+        abundance=PROCESSED_ABUNDANCE,
+        plates="data/plates.csv"
+    output:
+        CLINICAL
+    script:
+        "src/preprocess/prepare_clinical.R"
