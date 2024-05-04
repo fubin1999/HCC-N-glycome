@@ -25,18 +25,16 @@ rule run_glyhunter:
         db="results/data/glycan_db.byonic"
     output:
         directory("results/data/glyhunter_results/plate{no}/")
-    threads: 8
     shell:
         "glyhunter run {input.mass_list} -d {input.db} -o {output}"
 
 rule assign_maldi_pos:
     # Match the MALDI positions of GlyHunter results to samples.
     input:
-        "data/MALDI_plate_position/plate{no}.csv",
+        "data/MALDI_positions.csv",
         "results/data/glyhunter_results/plate{no}/"
     output:
         "results/data/data_per_plate/plate{no}.csv"
-    threads: 8
     script:
         "src/preprocess/assign_maldi_pos.R"
 

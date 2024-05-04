@@ -5,7 +5,11 @@ library(tidyverse)
 pos_file <- snakemake@input[[1]]
 glyhunter_result_file <- file.path(snakemake@input[[2]], "summary_area.csv")
 
-pos_df <- read_csv(pos_file)
+plate_no <- as.numeric(str_extract(glyhunter_result_file, "plate(\\d+)", group = 1))
+
+pos_df <- read_csv(pos_file) |> 
+  filter(plate == plate_no) |> 
+  select(-plate)
 glyhunter_df <- read_csv(glyhunter_result_file)
 
 glyhunter_long <- glyhunter_df |>
