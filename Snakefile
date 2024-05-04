@@ -56,10 +56,11 @@ rule preprocess:
     script:
         "src/preprocess/preprocess.R"
 
-rule get_groups:
+rule prepare_groups:
     # Prepare the groups.
     input:
-        "data/plates.csv"
+        plates="data/plates.csv",
+        abundance=PROCESSED_ABUNDANCE
     output:
         GROUPS
     script:
