@@ -6,11 +6,14 @@ CLINICAL = PREPARED_DIR + "clinical.csv"
 
 rule all:
     input:
+        # ===== Prepared Data =====
         PROCESSED_ABUNDANCE,
         RAW_ABUNDANCE,
         GROUPS,
         CLINICAL
 
+
+# ==================== Prepare Data ====================
 rule build_db:
     # Convert the serum glycan CSV file into a byonic database for GlyHunter.
     input:
@@ -18,7 +21,7 @@ rule build_db:
     output:
         "results/data/glycan_db.byonic"
     script:
-        "src/preprocess/make_db.py"
+        "src/prepare_data/make_db.py"
 
 rule run_glyhunter:
     # Run GlyHunter on each mass list file.
@@ -38,7 +41,7 @@ rule assign_maldi_pos:
     output:
         "results/data/data_per_plate/plate{no}.csv"
     script:
-        "src/preprocess/assign_maldi_pos.R"
+        "src/prepare_data/assign_maldi_pos.R"
 
 rule combine_data_per_plate:
     # Combine all GlyHunter results into a single file.
@@ -47,7 +50,7 @@ rule combine_data_per_plate:
     output:
         RAW_ABUNDANCE
     script:
-        "src/preprocess/combine_data_per_plate.R"
+        "src/prepare_data/combine_data_per_plate.R"
 
 rule preprocess:
     # Filter glycan, impute missing values, and normalize.
@@ -56,7 +59,7 @@ rule preprocess:
     output:
         PROCESSED_ABUNDANCE
     script:
-        "src/preprocess/preprocess.R"
+        "src/prepare_data/preprocess.R"
 
 rule prepare_groups:
     # Prepare the groups.
@@ -66,7 +69,7 @@ rule prepare_groups:
     output:
         GROUPS
     script:
-        "src/preprocess/prepare_groups.R"
+        "src/prepare_data/prepare_groups.R"
 
 rule prepare_clinical:
     # Prepare the clinical information.
@@ -77,4 +80,4 @@ rule prepare_clinical:
     output:
         CLINICAL
     script:
-        "src/preprocess/prepare_clinical.R"
+        "src/prepare_data/prepare_clinical.R"
