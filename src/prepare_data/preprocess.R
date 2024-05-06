@@ -21,56 +21,39 @@ convert <- function(comp) {
 converted <- raw_data |> 
   mutate(glycan = convert(glycan))
 
-# 2. Filter glycans-----
-# Remove glycans with missing values in more than 50% of samples.
+# 2. Filter samples-----
+# Filter outlier samples based on the number of glycans detected.
+to_delete <- c("D231", "D219", "D243", "D194", "D212")
 filtered_1 <- converted |> 
+  filter(!sample %in% to_delete)
+
+# 3. Filter glycans-----
+# Remove glycans with missing values in more than 50% of samples.
+filtered_2 <- filtered_1 |> 
   group_by(glycan) |> 
   mutate(missing_prop = mean(is.na(value))) |> 
   filter(missing_prop < 0.5) |> 
   ungroup() |> 
   select(-missing_prop)
 
-n_distinct(converted$glycan)
-n_distinct(filtered_1$glycan)
 # Before filtering: 72 glycans
 # After filtering: 62 glycans
 
-# 3. Filter samples-----
-to_delete_mannual <- c("D231", "D219", "D243", "D194", "D212")  # Outlier samples from manual inspection
-to_delete_missing <- filtered_1 |>   # Outlier samples with too many missing values
-  summarise(missing_prop = mean(is.na(value)), .by = sample) |> 
-  filter(missing_prop >= 0.5) |> 
-  pull(sample)
-to_delete <- c(to_delete_mannual, to_delete_missing)
-filtered_2 <- filtered_1 |> 
-  filter(!sample %in% to_delete)
+# 4. Impute glycans-----
+# Impute missing values using the the minimum value of each sample / 2.
+imputed <- filtered_2 |> 
+  group_by(sample) |> 
+  mutate(min_value = min(value, na.rm = TRUE)) |> 
+  ungroup() |> 
+  mutate(value = if_else(is.na(value), min_value / 2, value)) |> 
+  select(-min_value)
 
-# 4. Normalize abundance-----
+# 5. Normalize abundance-----
 # Normalize abundance values using median quotient normalization.
-normalized <- filtered_2 |> 
-  # Replace missing values with 0
-  # This step is essential for a robust normalization based on median quotient.
-  # If missing values are not replaced, the medians will be based on different sets of samples.
-  # This will result in a biased normalization.
-  mutate(
-    missing = is.na(value),
-    value = replace_na(value, 0)
-  ) |> 
-  rename(gid = sample) |>  # This is required by glycanr
+normalized <- imputed |> 
+  rename(gid = sample) |>  # This is required by glycanr::
   glycanr::medianquotientnorm() |> 
-  rename(sample = gid) |>   # Rename back to sample
-  mutate(value = if_else(missing, NA, value)) |> 
-  select(-missing)
+  rename(sample = gid)  # Rename back to sample
 
-# 5. Impute glycans-----
-wide_normalized <- normalized |> 
-  pivot_wider(names_from = glycan, values_from = value)
-imputed <- wide_normalized |> 
-  select(-sample) |> 
-  # Impute with KNN
-  VIM::kNN(k = 10) |> as_tibble() |> 
-  select(-ends_with("imp")) |> 
-  mutate(sample = wide_normalized$sample) |> 
-  pivot_longer(-sample, names_to = "glycan", values_to = "value")
 
-write_csv(imputed, snakemake@output[[1]])
+write_csv(normalized, snakemake@output[[1]])
