@@ -4,6 +4,7 @@ PROCESSED_ABUNDANCE = PREPARED_DIR + "processed_abundance.csv"
 PREPARED_ABUNDANCE = PREPARED_DIR + "prepared_abundance.rds"
 GROUPS = PREPARED_DIR + "groups.csv"
 CLINICAL = PREPARED_DIR + "clinical.csv"
+DERIVED_TRAITS = PREPARED_DIR + "derived_traits.csv"
 
 rule all:
     input:
@@ -13,6 +14,7 @@ rule all:
         RAW_ABUNDANCE,
         GROUPS,
         CLINICAL,
+        DERIVED_TRAITS,
 
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf"
@@ -96,6 +98,16 @@ rule prepare_clinical:
         CLINICAL
     script:
         "src/prepare_data/prepare_clinical.R"
+
+rule derived_traits:
+    # Calculate derived traits using GlyTrait
+    input:
+        PROCESSED_ABUNDANCE,
+        "data/human_serum_glycans.csv"
+    output:
+        DERIVED_TRAITS
+    script:
+        "src/prepare_data/derive_traits.py"
 
 # ==================== Data Quality ====================
 rule batch_effect_pca:
