@@ -1,7 +1,6 @@
 PREPARED_DIR = "results/data/prepared/"
 RAW_ABUNDANCE = PREPARED_DIR + "raw_abundance.csv"
 PROCESSED_ABUNDANCE = PREPARED_DIR + "processed_abundance.csv"
-PREPARED_ABUNDANCE = PREPARED_DIR + "prepared_abundance.rds"
 GROUPS = PREPARED_DIR + "groups.csv"
 CLINICAL = PREPARED_DIR + "clinical.csv"
 DERIVED_TRAITS = PREPARED_DIR + "derived_traits.csv"
@@ -9,7 +8,6 @@ DERIVED_TRAITS = PREPARED_DIR + "derived_traits.csv"
 rule all:
     input:
         # ===== Prepared Data =====
-        PREPARED_ABUNDANCE,
         PROCESSED_ABUNDANCE,
         RAW_ABUNDANCE,
         GROUPS,
@@ -77,16 +75,6 @@ rule prepare_groups:
         GROUPS
     script:
         "src/prepare_data/prepare_groups.R"
-
-rule prepare_abundance:
-    # Combine processed abundance and groups, and filter out QC sample.
-    input:
-        abundance=PROCESSED_ABUNDANCE,
-        groups=GROUPS
-    output:
-        PREPARED_ABUNDANCE
-    script:
-        "src/prepare_data/prepare_abundance.R"
 
 rule prepare_clinical:
     # Prepare the clinical information.
