@@ -17,6 +17,8 @@ rule all:
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/ancova_for_glycans.csv",
         "results/data/diff_analysis/posthoc_for_glycans.csv",
+        "results/data/diff_analysis/ancova_for_traits.csv",
+        "results/data/diff_analysis/posthoc_for_traits.csv",
 
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf"
@@ -126,3 +128,15 @@ rule ancova_for_glycans:
         posthoc="results/data/diff_analysis/posthoc_for_glycans.csv"
     script:
         "src/diff_analysis/ancova_for_glycans.R"
+
+rule ancova_for_traits:
+    # Perform ANCOVA for each derived trait.
+    input:
+        derived_traits=DERIVED_TRAITS,
+        groups=GROUPS,
+        clinical=CLINICAL
+    output:
+        ancova="results/data/diff_analysis/ancova_for_traits.csv",
+        posthoc="results/data/diff_analysis/posthoc_for_traits.csv"
+    script:
+        "src/diff_analysis/ancova_for_traits.R"
