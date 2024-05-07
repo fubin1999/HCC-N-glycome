@@ -12,7 +12,10 @@ rule all:
         PROCESSED_ABUNDANCE,
         RAW_ABUNDANCE,
         GROUPS,
-        CLINICAL
+        CLINICAL,
+
+        # ===== Data Quality Figures =====
+        "results/figures/data_quality/batch_effect_pca.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -93,3 +96,14 @@ rule prepare_clinical:
         CLINICAL
     script:
         "src/prepare_data/prepare_clinical.R"
+
+# ==================== Data Quality ====================
+rule batch_effect_pca:
+    # Draw PCA plot to check batch effect.
+    input:
+        PROCESSED_ABUNDANCE,
+        "data/plates.csv"
+    output:
+        "results/figures/data_quality/batch_effect_pca.pdf"
+    script:
+        "src/data_quality/batch_effect.R"
