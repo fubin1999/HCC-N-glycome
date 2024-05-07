@@ -12,8 +12,7 @@ clinical <- raw_clinical |>
   select(sample, everything()) |>
   select(-raw_sample) |> 
   semi_join(abundance |> distinct(sample), by = "sample") |> 
-  separate_wider_regex(sample, c("D", sample_no = "\\d+"), cols_remove = FALSE) |> 
-  mutate(sample_no = as.integer(sample_no)) |> 
+  mutate(sample_no = parse_number(sample)) |> 
   arrange(sample_no) |> 
   select(-sample_no)
 
