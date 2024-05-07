@@ -14,6 +14,10 @@ rule all:
         CLINICAL,
         DERIVED_TRAITS,
 
+        # ===== Differential Analysis Data =====
+        "results/data/diff_analysis/ancova_for_glycans.csv",
+        "results/data/diff_analysis/posthoc_for_glycans.csv",
+
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf"
 
@@ -97,6 +101,7 @@ rule derived_traits:
     script:
         "src/prepare_data/derive_traits.py"
 
+
 # ==================== Data Quality ====================
 rule batch_effect_pca:
     # Draw PCA plot to check batch effect.
@@ -107,3 +112,17 @@ rule batch_effect_pca:
         "results/figures/data_quality/batch_effect_pca.pdf"
     script:
         "src/data_quality/batch_effect.R"
+
+
+# ==================== Differential Analysis ====================
+rule ancova_for_glycans:
+    # Perform ANCOVA for each glycan.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        clinical=CLINICAL
+    output:
+        ancova="results/data/diff_analysis/ancova_for_glycans.csv",
+        posthoc="results/data/diff_analysis/posthoc_for_glycans.csv"
+    script:
+        "src/diff_analysis/ancova_for_glycans.R"
