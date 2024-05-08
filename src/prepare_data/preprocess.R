@@ -23,7 +23,7 @@ converted <- raw_data |>
 
 # 2. Filter samples-----
 # Filter outlier samples based on the number of glycans detected.
-to_delete <- c("D231", "D219", "D243", "D194", "D212")
+to_delete <- c("S231", "S219", "S243", "S194", "S212")
 filtered_1 <- converted |> 
   filter(!sample %in% to_delete)
 
