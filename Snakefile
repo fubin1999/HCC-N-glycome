@@ -148,17 +148,29 @@ rule ancova_for_traits:
         "src/diff_analysis/ancova_for_traits.R"
 
 # ==================== Machine Learning ====================
-rule compare_models:
-    # Compare different machine learning models (including the HCC Fusion Classifier)
-    # using 10-fold cross-validation.
+rule prepare_data_for_ml:
+    # Prepare data for ML and split the dataset.
     input:
         abundance=PROCESSED_ABUNDANCE,
         clinical=CLINICAL,
         groups=GROUPS
     output:
+        train_data="results/data/ml/train_data.csv",
+        test_data="results/data/ml/test_data.csv",
+        feature_types="results/data/ml/feature_types.json"
+    script:
+        "src/ml/prepare_data.py"
+
+rule compare_models:
+    # Compare different machine learning models (including the HCC Fusion Classifier)
+    # using 10-fold cross-validation.
+    input:
+        train_data="results/data/ml/train_data.csv",
+        feature_types="results/data/ml/feature_types.json"
+    output:
         "results/data/ml/model_comparison.csv"
     script:
-        "src/ml/model_compare.py"
+        "src/ml/compare_models.py"
 
 rule plot_compare_model_heatmap:
     # Draw the heatmap for model comparison
