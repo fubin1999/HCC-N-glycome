@@ -22,8 +22,8 @@ class HCCFusionClassifier(BaseEstimator, TransformerMixin, ClassifierMixin):
 
     def __init__(self, clinical_features, glycan_features, random_state=None):
         super().__init__()
-        self.clinical_features = list(clinical_features)
-        self.glycan_features = list(glycan_features)
+        self.clinical_features = clinical_features
+        self.glycan_features = glycan_features
         self.random_state = random_state
 
         self.clinical_model = RandomForestClassifier(n_estimators=1000, random_state=random_state)
