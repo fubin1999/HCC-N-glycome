@@ -21,7 +21,10 @@ rule all:
         "results/data/diff_analysis/posthoc_for_traits.csv",
 
         # ===== Data Quality Figures =====
-        "results/figures/data_quality/batch_effect_pca.pdf"
+        "results/figures/data_quality/batch_effect_pca.pdf",
+
+        # ===== Machine Learning Data =====
+        "results/data/ml/model_comparison.csv"
 
 
 # ==================== Prepare Data ====================
@@ -140,3 +143,16 @@ rule ancova_for_traits:
         posthoc="results/data/diff_analysis/posthoc_for_traits.csv"
     script:
         "src/diff_analysis/ancova_for_traits.R"
+
+# ==================== Machine Learning ====================
+rule compare_models:
+    # Compare different machine learning models (including the HCC Fusion Classifier)
+    # using 10-fold cross-validation.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        clinical=CLINICAL,
+        groups=GROUPS
+    output:
+        "results/data/ml/model_comparison.csv"
+    script:
+        "src/ml/model_compare.py"
