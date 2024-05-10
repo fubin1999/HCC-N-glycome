@@ -131,20 +131,26 @@ for model_name, model in models.items():
         models[model_name] = make_pipeline(StandardScaler(), model)
 models["HCC Fusion Classifier"] = HCCFusionClassifier(clinical_features, glycan_features, random_state=42)
 
-Record = namedtuple("Record", ["accuracy", "auc", "f1"])
+Record = namedtuple("Record", ["acc_mean", "auc_mean", "f1_mean", "acc_std", "auc_std", "f1_std"])
 results = {}
 for model_name, model in models.items():
     print(f"===== {model_name} =====")
-    acc = cross_val_score(model, X_train, y_train, cv=10, scoring="accuracy").mean()
-    print(f"Accuracy: {acc:.3f}")
-    auc = cross_val_score(model, X_train, y_train, cv=10, scoring="roc_auc").mean()
-    print(f"ROC AUC: {auc:.3f}")
-    f1 = cross_val_score(model, X_train, y_train, cv=10, scoring="f1").mean()
-    print(f"F1-score: {f1:.3f}")
-    results[model_name] = Record(accuracy=acc, auc=auc, f1=f1)
+    accs = cross_val_score(model, X_train, y_train, cv=10, scoring="accuracy")
+    acc_mean = accs.mean()
+    acc_std = accs.std()
+    print(f"Accuracy: {acc_mean:.3f} +- {acc_std:.3f}")
+    aucs = cross_val_score(model, X_train, y_train, cv=10, scoring="roc_auc")
+    auc_mean = aucs.mean()
+    auc_std = aucs.std()
+    print(f"ROC AUC: {auc_mean:.3f} +- {auc_std:.3f}")
+    f1s = cross_val_score(model, X_train, y_train, cv=10, scoring="f1")
+    f1_mean = f1s.mean()
+    f1_std = f1s.std()
+    print(f"F1-score: {f1_mean:.3f} +- {f1_std:.3f}")
+    results[model_name] = Record(acc_mean, auc_mean, f1_mean, acc_std, auc_std, f1_std)
     print()
 
 results = pd.DataFrame(results).T
-results.columns = ["accuracy", "ROC AUC", "f1-score"]
+results.columns = Record._fields
 # results.to_csv("results/data/ml/model_comparison.csv")
 results.to_csv(snakemake.output[0])
