@@ -24,7 +24,10 @@ rule all:
         "results/figures/data_quality/batch_effect_pca.pdf",
 
         # ===== Machine Learning Data =====
-        "results/data/ml/model_comparison.csv"
+        "results/data/ml/model_comparison.csv",
+
+        # ===== Machine Learning Figures =====
+        "results/figures/ml/model_comparison_heatmap.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -156,3 +159,12 @@ rule compare_models:
         "results/data/ml/model_comparison.csv"
     script:
         "src/ml/model_compare.py"
+
+rule plot_compare_model_heatmap:
+    # Draw the heatmap for model comparison
+    input:
+        "results/data/ml/model_comparison.csv"
+    output:
+        "results/figures/ml/model_comparison_heatmap.pdf"
+    script:
+        "src/ml/model_compare_heatmap.R"
