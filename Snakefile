@@ -25,6 +25,8 @@ rule all:
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
+        "results/data/ml/metrics.json",
+        "results/data/ml/predictions.csv",
 
         # ===== Machine Learning Figures =====
         "results/figures/ml/model_comparison_heatmap.pdf"
@@ -180,3 +182,15 @@ rule plot_compare_model_heatmap:
         "results/figures/ml/model_comparison_heatmap.pdf"
     script:
         "src/ml/model_compare_heatmap.R"
+
+rule make_predictions:
+    # Predict on the test data and evalute the model.
+    input:
+        train_data="results/data/ml/train_data.csv",
+        test_data="results/data/ml/test_data.csv",
+        feature_types="results/data/ml/feature_types.json"
+    output:
+        metrics="results/data/ml/metrics.json",
+        predictions="results/data/ml/predictions.csv"
+    script:
+        "src/ml/make_predictions.py"
