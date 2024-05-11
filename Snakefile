@@ -28,9 +28,11 @@ rule all:
         "results/data/ml/model_comparison.csv",
         "results/data/ml/metrics.json",
         "results/data/ml/predictions.csv",
+        "results/data/ml/roc_auc.csv",
 
         # ===== Machine Learning Figures =====
-        "results/figures/ml/model_comparison_heatmap.pdf"
+        "results/figures/ml/model_comparison_heatmap.pdf",
+        "results/figures/ml/roc_curves.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -204,3 +206,16 @@ rule make_predictions:
         predictions="results/data/ml/predictions.csv"
     script:
         "src/ml/make_predictions.py"
+
+rule roc:
+    # Calculate ROC AUCs for different groups and plot ROC curves.
+    input:
+        predictions="results/data/ml/predictions.csv",
+        groups=GROUPS,
+        clinical=CLINICAL,
+        other_glycan_markers="results/data/prepared/other_glycan_markers.csv"
+    output:
+        "results/figures/ml/roc_curves.pdf",
+        "results/data/ml/roc_auc.csv"
+    script:
+        "src/ml/roc.R"
