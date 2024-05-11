@@ -13,6 +13,7 @@ rule all:
         GROUPS,
         CLINICAL,
         DERIVED_TRAITS,
+        "results/data/prepared/other_glycan_markers.csv",
 
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/ancova_for_glycans.csv",
@@ -110,6 +111,15 @@ rule derived_traits:
         DERIVED_TRAITS
     script:
         "src/prepare_data/derive_traits.py"
+
+rule other_glycan_markers:
+    # Calculate other HCC glycan markers
+    input:
+        PROCESSED_ABUNDANCE
+    output:
+        "results/data/prepared/other_glycan_markers.csv"
+    script:
+        "src/prepare_data/other_glycan_markers.R"
 
 
 # ==================== Data Quality ====================
