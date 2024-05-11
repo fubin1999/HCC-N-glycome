@@ -20,12 +20,13 @@ groups = groups.set_index("sample")
 data = pd.merge(abundance, clinical, left_index=True, right_index=True, how="inner")
 data = pd.merge(data, groups, left_index=True, right_index=True, how="inner")
 data = data[data["group"] != "QC"]
+groups_4 = data["group"].copy()
 data["group"] = data["group"] == "C"
 
 clinical_features = clinical.columns.tolist()
 glycan_features = abundance.columns.tolist()
 
-train_data, test_data = train_test_split(data, test_size=128, random_state=42, stratify=data["group"], shuffle=True)
+train_data, test_data = train_test_split(data, test_size=128, random_state=43, stratify=groups_4, shuffle=True)
 feature_types = {"clinical": clinical_features, "glycan": glycan_features}
 
 train_data.to_csv(snakemake.output["train_data"], index=True)
