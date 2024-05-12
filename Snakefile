@@ -15,14 +15,17 @@ rule all:
         DERIVED_TRAITS,
         "results/data/prepared/other_glycan_markers.csv",
 
+        # ===== Others =====
+        "results/data/clinical/AFP_cutoff.csv",
+
+        # ===== Data Quality Figures =====
+        "results/figures/data_quality/batch_effect_pca.pdf",
+
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/ancova_for_glycans.csv",
         "results/data/diff_analysis/posthoc_for_glycans.csv",
         "results/data/diff_analysis/ancova_for_traits.csv",
         "results/data/diff_analysis/posthoc_for_traits.csv",
-
-        # ===== Data Quality Figures =====
-        "results/figures/data_quality/batch_effect_pca.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -137,6 +140,18 @@ rule batch_effect_pca:
         "src/data_quality/batch_effect.R"
 
 
+# ==================== Clinical Information ====================
+rule AFP_cutoff:
+    # Calculate classification metrics of AFP with different thresholds.
+    input:
+        CLINICAL,
+        GROUPS
+    output:
+        "results/data/clinical/AFP_cutoff.csv"
+    script:
+        "src/clinical/AFP_cutoff.R"
+
+
 # ==================== Differential Analysis ====================
 rule ancova_for_glycans:
     # Perform ANCOVA for each glycan.
@@ -161,6 +176,7 @@ rule ancova_for_traits:
         posthoc="results/data/diff_analysis/posthoc_for_traits.csv"
     script:
         "src/diff_analysis/ancova_for_traits.R"
+
 
 # ==================== Machine Learning ====================
 rule prepare_data_for_ml:
