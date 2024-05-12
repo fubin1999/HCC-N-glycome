@@ -10,6 +10,7 @@ from sklearn.metrics import (
     f1_score,
     roc_auc_score,
 )
+from sklearn.calibration import CalibratedClassifierCV
 
 from hcc_fusion_model import HCCFusionClassifier
 
@@ -28,6 +29,7 @@ model = HCCFusionClassifier(
     glycan_features=feature_types["glycan"],
     random_state=42,
 )
+model = CalibratedClassifierCV(model, method="isotonic", cv=5)
 model.fit(X_train, y_train)
 
 y_pred = model.predict(X_test)
