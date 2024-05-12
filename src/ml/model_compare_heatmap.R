@@ -28,8 +28,8 @@ row_anno <- rowAnnotation(
 
 # output_file <- "results/figures/ml/model_comparison_heatmap.pdf"
 output_file <- snakemake@output[[1]]
-pdf(output_file, width = 4.5, height = 8)
-Heatmap(
+pdf(output_file, width = 4, height = 8)
+hm <- Heatmap(
   mat,
   name = "score",
   col = col_fun,
@@ -45,6 +45,11 @@ Heatmap(
   column_names_centered = TRUE,
   column_names_gp = gpar(fontsize = 9, col = "grey30"),
   row_names_gp = gpar(fontsize = 8, fontface = c("bold", rep("plain", nrow(data)-1))),
+  heatmap_legend_param = list(
+    direction = "horizontal", 
+    title = "",
+    grid_height = unit(2, "mm")
+  ),
   cell_fun = function(j, i, x, y, width, height, fill) {
     grid.text(
       sprintf("%.3f", data[i, j]),
@@ -52,4 +57,5 @@ Heatmap(
       gp = gpar(fontsize = 7, col = "grey20", fontface = ifelse(i == 1, "bold", "plain")))
   }
 )
+draw(hm, heatmap_legend_side = "bottom")
 dev.off()
