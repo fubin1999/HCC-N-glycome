@@ -40,25 +40,30 @@ draw_roc_curve <- function(glycan_roc, AFP_roc, Gtest_roc) {
     scale_color_manual(values = c("#CC5F5A", "#7A848D", "#A2AFA6"))
 }
 
+# All data (AFP +-)
 global_glycan_roc <- roc(predictions, response = "target", predictor = "probability", ci = TRUE)
 global_AFP_roc <- roc(predictions, response = "target", predictor = "AFP", ci = TRUE)
 global_Gtest_roc <- roc(predictions, response = "target", predictor = "Gtest", ci = TRUE)
-global_p <- draw_roc_curve(global_glycan_roc, global_AFP_roc, global_Gtest_roc)
+global_p <- draw_roc_curve(global_glycan_roc, global_AFP_roc, global_Gtest_roc) +
+  ggtitle("Test Set: H+M+Y/C")
 
 HC_glycan_roc <- roc(predictions |> filter(group %in% c("H", "C")), response = "target", predictor = "probability", ci = TRUE)
 HC_AFP_roc <- roc(predictions |> filter(group %in% c("H", "C")), response = "target", predictor = "AFP", ci = TRUE)
 HC_Gtest_roc <- roc(predictions |> filter(group %in% c("H", "C")), response = "target", predictor = "Gtest", ci = TRUE)
-HC_p <- draw_roc_curve(HC_glycan_roc, HC_AFP_roc, HC_Gtest_roc)
+HC_p <- draw_roc_curve(HC_glycan_roc, HC_AFP_roc, HC_Gtest_roc) +
+  ggtitle("Test Set: H/C")
 
 MC_glycan_roc <- roc(predictions |> filter(group %in% c("M", "C")), response = "target", predictor = "probability", ci = TRUE)
 MC_AFP_roc <- roc(predictions |> filter(group %in% c("M", "C")), response = "target", predictor = "AFP", ci = TRUE)
 MC_Gtest_roc <- roc(predictions |> filter(group %in% c("M", "C")), response = "target", predictor = "Gtest", ci = TRUE)
-MC_p <- draw_roc_curve(MC_glycan_roc, MC_AFP_roc, MC_Gtest_roc)
+MC_p <- draw_roc_curve(MC_glycan_roc, MC_AFP_roc, MC_Gtest_roc) +
+  ggtitle("Test Set: M/C")
 
 YC_glycan_roc <- roc(predictions |> filter(group %in% c("Y", "C")), response = "target", predictor = "probability", ci = TRUE)
 YC_AFP_roc <- roc(predictions |> filter(group %in% c("Y", "C")), response = "target", predictor = "AFP", ci = TRUE)
 YC_Gtest_roc <- roc(predictions |> filter(group %in% c("Y", "C")), response = "target", predictor = "Gtest", ci = TRUE)
-YC_p <- draw_roc_curve(YC_glycan_roc, YC_AFP_roc, YC_Gtest_roc)
+YC_p <- draw_roc_curve(YC_glycan_roc, YC_AFP_roc, YC_Gtest_roc) +
+  ggtitle("Test Set: Y/C")
 
 final_p <- global_p | HC_p | MC_p | YC_p
 ggsave(snakemake@output[[1]], final_p, width = 16, height = 4)
