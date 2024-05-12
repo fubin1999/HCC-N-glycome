@@ -22,7 +22,7 @@ predictions <- predictions |>
   left_join(AFP_data, by = "sample") |> 
   left_join(other_glycan_markers, by = "sample")
 
-# Draw ROC curve-----
+# All data-----
 draw_roc_curve <- function(glycan_roc, AFP_roc, Gtest_roc) {
   ggroc(list(
     `HCC Fusion` = glycan_roc, 
@@ -33,14 +33,14 @@ draw_roc_curve <- function(glycan_roc, AFP_roc, Gtest_roc) {
     labs(color = "") +
     theme_bw() +
     theme(
-      legend.position = c(0.65, 0.2),
+      legend.position = c(0.65, 0.25),
       panel.grid = element_blank(),
-      legend.title = element_blank()
+      legend.title = element_blank(),
+      legend.background = element_blank()
     ) +
     scale_color_manual(values = c("#CC5F5A", "#7A848D", "#A2AFA6"))
 }
 
-# All data (AFP +-)
 global_glycan_roc <- roc(predictions, response = "target", predictor = "probability", ci = TRUE)
 global_AFP_roc <- roc(predictions, response = "target", predictor = "AFP", ci = TRUE)
 global_Gtest_roc <- roc(predictions, response = "target", predictor = "Gtest", ci = TRUE)
@@ -65,23 +65,71 @@ YC_Gtest_roc <- roc(predictions |> filter(group %in% c("Y", "C")), response = "t
 YC_p <- draw_roc_curve(YC_glycan_roc, YC_AFP_roc, YC_Gtest_roc) +
   ggtitle("Test Set: Y/C")
 
-final_p <- global_p | HC_p | MC_p | YC_p
-ggsave(snakemake@output[[1]], final_p, width = 16, height = 4)
+# AFP negative samples-----
+AFP_neg_samples <- predictions |> filter(AFP < 20)
+
+draw_roc_curve <- function(glycan_roc, Gtest_roc) {
+  ggroc(list(
+    `HCC Fusion` = glycan_roc, 
+    `G-test` = Gtest_roc
+  )) +
+    geom_abline(slope = 1, intercept = 1, linetype = "dashed", color = "grey") +
+    labs(color = "") +
+    theme_bw() +
+    theme(
+      legend.position = c(0.65, 0.2),
+      panel.grid = element_blank(),
+      legend.title = element_blank(),
+      legend.background = element_blank()
+    ) +
+    scale_color_manual(values = c("#CC5F5A", "#A2AFA6"))
+}
+
+AN_global_glycan_roc <- roc(AFP_neg_samples, response = "target", predictor = "probability", ci = TRUE)
+AN_global_Gtest_roc <- roc(AFP_neg_samples, response = "target", predictor = "Gtest", ci = TRUE)
+AN_global_p <- draw_roc_curve(AN_global_glycan_roc, AN_global_Gtest_roc) +
+  ggtitle("Test Set: H+M+Y/C, AFP(-)")
+
+AN_HC_glycan_roc <- roc(AFP_neg_samples |> filter(group %in% c("H", "C")), response = "target", predictor = "probability", ci = TRUE)
+AN_HC_Gtest_roc <- roc(AFP_neg_samples |> filter(group %in% c("H", "C")), response = "target", predictor = "Gtest", ci = TRUE)
+AN_HC_p <- draw_roc_curve(AN_HC_glycan_roc, AN_HC_Gtest_roc) +
+  ggtitle("Test Set: H/C, AFP(-)")
+
+AN_MC_glycan_roc <- roc(AFP_neg_samples |> filter(group %in% c("M", "C")), response = "target", predictor = "probability", ci = TRUE)
+AN_MC_Gtest_roc <- roc(AFP_neg_samples |> filter(group %in% c("M", "C")), response = "target", predictor = "Gtest", ci = TRUE)
+AN_MC_p <- draw_roc_curve(AN_MC_glycan_roc, AN_MC_Gtest_roc) +
+  ggtitle("Test Set: M/C, AFP(-)")
+
+AN_YC_glycan_roc <- roc(AFP_neg_samples |> filter(group %in% c("Y", "C")), response = "target", predictor = "probability", ci = TRUE)
+AN_YC_Gtest_roc <- roc(AFP_neg_samples |> filter(group %in% c("Y", "C")), response = "target", predictor = "Gtest", ci = TRUE)
+AN_YC_p <- draw_roc_curve(AN_YC_glycan_roc, AN_YC_Gtest_roc) +
+  ggtitle("Test Set: Y/C, AFP(-)")
+
+final_p <- (global_p | HC_p | MC_p | YC_p) / (AN_global_p | AN_HC_p | AN_MC_p | AN_YC_p)
+ggsave(snakemake@output[[1]], final_p, width = 12, height = 6)
 
 # Save results-----
 auc_df <- tribble(
-  ~between, ~predictor, ~AUC, ~ci_lower, ~ci_upper,
-  "Global", "HCC Fusion", global_glycan_roc$auc[1], global_glycan_roc$ci[1], global_glycan_roc$ci[3],
-  "Global", "AFP", global_AFP_roc$auc[1], global_AFP_roc$ci[1], global_AFP_roc$ci[3],
-  "Global", "G-test", global_Gtest_roc$auc[1], global_Gtest_roc$ci[1], global_Gtest_roc$ci[3],
-  "HvsC", "HCC Fusion", HC_glycan_roc$auc[1], HC_glycan_roc$ci[1], HC_glycan_roc$ci[3],
-  "HvsC", "AFP", HC_AFP_roc$auc[1], HC_AFP_roc$ci[1], HC_AFP_roc$ci[3],
-  "HvsC", "G-test", HC_Gtest_roc$auc[1], HC_Gtest_roc$ci[1], HC_Gtest_roc$ci[3],
-  "MvsC", "HCC Fusion", MC_glycan_roc$auc[1], MC_glycan_roc$ci[1], MC_glycan_roc$ci[3],
-  "MvsC", "AFP", MC_AFP_roc$auc[1], MC_AFP_roc$ci[1], MC_AFP_roc$ci[3],
-  "MvsC", "G-test", MC_Gtest_roc$auc[1], MC_Gtest_roc$ci[1], MC_Gtest_roc$ci[3],
-  "YvsC", "HCC Fusion", YC_glycan_roc$auc[1], YC_glycan_roc$ci[1], YC_glycan_roc$ci[3],
-  "YvsC", "AFP", YC_AFP_roc$auc[1], YC_AFP_roc$ci[1], YC_AFP_roc$ci[3],
-  "YvsC", "G-test", YC_Gtest_roc$auc[1], YC_Gtest_roc$ci[1], YC_Gtest_roc$ci[3]
+  ~data, ~between, ~predictor, ~AUC, ~ci_lower, ~ci_upper,
+  "all", "H+M+Y/C", "HCC Fusion", global_glycan_roc$auc[1], global_glycan_roc$ci[1], global_glycan_roc$ci[3],
+  "all", "H+M+Y/C", "AFP", global_AFP_roc$auc[1], global_AFP_roc$ci[1], global_AFP_roc$ci[3],
+  "all", "H+M+Y/C", "G-test", global_Gtest_roc$auc[1], global_Gtest_roc$ci[1], global_Gtest_roc$ci[3],
+  "all", "H/C", "HCC Fusion", HC_glycan_roc$auc[1], HC_glycan_roc$ci[1], HC_glycan_roc$ci[3],
+  "all", "H/C", "AFP", HC_AFP_roc$auc[1], HC_AFP_roc$ci[1], HC_AFP_roc$ci[3],
+  "all", "H/C", "G-test", HC_Gtest_roc$auc[1], HC_Gtest_roc$ci[1], HC_Gtest_roc$ci[3],
+  "all", "M/C", "HCC Fusion", MC_glycan_roc$auc[1], MC_glycan_roc$ci[1], MC_glycan_roc$ci[3],
+  "all", "M/C", "AFP", MC_AFP_roc$auc[1], MC_AFP_roc$ci[1], MC_AFP_roc$ci[3],
+  "all", "M/C", "G-test", MC_Gtest_roc$auc[1], MC_Gtest_roc$ci[1], MC_Gtest_roc$ci[3],
+  "all", "Y/C", "HCC Fusion", YC_glycan_roc$auc[1], YC_glycan_roc$ci[1], YC_glycan_roc$ci[3],
+  "all", "Y/C", "AFP", YC_AFP_roc$auc[1], YC_AFP_roc$ci[1], YC_AFP_roc$ci[3],
+  "all", "Y/C", "G-test", YC_Gtest_roc$auc[1], YC_Gtest_roc$ci[1], YC_Gtest_roc$ci[3],
+  "AFP-", "H+M+Y/C", "HCC Fusion", AN_global_glycan_roc$auc[1], AN_global_glycan_roc$ci[1], AN_global_glycan_roc$ci[3],
+  "AFP-", "H+M+Y/C", "G-test", AN_global_Gtest_roc$auc[1], AN_global_Gtest_roc$ci[1], AN_global_Gtest_roc$ci[3],
+  "AFP-", "H/C", "HCC Fusion", AN_HC_glycan_roc$auc[1], AN_HC_glycan_roc$ci[1], AN_HC_glycan_roc$ci[3],
+  "AFP-", "H/C", "G-test", AN_HC_Gtest_roc$auc[1], AN_HC_Gtest_roc$ci[1], AN_HC_Gtest_roc$ci[3],
+  "AFP-", "M/C", "HCC Fusion", AN_MC_glycan_roc$auc[1], AN_MC_glycan_roc$ci[1], AN_MC_glycan_roc$ci[3],
+  "AFP-", "M/C", "G-test", AN_MC_Gtest_roc$auc[1], AN_MC_Gtest_roc$ci[1], AN_MC_Gtest_roc$ci[3],
+  "AFP-", "Y/C", "HCC Fusion", AN_YC_glycan_roc$auc[1], AN_YC_glycan_roc$ci[1], AN_YC_glycan_roc$ci[3],
+  "AFP-", "Y/C", "G-test", AN_YC_Gtest_roc$auc[1], AN_YC_Gtest_roc$ci[1], AN_YC_Gtest_roc$ci[3]
 )
 write_csv(auc_df, snakemake@output[[2]])
