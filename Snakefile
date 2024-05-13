@@ -38,7 +38,8 @@ rule all:
         "results/figures/ml/roc_curves.pdf",
         "results/figures/ml/calibration_curve.pdf",
         "results/figures/ml/confusion_matrix.pdf",
-        "results/figures/ml/probability_boxplots.pdf"
+        "results/figures/ml/probability_boxplots.pdf",
+        "results/figures/ml/model_metrics_heatmap.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -276,3 +277,12 @@ rule evaluate_model:
         "results/data/ml/model_performance.csv"
     script:
         "src/ml/metrics.R"
+
+rule plot_model_metrics:
+    # Draw a heatmap of model metrics.
+    input:
+        "results/data/ml/model_performance.csv"
+    output:
+        "results/figures/ml/model_metrics_heatmap.pdf"
+    script:
+        "src/ml/metrics_heatmap.R"
