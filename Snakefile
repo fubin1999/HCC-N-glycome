@@ -29,7 +29,6 @@ rule all:
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
-        "results/data/ml/metrics.json",
         "results/data/ml/predictions.csv",
         "results/data/ml/roc_auc.csv",
 
@@ -221,8 +220,7 @@ rule make_predictions:
         test_data="results/data/ml/test_data.csv",
         feature_types="results/data/ml/feature_types.json"
     output:
-        metrics="results/data/ml/metrics.json",
-        predictions="results/data/ml/predictions.csv"
+        "results/data/ml/predictions.csv"
     script:
         "src/ml/make_predictions.py"
 

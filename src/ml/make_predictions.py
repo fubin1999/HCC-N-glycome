@@ -35,15 +35,6 @@ model.fit(X_train, y_train)
 y_pred = model.predict(X_test)
 y_proba = model.predict_proba(X_test)[:, 1]
 
-metrics = {
-    "accuracy": accuracy_score(y_test, y_pred),
-    "precision": precision_score(y_test, y_pred),
-    "recall": recall_score(y_test, y_pred),
-    "f1": f1_score(y_test, y_pred),
-    "roc_auc": roc_auc_score(y_test, y_proba),
-}
-json.dump(metrics, open(snakemake.output["metrics"], "w"))
-
 prediction_df = pd.DataFrame(
     {
         "target": y_test,
@@ -52,4 +43,4 @@ prediction_df = pd.DataFrame(
     },
     index=X_test.index,
 )
-prediction_df.to_csv(snakemake.output["predictions"], index=True)
+prediction_df.to_csv(snakemake.output[0], index=True)
