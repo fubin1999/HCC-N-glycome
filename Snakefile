@@ -31,6 +31,7 @@ rule all:
         "results/data/ml/model_comparison.csv",
         "results/data/ml/predictions.csv",
         "results/data/ml/roc_auc.csv",
+        "results/data/ml/model_performance.csv",
 
         # ===== Machine Learning Figures =====
         "results/figures/ml/model_comparison_heatmap.pdf",
@@ -265,3 +266,13 @@ rule probability_boxplots:
         "results/figures/ml/probability_boxplots.pdf"
     script:
         "src/ml/score_boxplots.R"
+
+rule evaluate_model:
+    # Calculate the performance metrics of the model.
+    input:
+        "results/data/ml/predictions.csv",
+        "results/data/prepared/groups.csv"
+    output:
+        "results/data/ml/model_performance.csv"
+    script:
+        "src/ml/metrics.R"
