@@ -36,7 +36,8 @@ rule all:
         # ===== Machine Learning Figures =====
         "results/figures/ml/model_comparison_heatmap.pdf",
         "results/figures/ml/roc_curves.pdf",
-        "results/figures/ml/calibration_curve.pdf"
+        "results/figures/ml/calibration_curve.pdf",
+        "results/figures/ml/confusion_matrix.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -236,6 +237,16 @@ rule roc:
         "results/data/ml/roc_auc.csv"
     script:
         "src/ml/roc.R"
+
+rule confusion_matrix:
+    # Draw confusion matrix for the model.
+    input:
+        "results/data/ml/predictions.csv",
+        "results/data/prepared/groups.csv"
+    output:
+        "results/figures/ml/confusion_matrix.pdf"
+    script:
+        "src/ml/confusion_matrix.R"
 
 rule calibration_curve:
     # Draw the calibration curve of the model.
