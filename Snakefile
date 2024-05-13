@@ -37,7 +37,8 @@ rule all:
         "results/figures/ml/model_comparison_heatmap.pdf",
         "results/figures/ml/roc_curves.pdf",
         "results/figures/ml/calibration_curve.pdf",
-        "results/figures/ml/confusion_matrix.pdf"
+        "results/figures/ml/confusion_matrix.pdf",
+        "results/figures/ml/probability_boxplots.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -256,3 +257,13 @@ rule calibration_curve:
         "results/figures/ml/calibration_curve.pdf"
     script:
         "src/ml/calibration_curve.R"
+
+rule probability_boxplots:
+    # Draw boxplots displaying probability distributions for each group.
+    input:
+        "results/data/ml/predictions.csv",
+        "results/data/prepared/groups.csv"
+    output:
+        "results/figures/ml/probability_boxplots.pdf"
+    script:
+        "src/ml/score_boxplots.R"
