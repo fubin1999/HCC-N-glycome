@@ -25,7 +25,7 @@ plot_cm <- function(cm) {
       legend.position = 0
     ) +
     coord_equal() +
-    scale_fill_gradient(low = "grey95", high = "steelblue") +
+    scale_fill_gradient(low = "grey95", high = "steelblue", limits = c(0, 70)) +
     scale_x_discrete(labels = c("Control", "HCC")) +
     scale_y_discrete(labels = c("HCC", "Control"))
 }
