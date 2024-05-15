@@ -27,6 +27,9 @@ rule all:
         "results/data/diff_analysis/ancova_for_traits.csv",
         "results/data/diff_analysis/posthoc_for_traits.csv",
 
+        # ===== Differential Analysis Figures =====
+        "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
+
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
         "results/data/ml/predictions.csv",
@@ -179,6 +182,17 @@ rule ancova_for_traits:
         posthoc="results/data/diff_analysis/posthoc_for_traits.csv"
     script:
         "src/diff_analysis/ancova_for_traits.R"
+
+rule diff_glycan_heatmap:
+    # Draw heatmap for differential glycans.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        ancova_result="results/data/diff_analysis/ancova_for_glycans.csv"
+    output:
+        "results/figures/diff_analysis/diff_glycan_heatmap.pdf"
+    script:
+        "src/diff_analysis/heatmap.R"
 
 
 # ==================== Machine Learning ====================
