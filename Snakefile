@@ -29,6 +29,7 @@ rule all:
 
         # ===== Differential Analysis Figures =====
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
+        "results/figures/diff_analysis/glycan_cluster_trends.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -194,6 +195,17 @@ rule diff_glycan_heatmap:
         "results/data/diff_analysis/glycan_clusters.rds"
     script:
         "src/diff_analysis/heatmap.R"
+
+rule glycan_cluster_trends:
+    # Plot the alteration trends of glycan clusters from the heatmap about.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        clusters="results/data/diff_analysis/glycan_clusters.rds"
+    output:
+        "results/figures/diff_analysis/glycan_cluster_trends.pdf"
+    script:
+        "src/diff_analysis/cluster_trends.R"
 
 
 # ==================== Machine Learning ====================
