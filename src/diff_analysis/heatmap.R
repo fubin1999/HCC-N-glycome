@@ -56,7 +56,7 @@ ht <- Heatmap(
   row_km_repeats = 100,
   heatmap_legend_param = list(direction = "horizontal"),
   layer_fun = function(j, i, x, y, width, height, fill, slice_r, slice_c) {
-    highlight <- ((slice_r == 1) & (slice_c == 4)) | ((slice_r == 3) & (slice_c == 4))
+    highlight <- (slice_r == 1) & (slice_c == 4)
     if (highlight) {
       grid.rect(gp = gpar(lwd = 2, fill = "transparent"))
     }
