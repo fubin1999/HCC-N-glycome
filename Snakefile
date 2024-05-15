@@ -190,7 +190,8 @@ rule diff_glycan_heatmap:
         groups=GROUPS,
         ancova_result="results/data/diff_analysis/ancova_for_glycans.csv"
     output:
-        "results/figures/diff_analysis/diff_glycan_heatmap.pdf"
+        "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
+        "results/data/diff_analysis/glycan_clusters.rds"
     script:
         "src/diff_analysis/heatmap.R"
 
