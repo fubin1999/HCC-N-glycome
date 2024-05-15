@@ -32,19 +32,19 @@ plot_cm <- function(cm) {
 
 global_cm <- get_cm(predictions)
 global_p <- plot_cm(global_cm) +
-  ggtitle("Test Set: H+M+Y/C")
+  ggtitle("Test Set: Control/HCC")
 
-HC_cm <- get_cm(predictions |> filter(group %in% c("H", "C")))
+HC_cm <- get_cm(predictions |> filter(group %in% c("HC", "HCC")))
 HC_p <- plot_cm(HC_cm) +
-  ggtitle("Test Set: H/C")
+  ggtitle("Test Set: HC/HCC")
 
-MC_cm <- get_cm(predictions |> filter(group %in% c("M", "C")))
+MC_cm <- get_cm(predictions |> filter(group %in% c("CHB", "HCC")))
 MC_p <- plot_cm(MC_cm) +
-  ggtitle("Test Set: M/C")
+  ggtitle("Test Set: CHB/HCC")
 
-YC_cm <- get_cm(predictions |> filter(group %in% c("Y", "C")))
+YC_cm <- get_cm(predictions |> filter(group %in% c("LC", "HCC")))
 YC_p <- plot_cm(YC_cm) +
-  ggtitle("Test Set: Y/C")
+  ggtitle("Test Set: LC/HCC")
 
 global_p | HC_p | MC_p | YC_p
 ggsave(snakemake@output[[1]], width = 12, height = 3)

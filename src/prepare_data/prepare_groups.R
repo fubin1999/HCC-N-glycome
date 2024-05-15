@@ -8,6 +8,7 @@ groups <- plates |>
     mutate(group = if_else(
         raw_sample == "QC", "QC", str_sub(raw_sample, 1, 1)
     )) |> 
+    mutate(group = case_match(group, "H" ~ "HC", "M" ~ "CHB", "Y" ~ "LC", "C" ~ "HCC", "QC" ~ "QC")) |> 
     select(sample, group) |> 
     semi_join(abundance, by = "sample")
 write_csv(groups, snakemake@output[[1]])

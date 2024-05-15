@@ -7,7 +7,7 @@ library(gt)
 metrics_file <- snakemake@input[[1]]
 metrics <- read_csv(metrics_file) |> 
   mutate(
-    comparison = factor(comparison, levels = rev(c("H+M+Y/C", "H/C", "M/C", "Y/C"))),
+    comparison = factor(comparison, levels = rev(c("Control/HCC", "HC/HCC", "CHB/HCC", "LC/HCC"))),
     metric = case_match(
       metric,
       "accuracy" ~ "Accuracy",

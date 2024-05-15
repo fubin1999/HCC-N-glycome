@@ -21,7 +21,7 @@ data = pd.merge(abundance, clinical, left_index=True, right_index=True, how="inn
 data = pd.merge(data, groups, left_index=True, right_index=True, how="inner")
 data = data[data["group"] != "QC"]
 groups_4 = data["group"].copy()
-data["group"] = data["group"] == "C"
+data["group"] = data["group"] == "HCC"
 
 clinical_features = clinical.columns.tolist()
 glycan_features = abundance.columns.tolist()

@@ -14,9 +14,9 @@ predictions <- predictions |>
     prediction = factor(prediction, levels = c(T, F))
   )
 
-HC_predictions <- predictions |> filter(group %in% c("H", "C"))
-MC_predictions <- predictions |> filter(group %in% c("M", "C"))
-YC_predictions <- predictions |> filter(group %in% c("Y", "C"))
+HC_predictions <- predictions |> filter(group %in% c("HC", "HCC"))
+MC_predictions <- predictions |> filter(group %in% c("CHB", "HCC"))
+YC_predictions <- predictions |> filter(group %in% c("LC", "HCC"))
 
 get_metrics <- function(data) {
   class_metrics <- metric_set(accuracy, sensitivity, specificity, f_meas)
@@ -27,10 +27,10 @@ get_metrics <- function(data) {
 }
 
 data_list <- list(
-  `H+M+Y/C` = predictions,
-  `H/C` = HC_predictions,
-  `M/C` = MC_predictions,
-  `Y/C` = YC_predictions
+  `Control/HCC` = predictions,
+  `HC/HCC` = HC_predictions,
+  `CHB/HCC` = MC_predictions,
+  `LC/HCC` = YC_predictions
 )
 result <- map(data_list, get_metrics) |> 
   bind_rows(.id = "comparison") |> 
