@@ -5,10 +5,10 @@ library(patchwork)
 
 # abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
-# clusters <- read_rds("results/data/diff_analysis/glycan_clusters.rds")
+# clusters <- read_csv("results/data/diff_analysis/glycan_clusters.csv")
 abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
-clusters <- read_rds(snakemake@input[["clusters"]])
+clusters <- read_csv(snakemake@input[["clusters"]])
 
 data <- abundance |> 
   inner_join(groups, by = "sample") |> 
@@ -18,20 +18,22 @@ data <- abundance |>
   group_by(glycan) |> 
   mutate(value = (value - mean(value)) / sd(value)) |> 
   ungroup() |> 
-  summarise(median = median(value), .by = c(glycan, group))
+  summarise(median = median(value), .by = c(glycan, group)) |> 
+  inner_join(clusters, by = "glycan")
 
-plot_trend <- function(idx) {
-  title <- str_glue("Cluster {names(clusters)[[idx]]}")
+plot_trend <- function(data, .cluster) {
   data |> 
-    filter(glycan %in% clusters[[idx]]) |> 
     ggplot(aes(group, median, group = glycan)) +
-    labs(x = "", y = "z-score median", title = title) +
     geom_point(color = "steelblue") +
     geom_line(color = "steelblue") +
+    labs(x = "", y = "z-score median", title = str_glue("Cluster {.cluster}")) +
     theme_classic()
 }
 
-plot_trend(1) + plot_trend(2) + plot_trend(3) + plot_trend(4)
+trend_plots <- data |> 
+  nest(.by = cluster) |> 
+  mutate(plot = map2(data, cluster, plot_trend))
+wrap_plots(trend_plots$plot, ncol = 1)
 
-tgutil::ggpreview(width = 6, height = 6)
-ggsave(snakemake@output[[1]], width = 6, height = 6)
+# tgutil::ggpreview(width = 6, height = 6)
+ggsave(snakemake@output[[1]], width = 3, height = 12)

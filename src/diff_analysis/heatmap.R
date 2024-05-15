@@ -65,5 +65,7 @@ ht <- Heatmap(
 ht <- draw(ht, heatmap_legend_side = "bottom")
 dev.off()
 
-glycan_cluster <- map(row_order(ht), ~ rownames(mat)[.])
-write_rds(glycan_cluster, snakemake@output[[2]])
+glycan_cluster <- map(row_order(ht), ~ rownames(mat)[.]) |> 
+  map(~ tibble(glycan = .x)) |> 
+  list_rbind(names_to = "cluster")
+write_csv(glycan_cluster, snakemake@output[[2]])

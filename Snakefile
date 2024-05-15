@@ -192,7 +192,7 @@ rule diff_glycan_heatmap:
         ancova_result="results/data/diff_analysis/ancova_for_glycans.csv"
     output:
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
-        "results/data/diff_analysis/glycan_clusters.rds"
+        "results/data/diff_analysis/glycan_clusters.csv"
     script:
         "src/diff_analysis/heatmap.R"
 
@@ -201,7 +201,7 @@ rule glycan_cluster_trends:
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        clusters="results/data/diff_analysis/glycan_clusters.rds"
+        clusters="results/data/diff_analysis/glycan_clusters.csv"
     output:
         "results/figures/diff_analysis/glycan_cluster_trends.pdf"
     script:
