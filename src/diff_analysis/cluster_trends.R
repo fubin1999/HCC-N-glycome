@@ -32,6 +32,7 @@ plot_trend <- function(data, .cluster) {
 
 trend_plots <- data |> 
   nest(.by = cluster) |> 
+  arrange(cluster) |> 
   mutate(plot = map2(data, cluster, plot_trend))
 wrap_plots(trend_plots$plot, ncol = 1)
 
