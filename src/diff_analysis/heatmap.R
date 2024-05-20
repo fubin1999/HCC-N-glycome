@@ -45,6 +45,7 @@ col_split <- factor(col_split, levels = c("HC", "CHB", "LC", "HCC"))
 col <- colorRamp2(c(-2, 0, 2), c("blue", "white", "red"))
 
 pdf(snakemake@output[[1]], width = 6, height = 8)
+set.seed(42)
 ht <- Heatmap(
   mat,
   name = "Z-score",
@@ -54,13 +55,8 @@ ht <- Heatmap(
   column_split = col_split,
   row_km = 4,
   row_km_repeats = 100,
-  heatmap_legend_param = list(direction = "horizontal"),
-  layer_fun = function(j, i, x, y, width, height, fill, slice_r, slice_c) {
-    highlight <- (slice_r == 1) & (slice_c == 4)
-    if (highlight) {
-      grid.rect(gp = gpar(lwd = 2, fill = "transparent"))
-    }
-  }
+  cluster_row_slices = FALSE,
+  heatmap_legend_param = list(direction = "horizontal")
 )
 ht <- draw(ht, heatmap_legend_side = "bottom")
 dev.off()
