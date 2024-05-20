@@ -3,7 +3,7 @@ source("renv/activate.R")
 library(tidyverse)
 
 raw_data <- read_csv(snakemake@input[[1]])
-#raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
+# raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
 
 # 1. Convert glycans-----
 # Convert glycan strings from byonic format into condensed format.
@@ -23,7 +23,13 @@ converted <- raw_data |>
 
 # 2. Filter samples-----
 # Filter outlier samples based on the number of glycans detected.
-to_delete <- c("S231", "S219", "S243", "S194", "S212")
+to_delete_1 <- c("S231", "S219", "S243", "S194", "S212")
+to_delete_2 <- converted |> 
+  summarise(na_prop = mean(is.na(value)), .by = sample) |> 
+  filter(na_prop >= 0.5) |> 
+  pull(sample)
+to_delete <- c(to_delete_1, to_delete_2)
+
 filtered_1 <- converted |> 
   filter(!sample %in% to_delete)
 
