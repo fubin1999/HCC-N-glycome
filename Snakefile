@@ -7,14 +7,6 @@ DERIVED_TRAITS = PREPARED_DIR + "derived_traits.csv"
 
 rule all:
     input:
-        # ===== Prepared Data =====
-        PROCESSED_ABUNDANCE,
-        RAW_ABUNDANCE,
-        GROUPS,
-        CLINICAL,
-        DERIVED_TRAITS,
-        "results/data/prepared/other_glycan_markers.csv",
-
         # ===== Others =====
         "results/data/clinical/AFP_cutoff.csv",
 
