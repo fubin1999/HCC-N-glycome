@@ -121,7 +121,8 @@ rule derived_traits:
         PROCESSED_ABUNDANCE,
         "data/human_serum_glycans.csv"
     output:
-        DERIVED_TRAITS
+        DERIVED_TRAITS,
+        "results/data/prepared/meta_properties.csv"
     script:
         "src/prepare_data/derive_traits.py"
 
