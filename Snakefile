@@ -182,7 +182,8 @@ rule diff_glycan_heatmap:
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        ancova_result="results/data/diff_analysis/ancova_for_glycans.csv"
+        ancova_result="results/data/diff_analysis/ancova_for_glycans.csv",
+        mp_table="results/data/prepared/meta_properties.csv"
     output:
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
         "results/data/diff_analysis/glycan_clusters.csv"
