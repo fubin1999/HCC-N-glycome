@@ -18,16 +18,19 @@ data <- abundance |>
   group_by(glycan) |> 
   mutate(value = (value - mean(value)) / sd(value)) |> 
   ungroup() |> 
-  summarise(median = median(value), .by = c(glycan, group)) |> 
+  summarise(mean = mean(value), .by = c(glycan, group)) |>
   inner_join(clusters, by = "glycan")
 
 plot_trend <- function(data, .cluster) {
   data |> 
-    ggplot(aes(group, median, group = glycan)) +
-    geom_point(color = "steelblue") +
-    geom_line(color = "steelblue") +
-    labs(x = "", y = "z-score median", title = str_glue("Cluster {.cluster}")) +
-    theme_classic()
+    ggplot(aes(group, mean, group = glycan)) +
+    geom_line(color = "steelblue", linewidth = 1, alpha = 0.5) +
+    labs(x = "", y = "Mean Z-score", title = str_glue("Cluster {.cluster}")) +
+    theme_minimal() +
+    theme(
+      panel.grid.major.x = element_line(color = "grey30", linetype = "dashed"),
+      plot.title = element_text(hjust = 0.5)
+    )
 }
 
 trend_plots <- data |> 
@@ -36,5 +39,5 @@ trend_plots <- data |>
   mutate(plot = map2(data, cluster, plot_trend))
 wrap_plots(trend_plots$plot, ncol = 1)
 
-# tgutil::ggpreview(width = 6, height = 6)
-ggsave(snakemake@output[[1]], width = 3, height = 12)
+# tgutil::ggpreview(width = 3, height = 10)
+ggsave(snakemake@output[[1]], width = 3, height = 10)
