@@ -10,7 +10,8 @@ clinical <- read_csv(snakemake@input[["clinical"]])
 
 data <- derived_traits %>%
   inner_join(groups, by = "sample") %>%
-  inner_join(clinical |> select(sample, sex, age), by = "sample")
+  inner_join(clinical |> select(sample, sex, age), by = "sample") %>%
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
 # ANCOVA-----
 ancova_result <- data |> 

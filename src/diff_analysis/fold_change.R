@@ -16,8 +16,8 @@ data <- glycan_data %>%
 FC_result <- data %>%
   summarise(mean_value = mean(value), .by = c(glycan, group)) %>%
   pivot_wider(names_from = group, values_from = mean_value) %>%
-  mutate(HCC_CHB = HCC / CHB, HCC_HC = HCC / HC, HCC_LC = HCC / LC) %>%
-  select(glycan, HCC_CHB, HCC_HC, HCC_LC) %>%
+  mutate(CHB_HCC = HCC / CHB, HC_HCC = HCC / HC, LC_HCC = HCC / LC) %>%
+  select(glycan, CHB_HCC, HC_HCC, LC_HCC) %>%
   pivot_longer(-glycan, names_to = "comparison", values_to = "FC") %>%
   separate_wider_delim(comparison, delim = "_", names = c("group1", "group2"))
 
