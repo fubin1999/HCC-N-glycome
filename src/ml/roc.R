@@ -36,7 +36,8 @@ draw_roc_curve <- function(glycan_roc, AFP_roc, Gtest_roc) {
       legend.position = c(0.65, 0.25),
       panel.grid = element_blank(),
       legend.title = element_blank(),
-      legend.background = element_blank()
+      legend.background = element_blank(),
+      title = element_text(size = 10)
     ) +
     scale_color_manual(values = c("#CC5F5A", "#7A848D", "#A2AFA6"))
 }
@@ -45,7 +46,7 @@ global_glycan_roc <- roc(predictions, response = "target", predictor = "probabil
 global_AFP_roc <- roc(predictions, response = "target", predictor = "AFP", ci = TRUE)
 global_Gtest_roc <- roc(predictions, response = "target", predictor = "Gtest", ci = TRUE)
 global_p <- draw_roc_curve(global_glycan_roc, global_AFP_roc, global_Gtest_roc) +
-  ggtitle("Test Set: Control/C")
+  ggtitle("Test Set: Control/HCC")
 
 HC_glycan_roc <- roc(predictions |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "probability", ci = TRUE)
 HC_AFP_roc <- roc(predictions |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "AFP", ci = TRUE)
@@ -80,7 +81,8 @@ draw_roc_curve <- function(glycan_roc, Gtest_roc) {
       legend.position = c(0.65, 0.2),
       panel.grid = element_blank(),
       legend.title = element_blank(),
-      legend.background = element_blank()
+      legend.background = element_blank(),
+      title = element_text(size = 10)
     ) +
     scale_color_manual(values = c("#CC5F5A", "#A2AFA6"))
 }
@@ -88,7 +90,7 @@ draw_roc_curve <- function(glycan_roc, Gtest_roc) {
 AN_global_glycan_roc <- roc(AFP_neg_samples, response = "target", predictor = "probability", ci = TRUE)
 AN_global_Gtest_roc <- roc(AFP_neg_samples, response = "target", predictor = "Gtest", ci = TRUE)
 AN_global_p <- draw_roc_curve(AN_global_glycan_roc, AN_global_Gtest_roc) +
-  ggtitle("Test Set: Control/C, AFP(-)")
+  ggtitle("Test Set: Control/HCC, AFP(-)")
 
 AN_HC_glycan_roc <- roc(AFP_neg_samples |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "probability", ci = TRUE)
 AN_HC_Gtest_roc <- roc(AFP_neg_samples |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "Gtest", ci = TRUE)
@@ -111,9 +113,9 @@ ggsave(snakemake@output[[1]], final_p, width = 12, height = 6)
 # Save results-----
 auc_df <- tribble(
   ~data, ~between, ~predictor, ~AUC, ~ci_lower, ~ci_upper,
-  "all", "Control/C", "HCC Fusion", global_glycan_roc$auc[1], global_glycan_roc$ci[1], global_glycan_roc$ci[3],
-  "all", "Control/C", "AFP", global_AFP_roc$auc[1], global_AFP_roc$ci[1], global_AFP_roc$ci[3],
-  "all", "Control/C", "G-test", global_Gtest_roc$auc[1], global_Gtest_roc$ci[1], global_Gtest_roc$ci[3],
+  "all", "Control/HCC", "HCC Fusion", global_glycan_roc$auc[1], global_glycan_roc$ci[1], global_glycan_roc$ci[3],
+  "all", "Control/HCC", "AFP", global_AFP_roc$auc[1], global_AFP_roc$ci[1], global_AFP_roc$ci[3],
+  "all", "Control/HCC", "G-test", global_Gtest_roc$auc[1], global_Gtest_roc$ci[1], global_Gtest_roc$ci[3],
   "all", "HC/HCC", "HCC Fusion", HC_glycan_roc$auc[1], HC_glycan_roc$ci[1], HC_glycan_roc$ci[3],
   "all", "HC/HCC", "AFP", HC_AFP_roc$auc[1], HC_AFP_roc$ci[1], HC_AFP_roc$ci[3],
   "all", "HC/HCC", "G-test", HC_Gtest_roc$auc[1], HC_Gtest_roc$ci[1], HC_Gtest_roc$ci[3],
@@ -123,8 +125,8 @@ auc_df <- tribble(
   "all", "LC/HCC", "HCC Fusion", YC_glycan_roc$auc[1], YC_glycan_roc$ci[1], YC_glycan_roc$ci[3],
   "all", "LC/HCC", "AFP", YC_AFP_roc$auc[1], YC_AFP_roc$ci[1], YC_AFP_roc$ci[3],
   "all", "LC/HCC", "G-test", YC_Gtest_roc$auc[1], YC_Gtest_roc$ci[1], YC_Gtest_roc$ci[3],
-  "AFP-", "Control/C", "HCC Fusion", AN_global_glycan_roc$auc[1], AN_global_glycan_roc$ci[1], AN_global_glycan_roc$ci[3],
-  "AFP-", "Control/C", "G-test", AN_global_Gtest_roc$auc[1], AN_global_Gtest_roc$ci[1], AN_global_Gtest_roc$ci[3],
+  "AFP-", "Control/HCC", "HCC Fusion", AN_global_glycan_roc$auc[1], AN_global_glycan_roc$ci[1], AN_global_glycan_roc$ci[3],
+  "AFP-", "Control/HCC", "G-test", AN_global_Gtest_roc$auc[1], AN_global_Gtest_roc$ci[1], AN_global_Gtest_roc$ci[3],
   "AFP-", "HC/HCC", "HCC Fusion", AN_HC_glycan_roc$auc[1], AN_HC_glycan_roc$ci[1], AN_HC_glycan_roc$ci[3],
   "AFP-", "HC/HCC", "G-test", AN_HC_Gtest_roc$auc[1], AN_HC_Gtest_roc$ci[1], AN_HC_Gtest_roc$ci[3],
   "AFP-", "CHB/HCC", "HCC Fusion", AN_MC_glycan_roc$auc[1], AN_MC_glycan_roc$ci[1], AN_MC_glycan_roc$ci[3],
