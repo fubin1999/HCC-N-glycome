@@ -22,7 +22,7 @@ data <- data |>
 
 # Prepare for heatmap-----
 diff_glycans <- anova_result |> 
-  filter(p.adj < 0.05) |> 
+  filter(p.adj < 0.05, Effect == "group") |>
   pull(glycan)
 
 mat <- data |> 

@@ -18,13 +18,11 @@ ancova_result <- data |>
   group_by(trait) |>
   anova_test(value ~ group + age + sex, white.adjust = TRUE) |> 
   adjust_pvalue(method = "BH") |> 
-  as_tibble() |> 
-  filter(Effect == "group") |> 
-  select(-Effect)
+  as_tibble()
 
 # Post-hoc-----
 diff_traits <- ancova_result |> 
-  filter(p.adj < 0.05) |> 
+  filter(p.adj < 0.05, Effect == "group") |>
   pull(trait)
 
 posthoc_result <- data |>
