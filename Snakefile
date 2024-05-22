@@ -23,6 +23,7 @@ rule all:
         # ===== Differential Analysis Figures =====
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_cluster_trends.pdf",
+        "results/figures/diff_analysis/diff_bubble.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -200,6 +201,17 @@ rule diff_glycan_heatmap:
         "results/data/diff_analysis/glycan_clusters.csv"
     script:
         "src/diff_analysis/heatmap.R"
+
+rule diff_bubble:
+    # Draw bubble plot for p-values and fold changes of glycans.
+    input:
+        post_hoc="results/data/diff_analysis/posthoc_for_glycans.csv",
+        fold_change="results/data/diff_analysis/fold_change.csv",
+        row_order="results/data/diff_analysis/glycan_clusters.csv"
+    output:
+        "results/figures/diff_analysis/diff_bubble.pdf"
+    script:
+        "src/diff_analysis/diff_bubble.R"
 
 rule glycan_cluster_trends:
     # Plot the alteration trends of glycan clusters from the heatmap about.
