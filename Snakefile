@@ -16,6 +16,7 @@ rule all:
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/ancova_for_glycans.csv",
         "results/data/diff_analysis/posthoc_for_glycans.csv",
+        "results/data/diff_analysis/fold_change.csv",
         "results/data/diff_analysis/ancova_for_traits.csv",
         "results/data/diff_analysis/posthoc_for_traits.csv",
 
@@ -164,6 +165,16 @@ rule ancova_for_glycans:
         posthoc="results/data/diff_analysis/posthoc_for_glycans.csv"
     script:
         "src/diff_analysis/ancova_for_glycans.R"
+
+rule fold_change:
+    # Calculate fold changes for each glycan.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS
+    output:
+        "results/data/diff_analysis/fold_change.csv"
+    script:
+        "src/diff_analysis/fold_change.R"
 
 rule ancova_for_traits:
     # Perform ANCOVA for each derived trait.
