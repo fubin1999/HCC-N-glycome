@@ -21,6 +21,7 @@ rule all:
         "results/data/diff_analysis/posthoc_for_traits.csv",
 
         # ===== Differential Analysis Figures =====
+        "results/figures/diff_analysis/diff_rose_plot.pdf",
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_cluster_trends.pdf",
         "results/figures/diff_analysis/diff_bubble.pdf",
@@ -188,6 +189,15 @@ rule ancova_for_traits:
         posthoc="results/data/diff_analysis/posthoc_for_traits.csv"
     script:
         "src/diff_analysis/ancova_for_traits.R"
+
+rule diff_rose_plot:
+    # Draw rose plot for differential glycans between each group pair.
+    input:
+        "results/data/diff_analysis/posthoc_for_glycans.csv"
+    output:
+        "results/figures/diff_analysis/diff_rose_plot.pdf"
+    script:
+        "src/diff_analysis/rose_plot.R"
 
 rule diff_glycan_heatmap:
     # Draw heatmap for differential glycans.
