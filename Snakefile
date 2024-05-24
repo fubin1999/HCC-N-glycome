@@ -21,6 +21,7 @@ rule all:
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_cluster_trends.pdf",
         "results/figures/diff_analysis/diff_bubble.pdf",
+        "results/figures/diff_analysis/violin_plots.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -221,6 +222,17 @@ rule glycan_cluster_trends:
         "results/figures/diff_analysis/glycan_cluster_trends.pdf"
     script:
         "src/diff_analysis/cluster_trends.R"
+
+rule violin_plots:
+    # Plot violin plots for all significant glycans.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        ancova_result="results/data/diff_analysis/ancova_for_glycans.csv"
+    output:
+        "results/figures/diff_analysis/violin_plots.pdf"
+    script:
+        "src/diff_analysis/violin_plots.R"
 
 
 # ==================== Machine Learning ====================
