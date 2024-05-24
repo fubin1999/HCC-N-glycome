@@ -3,7 +3,6 @@ RAW_ABUNDANCE = PREPARED_DIR + "raw_abundance.csv"
 PROCESSED_ABUNDANCE = PREPARED_DIR + "processed_abundance.csv"
 GROUPS = PREPARED_DIR + "groups.csv"
 CLINICAL = PREPARED_DIR + "clinical.csv"
-DERIVED_TRAITS = PREPARED_DIR + "derived_traits.csv"
 
 rule all:
     input:
@@ -15,16 +14,17 @@ rule all:
 
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/ancova_for_glycans.csv",
-        "results/data/diff_analysis/posthoc_for_glycans.csv",
         "results/data/diff_analysis/fold_change.csv",
-        "results/data/diff_analysis/ancova_for_traits.csv",
-        "results/data/diff_analysis/posthoc_for_traits.csv",
 
         # ===== Differential Analysis Figures =====
         "results/figures/diff_analysis/diff_rose_plot.pdf",
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_cluster_trends.pdf",
         "results/figures/diff_analysis/diff_bubble.pdf",
+
+        # ===== Derived Traits Data =====
+        "results/data/derived_traits/derived_traits.csv",
+        "results/data/derived_traits/meta_properties.csv",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -116,10 +116,10 @@ rule derived_traits:
         PROCESSED_ABUNDANCE,
         "data/human_serum_glycans.csv"
     output:
-        DERIVED_TRAITS,
-        "results/data/prepared/meta_properties.csv"
+        "results/data/derived_traits/derived_traits.csv",
+        "results/data/derived_traits/meta_properties.csv"
     script:
-        "src/prepare_data/derive_traits.py"
+        "src/derived_traits/derive_traits.py"
 
 rule other_glycan_markers:
     # Calculate other HCC glycan markers
@@ -178,18 +178,6 @@ rule fold_change:
     script:
         "src/diff_analysis/fold_change.R"
 
-rule ancova_for_traits:
-    # Perform ANCOVA for each derived trait.
-    input:
-        derived_traits=DERIVED_TRAITS,
-        groups=GROUPS,
-        clinical=CLINICAL
-    output:
-        ancova="results/data/diff_analysis/ancova_for_traits.csv",
-        posthoc="results/data/diff_analysis/posthoc_for_traits.csv"
-    script:
-        "src/diff_analysis/ancova_for_traits.R"
-
 rule diff_rose_plot:
     # Draw rose plot for differential glycans between each group pair.
     input:
@@ -205,7 +193,7 @@ rule diff_glycan_heatmap:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
         ancova_result="results/data/diff_analysis/ancova_for_glycans.csv",
-        mp_table="results/data/prepared/meta_properties.csv"
+        mp_table="results/data/derived_traits/meta_properties.csv"
     output:
         "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
         "results/data/diff_analysis/glycan_clusters.csv"
