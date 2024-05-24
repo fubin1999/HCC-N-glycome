@@ -9,6 +9,7 @@ glycan_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 
 data <- glycan_data %>%
+  pivot_longer(-sample, names_to = "glycan", values_to = "value") |>
   left_join(groups, by = "sample") %>%
   filter(group != "QC")
 

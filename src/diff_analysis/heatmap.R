@@ -5,19 +5,20 @@ library(ComplexHeatmap)
 library(circlize)
 
 # Read data-----
-# data <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# anova_result <- read_csv("results/data/diff_analysis/ancova_for_glycans.csv")
-# mp_table <- read_csv("results/data/prepared/meta_properties.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+anova_result <- read_csv("results/data/diff_analysis/ancova_for_glycans.csv")
+mp_table <- read_csv("results/data/prepared/meta_properties.csv")
 
-data <- read_csv(snakemake@input[["abundance"]])
+abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
 anova_result <- read_csv(snakemake@input[["ancova_result"]])
 mp_table <- read_csv(snakemake@input[["mp_table"]])
 
 groups <- groups |> 
   filter(group != "QC")
-data <- data |> 
+data <- abundance |>
+  pivot_longer(-sample, names_to = "glycan", values_to = "value") |>
   semi_join(groups, by = "sample")
 
 # Prepare for heatmap-----

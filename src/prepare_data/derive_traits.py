@@ -3,9 +3,6 @@ from glytrait import Experiment, load_data
 
 
 abundance_df = pd.read_csv(snakemake.input[0])
-abundance_df = abundance_df.pivot(index="sample", columns="glycan", values="value")
-abundance_df = abundance_df.reset_index()
-abundance_df.columns.name = None
 abundance_df = abundance_df.rename(columns={"sample": "Sample"})
 
 structure_df = pd.read_csv(snakemake.input[1])
@@ -20,7 +17,7 @@ experiment = Experiment(input_data)
 experiment.run_workflow(corr_threshold=0.9)
 
 traits_df = experiment.filtered_derived_trait_table  # "Sample" as index, traits as columns
-traits_df = traits_df.reset_index().melt(id_vars="Sample", var_name="trait", value_name="value")
+traits_df = traits_df.reset_index()
 traits_df = traits_df.rename(columns={"Sample": "sample"})
 traits_df.to_csv(snakemake.output[0], index=False)
 

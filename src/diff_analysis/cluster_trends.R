@@ -10,7 +10,8 @@ abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
 clusters <- read_csv(snakemake@input[["clusters"]])
 
-data <- abundance |> 
+data <- abundance |>
+  pivot_longer(-sample, names_to = "glycan", values_to = "value") |>
   inner_join(groups, by = "sample") |> 
   filter(group != "QC") |>
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) |> 

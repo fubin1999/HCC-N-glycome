@@ -5,9 +5,9 @@ library(ggbeeswarm)
 library(ggsignif)
 library(rstatix)
 
-# predictions <- read_csv("results/data/ml/predictions.csv")
-# groups <- read_csv("results/data/prepared/groups.csv") |> 
-#   mutate(group = factor(group, levels = c("H", "M", "Y", "C")))
+predictions <- read_csv("results/data/ml/predictions.csv")
+groups <- read_csv("results/data/prepared/groups.csv") |>
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
 predictions <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]]) |> 
@@ -30,7 +30,7 @@ ggplot(predictions, aes(group, probability)) +
   ) +
   labs(x = "Group", y = "Predicted Probability") +
   theme_classic() +
-  theme(legend.position = 0) +
+  theme(legend.position = "none") +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.1))) +
   scale_color_manual(values = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"))
 # tgutil::ggpreview(width = 3, height = 3)

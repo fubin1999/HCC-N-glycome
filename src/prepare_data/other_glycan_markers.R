@@ -2,8 +2,7 @@ library(tidyverse)
 
 # processed_file <- "results/data/prepared/processed_abundance.csv"
 processed_file <- snakemake@input[[1]]
-data <- read_csv(processed_file) |> 
-  pivot_wider(names_from = "glycan", values_from = "value")
+data <- read_csv(processed_file)
 
 glycans <- setdiff(colnames(data), "sample")
 

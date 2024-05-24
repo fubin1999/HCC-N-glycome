@@ -9,6 +9,7 @@ groups <- read_csv(snakemake@input[["groups"]])
 clinical <- read_csv(snakemake@input[["clinical"]])
 
 data <- derived_traits %>%
+  pivot_longer(-sample, names_to = "trait", values_to = "value") |>
   inner_join(groups, by = "sample") %>%
   inner_join(clinical |> select(sample, sex, age), by = "sample") %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))

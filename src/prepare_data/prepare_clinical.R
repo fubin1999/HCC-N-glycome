@@ -11,7 +11,7 @@ clinical <- raw_clinical |>
   left_join(plates |> select(raw_sample, sample), by = "raw_sample") |> 
   select(sample, everything()) |>
   select(-raw_sample) |> 
-  semi_join(abundance |> distinct(sample), by = "sample") |> 
+  semi_join(abundance, by = "sample") |>
   mutate(sample_no = parse_number(sample)) |> 
   arrange(sample_no) |> 
   select(-sample_no)

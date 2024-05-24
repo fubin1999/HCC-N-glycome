@@ -5,32 +5,20 @@ library(tidyverse)
 raw_data <- read_csv(snakemake@input[[1]])
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
 
-# 1. Convert glycans-----
-# Convert glycan strings from byonic format into condensed format.
-# e.g. Hex(7)HexNAc(6)dHex(1)NeuAc[+13.0316](4) -> H7N6F1S4
-# (The byonic format is from the result of GlyHunter.)
-convert <- function(comp) {
-  comp = str_replace(comp, "\\[.*?\\]", "")
-  comp = str_replace(comp, "Hex\\((\\d+)\\)", "H\\1")
-  comp = str_replace(comp, "HexNAc\\((\\d+)\\)", "N\\1")
-  comp = str_replace(comp, "dHex\\((\\d+)\\)", "F\\1")
-  comp = str_replace(comp, "NeuAc\\((\\d+)\\)", "S\\1")
-  return(comp)
-}
-
-converted <- raw_data |> 
-  mutate(glycan = convert(glycan))
+# 1. Convert to long-----
+long_data <- raw_data |>
+  pivot_longer(-sample, names_to = "glycan", values_to = "value")
 
 # 2. Filter samples-----
 # Filter outlier samples based on the number of glycans detected.
 to_delete_1 <- c("S231", "S219", "S243", "S194", "S212")
-to_delete_2 <- converted |> 
+to_delete_2 <- long_data |>
   summarise(na_prop = mean(is.na(value)), .by = sample) |> 
   filter(na_prop >= 0.5) |> 
   pull(sample)
 to_delete <- c(to_delete_1, to_delete_2)
 
-filtered_1 <- converted |> 
+filtered_1 <- long_data |>
   filter(!sample %in% to_delete)
 
 # 3. Filter glycans-----
@@ -61,5 +49,9 @@ normalized <- imputed |>
   glycanr::medianquotientnorm() |> 
   rename(sample = gid)  # Rename back to sample
 
+# 6. Convert back to wide-----
+final_data <- normalized |>
+  pivot_wider(names_from = glycan, values_from = value)
 
-write_csv(normalized, snakemake@output[[1]])
+# Save result-----
+write_csv(final_data, snakemake@output[[1]])

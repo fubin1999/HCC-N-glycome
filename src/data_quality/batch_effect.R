@@ -12,7 +12,8 @@ abundance <- read_csv(abundance_file)
 plates <- read_csv(plates_file) |> 
   select(sample, plate)
 
-data <- abundance |> 
+data <- abundance |>
+  pivot_longer(-sample, names_to = "glycan", values_to = "value") |>
   left_join(plates, by = "sample")
 
 # PCA on abundance data-----

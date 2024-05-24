@@ -8,11 +8,10 @@ from sklearn.model_selection import train_test_split
 # abundance = pd.read_csv("results/data/prepared/processed_abundance.csv")
 # clinical = pd.read_csv("results/data/prepared/clinical.csv")
 # groups = pd.read_csv("results/data/prepared/groups.csv")
-abundance = pd.read_csv(snakemake.input["abundance"])
+abundance = pd.read_csv(snakemake.input["abundance"], index_col=0)
 clinical = pd.read_csv(snakemake.input["clinical"])
 groups = pd.read_csv(snakemake.input["groups"])
 
-abundance = abundance.pivot(index="sample", columns="glycan", values="value")
 abundance = pd.DataFrame(np.log2(abundance.values), columns=abundance.columns, index=abundance.index)
 clinical = clinical.drop(["sex", "age"], axis=1)
 clinical = clinical.set_index("sample")
