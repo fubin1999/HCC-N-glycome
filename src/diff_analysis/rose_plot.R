@@ -29,4 +29,4 @@ ggplot(plot_data, aes(comparison, n)) +
   ) +
   scale_fill_manual(values = c("up" = "#CC5F5A", "down" = "#97A5C0"))
 # tgutil::ggpreview(width = 4, height = 5)
-ggsave(snakemake@output[[1]], width = 4, height = 5)
+ggsave(snakemake@output[[1]], width = 3, height = 3.5)
