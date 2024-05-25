@@ -12,17 +12,17 @@ rule all:
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
 
-        # ===== Differential Analysis Data =====
-        "results/data/diff_analysis/ancova_for_glycans.csv",
-        "results/data/diff_analysis/fold_change.csv",
+        # ===== Glycan Abundance Data =====
+        "results/data/glycan_abundance/ancova_for_glycans.csv",
+        "results/data/glycan_abundance/fold_change.csv",
 
-        # ===== Differential Analysis Figures =====
-        "results/figures/diff_analysis/diff_rose_plot.pdf",
-        "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
-        "results/figures/diff_analysis/glycan_cluster_trends.pdf",
-        "results/figures/diff_analysis/diff_bubble.pdf",
-        "results/figures/diff_analysis/violin_plots.pdf",
-        "results/figures/diff_analysis/diff_upset.pdf",
+        # ===== Glycan Abundance Figures =====
+        "results/figures/glycan_abundance/diff_rose_plot.pdf",
+        "results/figures/glycan_abundance/diff_glycan_heatmap.pdf",
+        "results/figures/glycan_abundance/glycan_cluster_trends.pdf",
+        "results/figures/glycan_abundance/diff_bubble.pdf",
+        "results/figures/glycan_abundance/violin_plots.pdf",
+        "results/figures/glycan_abundance/diff_upset.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -148,7 +148,7 @@ rule AFP_cutoff:
         "src/clinical/AFP_cutoff.R"
 
 
-# ==================== Differential Analysis ====================
+# ==================== Glycan Abundance ====================
 rule ancova_for_glycans:
     # Perform ANCOVA for each glycan.
     input:
@@ -156,10 +156,10 @@ rule ancova_for_glycans:
         groups=GROUPS,
         clinical=CLINICAL
     output:
-        ancova="results/data/diff_analysis/ancova_for_glycans.csv",
-        posthoc="results/data/diff_analysis/posthoc_for_glycans.csv"
+        ancova="results/data/glycan_abundance/ancova_for_glycans.csv",
+        posthoc="results/data/glycan_abundance/posthoc_for_glycans.csv"
     script:
-        "src/diff_analysis/ancova_for_glycans.R"
+        "src/glycan_abundance/ancova_for_glycans.R"
 
 rule fold_change:
     # Calculate fold changes for each glycan.
@@ -167,74 +167,74 @@ rule fold_change:
         PROCESSED_ABUNDANCE,
         GROUPS
     output:
-        "results/data/diff_analysis/fold_change.csv"
+        "results/data/glycan_abundance/fold_change.csv"
     script:
-        "src/diff_analysis/fold_change.R"
+        "src/glycan_abundance/fold_change.R"
 
 rule diff_rose_plot:
     # Draw rose plot for differential glycans between each group pair.
     input:
-        "results/data/diff_analysis/posthoc_for_glycans.csv"
+        "results/data/glycan_abundance/posthoc_for_glycans.csv"
     output:
-        "results/figures/diff_analysis/diff_rose_plot.pdf"
+        "results/figures/glycan_abundance/diff_rose_plot.pdf"
     script:
-        "src/diff_analysis/rose_plot.R"
+        "src/glycan_abundance/rose_plot.R"
 
 rule diff_glycan_heatmap:
     # Draw heatmap for differential glycans.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        ancova_result="results/data/diff_analysis/ancova_for_glycans.csv",
+        ancova_result="results/data/glycan_abundance/ancova_for_glycans.csv",
         mp_table="results/data/derived_traits/meta_properties.csv"
     output:
-        "results/figures/diff_analysis/diff_glycan_heatmap.pdf",
-        "results/data/diff_analysis/glycan_clusters.csv"
+        "results/figures/glycan_abundance/diff_glycan_heatmap.pdf",
+        "results/data/glycan_abundance/glycan_clusters.csv"
     script:
-        "src/diff_analysis/heatmap.R"
+        "src/glycan_abundance/heatmap.R"
 
 rule diff_bubble:
     # Draw bubble plot for p-values and fold changes of glycans.
     input:
-        post_hoc="results/data/diff_analysis/posthoc_for_glycans.csv",
-        fold_change="results/data/diff_analysis/fold_change.csv",
-        row_order="results/data/diff_analysis/glycan_clusters.csv"
+        post_hoc="results/data/glycan_abundance/posthoc_for_glycans.csv",
+        fold_change="results/data/glycan_abundance/fold_change.csv",
+        row_order="results/data/glycan_abundance/glycan_clusters.csv"
     output:
-        "results/figures/diff_analysis/diff_bubble.pdf"
+        "results/figures/glycan_abundance/diff_bubble.pdf"
     script:
-        "src/diff_analysis/diff_bubble.R"
+        "src/glycan_abundance/diff_bubble.R"
 
 rule glycan_cluster_trends:
     # Plot the alteration trends of glycan clusters from the heatmap about.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        clusters="results/data/diff_analysis/glycan_clusters.csv"
+        clusters="results/data/glycan_abundance/glycan_clusters.csv"
     output:
-        "results/figures/diff_analysis/glycan_cluster_trends.pdf"
+        "results/figures/glycan_abundance/glycan_cluster_trends.pdf"
     script:
-        "src/diff_analysis/cluster_trends.R"
+        "src/glycan_abundance/cluster_trends.R"
 
 rule violin_plots:
     # Plot violin plots for all significant glycans.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        ancova_result="results/data/diff_analysis/ancova_for_glycans.csv"
+        ancova_result="results/data/glycan_abundance/ancova_for_glycans.csv"
     output:
-        "results/figures/diff_analysis/violin_plots.pdf"
+        "results/figures/glycan_abundance/violin_plots.pdf"
     script:
-        "src/diff_analysis/violin_plots.R"
+        "src/glycan_abundance/violin_plots.R"
 
 rule diff_upset:
     # Plot upset plot for the number of significant glycans
     # between each group paires.
     input:
-        "results/data/diff_analysis/posthoc_for_glycans.csv"
+        "results/data/glycan_abundance/posthoc_for_glycans.csv"
     output:
-        "results/figures/diff_analysis/diff_upset.pdf"
+        "results/figures/glycan_abundance/diff_upset.pdf"
     script:
-        "src/diff_analysis/diff_upset.R"
+        "src/glycan_abundance/diff_upset.R"
 
 
 # ==================== Derived Traits ====================

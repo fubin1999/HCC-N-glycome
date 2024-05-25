@@ -47,4 +47,4 @@ ggplot(data, aes(comparison, reorder(glycan, desc(rank)))) +
   scale_color_gradient2(high = "#CD0000", low = "#27408B", mid = "white")
 
 tgutil::ggpreview(width = 2, height = 7)
-ggsave("results/figures/diff_analysis/diff_bubble.pdf", width = 2, height = 7)
+ggsave(snakemake@output[[1]], width = 2, height = 7)
