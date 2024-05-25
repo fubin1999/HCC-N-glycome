@@ -27,6 +27,8 @@ rule all:
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
         "results/data/derived_traits/meta_properties.csv",
+        "results/data/derived_traits/ancova_for_derived_traits.csv",
+        "results/data/derived_traits/posthoc_for_derived_traits.csv",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -111,17 +113,6 @@ rule prepare_clinical:
         CLINICAL
     script:
         "src/prepare_data/prepare_clinical.R"
-
-rule derived_traits:
-    # Calculate derived traits using GlyTrait
-    input:
-        PROCESSED_ABUNDANCE,
-        "data/human_serum_glycans.csv"
-    output:
-        "results/data/derived_traits/derived_traits.csv",
-        "results/data/derived_traits/meta_properties.csv"
-    script:
-        "src/derived_traits/derive_traits.py"
 
 rule other_glycan_markers:
     # Calculate other HCC glycan markers
@@ -244,6 +235,31 @@ rule diff_upset:
         "results/figures/diff_analysis/diff_upset.pdf"
     script:
         "src/diff_analysis/diff_upset.R"
+
+
+# ==================== Derived Traits ====================
+rule calculate_derived_traits:
+    # Calculate derived traits using GlyTrait
+    input:
+        PROCESSED_ABUNDANCE,
+        "data/human_serum_glycans.csv"
+    output:
+        "results/data/derived_traits/derived_traits.csv",
+        "results/data/derived_traits/meta_properties.csv"
+    script:
+        "src/derived_traits/derive_traits.py"
+
+rule trait_ancova:
+    # Perform ANCOVA on derived traits.
+    input:
+        traits="results/data/derived_traits/derived_traits.csv",
+        groups=GROUPS,
+        clinical=CLINICAL
+    output:
+        "results/data/derived_traits/ancova_for_derived_traits.csv",
+        "results/data/derived_traits/posthoc_for_derived_traits.csv"
+    script:
+        "src/derived_traits/ancova.R"
 
 
 # ==================== Machine Learning ====================
