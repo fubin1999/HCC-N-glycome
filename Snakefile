@@ -259,7 +259,7 @@ rule trait_ancova:
         "results/data/derived_traits/ancova_for_derived_traits.csv",
         "results/data/derived_traits/posthoc_for_derived_traits.csv"
     script:
-        "src/derived_traits/ancova.R"
+        "src/derived_traits/ancova_for_derived_traits.R"
 
 
 # ==================== Machine Learning ====================

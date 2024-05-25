@@ -23,7 +23,11 @@ data <- trait_data %>%
 # Perform ANCOVA-----
 ancova_result <- data |>
   group_by(trait) |>
-  anova_test(value ~ group + age + sex, white.adjust = TRUE) |>
+  anova_test(
+    value ~ group + age + sex,
+    white.adjust = TRUE,
+    effect.size = "pes"
+  ) |>
   adjust_pvalue(method = "BH") |>
   as_tibble()
 
@@ -32,13 +36,21 @@ diff_traits <- ancova_result |>
   filter(p.adj < 0.05, Effect == "group") |>
   pull(trait)
 
-posthoc_result <- data |>
-  filter(trait %in% diff_traits) |>
-  group_by(trait) |>
-  tukey_hsd(value ~ group, p.adjust.method = "BH") |>
-  as_tibble() |>
-  filter(term == "group") |>
-  select(-term)
+posthoc_result <- data %>%
+  filter(trait %in% diff_traits) %>%
+  group_by(trait) %>%
+  nest() %>%
+  mutate(
+    lm_model = map(data, ~ lm(value ~ group + sex + age, data = .x)),
+    emm = map(lm_model, ~ emmeans::emmeans(.x, ~ group)),
+    pairwise_comparison = map(emm, ~ emmeans::contrast(.x, "pairwise", adjust = "tukey")),
+    result_df = map(pairwise_comparison, ~ as_tibble(.x))
+  ) %>%
+  select(trait, result_df) %>%
+  unnest(cols = result_df) %>%
+  separate_wider_delim(contrast, delim = " - ", names = c("group1", "group2")) %>%
+  rename(p.adj = p.value) %>%
+  add_significance(p.col = "p.adj")
 
 # Save results-----
 write_csv(ancova_result, snakemake@output[[1]])
