@@ -15,6 +15,7 @@ rule all:
         # ===== Glycan Abundance Data =====
         "results/data/glycan_abundance/ancova_for_glycans.csv",
         "results/data/glycan_abundance/fold_change.csv",
+        "results/data/glycan_abundance/roc_auc.csv",
 
         # ===== Glycan Abundance Figures =====
         "results/figures/glycan_abundance/diff_rose_plot.pdf",
@@ -245,6 +246,16 @@ rule confounders:
         "results/figures/glycan_abundance/confounders.pdf"
     script:
         "src/glycan_abundance/confounder_dot_plot.R"
+
+rule glycan_roc:
+    # Perform ROC analysis on glycans.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS
+    output:
+        "results/data/glycan_abundance/roc_auc.csv"
+    script:
+        "src/glycan_abundance/roc.R"
 
 
 # ==================== Derived Traits ====================
