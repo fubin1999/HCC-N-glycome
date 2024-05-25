@@ -23,6 +23,7 @@ rule all:
         "results/figures/glycan_abundance/diff_bubble.pdf",
         "results/figures/glycan_abundance/violin_plots.pdf",
         "results/figures/glycan_abundance/diff_upset.pdf",
+        "results/figures/glycan_abundance/confounders.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -235,6 +236,15 @@ rule diff_upset:
         "results/figures/glycan_abundance/diff_upset.pdf"
     script:
         "src/glycan_abundance/diff_upset.R"
+
+rule confounders:
+    # Plot dot plot for confounders' p-values.
+    input:
+        "results/data/glycan_abundance/ancova_for_glycans.csv"
+    output:
+        "results/figures/glycan_abundance/confounders.pdf"
+    script:
+        "src/glycan_abundance/confounder_dot_plot.R"
 
 
 # ==================== Derived Traits ====================
