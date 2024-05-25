@@ -22,7 +22,7 @@ plot_cm <- function(cm) {
     theme_minimal() +
     theme(
       panel.grid = element_blank(),
-      legend.position = 0
+      legend.position = "none"
     ) +
     coord_equal() +
     scale_fill_gradient(low = "grey95", high = "steelblue", limits = c(0, 70)) +
