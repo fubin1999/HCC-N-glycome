@@ -22,6 +22,7 @@ rule all:
         "results/figures/diff_analysis/glycan_cluster_trends.pdf",
         "results/figures/diff_analysis/diff_bubble.pdf",
         "results/figures/diff_analysis/violin_plots.pdf",
+        "results/figures/diff_analysis/diff_upset.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -233,6 +234,16 @@ rule violin_plots:
         "results/figures/diff_analysis/violin_plots.pdf"
     script:
         "src/diff_analysis/violin_plots.R"
+
+rule diff_upset:
+    # Plot upset plot for the number of significant glycans
+    # between each group paires.
+    input:
+        "results/data/diff_analysis/posthoc_for_glycans.csv"
+    output:
+        "results/figures/diff_analysis/diff_upset.pdf"
+    script:
+        "src/diff_analysis/diff_upset.R"
 
 
 # ==================== Machine Learning ====================
