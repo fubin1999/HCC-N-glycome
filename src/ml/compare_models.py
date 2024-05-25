@@ -2,9 +2,11 @@ from collections import namedtuple
 import warnings
 import json
 
+import numpy as np
 import pandas as pd
 
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 from sklearn.pipeline import make_pipeline
 from sklearn.linear_model import LogisticRegression, Perceptron, PassiveAggressiveClassifier
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
@@ -20,6 +22,8 @@ from sklearn.ensemble import AdaBoostClassifier
 from sklearn.preprocessing import StandardScaler
 
 from hcc_fusion_model import HCCFusionClassifier
+
+N_SPLITS = 10
 
 warnings.filterwarnings("ignore", module="sklearn")
 
@@ -114,15 +118,30 @@ Record = namedtuple("Record", ["acc_mean", "auc_mean", "f1_mean", "acc_std", "au
 results = {}
 for model_name, model in models.items():
     print(f"===== {model_name} =====")
-    accs = cross_val_score(model, X_train, y_train, cv=10, scoring="accuracy")
+    accs = np.empty(N_SPLITS)
+    f1s = np.empty(N_SPLITS)
+    aucs = np.empty(N_SPLITS)
+    skf = StratifiedKFold(n_splits=N_SPLITS)
+    for i, (train_idx, test_idx) in enumerate(skf.split(X_train, y_train)):
+        X_train_fold = X_train.iloc[train_idx, :]
+        X_test_fold = X_train.iloc[test_idx, :]
+        y_train_fold = y_train.iloc[train_idx]
+        y_test_fold = y_train.iloc[test_idx]
+        model.fit(X_train_fold, y_train_fold)
+        y_pred_fold = model.predict(X_test_fold)
+        try:
+            y_proba_fold = model.predict_proba(X_test_fold)[:, 1]
+        except AttributeError:
+            y_proba_fold = model.decision_function(X_test_fold)
+        accs[i] = accuracy_score(y_test_fold, y_pred_fold)
+        f1s[i] = f1_score(y_test_fold, y_pred_fold)
+        aucs[i] = roc_auc_score(y_test_fold, y_proba_fold)
     acc_mean = accs.mean()
     acc_std = accs.std()
     print(f"Accuracy: {acc_mean:.3f} +- {acc_std:.3f}")
-    aucs = cross_val_score(model, X_train, y_train, cv=10, scoring="roc_auc")
     auc_mean = aucs.mean()
     auc_std = aucs.std()
     print(f"ROC AUC: {auc_mean:.3f} +- {auc_std:.3f}")
-    f1s = cross_val_score(model, X_train, y_train, cv=10, scoring="f1")
     f1_mean = f1s.mean()
     f1_std = f1s.std()
     print(f"F1-score: {f1_mean:.3f} +- {f1_std:.3f}")
