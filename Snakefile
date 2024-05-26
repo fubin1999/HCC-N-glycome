@@ -248,12 +248,13 @@ rule confounders:
         "src/glycan_abundance/confounder_dot_plot.R"
 
 rule glycan_roc:
-    # Perform ROC analysis on glycans.
+    # Perform ROC analysis on glycans, and draw ROC curves.
     input:
         PROCESSED_ABUNDANCE,
         GROUPS
     output:
-        "results/data/glycan_abundance/roc_auc.csv"
+        "results/data/glycan_abundance/roc_auc.csv",
+        "results/figures/glycan_abundance/roc_curves.pdf"
     script:
         "src/glycan_abundance/roc.R"
 
@@ -328,7 +329,7 @@ rule make_predictions:
     script:
         "src/ml/make_predictions.py"
 
-rule roc:
+rule ml_roc:
     # Calculate ROC AUCs for different groups and plot ROC curves.
     input:
         predictions="results/data/ml/predictions.csv",
