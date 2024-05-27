@@ -32,6 +32,9 @@ rule all:
         "results/data/derived_traits/ancova_for_derived_traits.csv",
         "results/data/derived_traits/posthoc_for_derived_traits.csv",
 
+        # ===== Derived Traits Figures =====
+        "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
+
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
         "results/data/ml/mrmr_result.csv",
@@ -284,6 +287,16 @@ rule trait_ancova:
         "results/data/derived_traits/posthoc_for_derived_traits.csv"
     script:
         "src/derived_traits/ancova_for_derived_traits.R"
+
+rule boxplots_for_selected_traits:
+    # Draw boxplots for selected derived traits.
+    input:
+        "results/data/derived_traits/derived_traits.csv",
+        "results/data/prepared/groups.csv"
+    output:
+        "results/figures/derived_traits/boxplots_for_selected_traits.pdf"
+    script:
+        "src/derived_traits/selected_boxplots.R"
 
 
 # ==================== Machine Learning ====================
