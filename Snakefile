@@ -34,6 +34,7 @@ rule all:
 
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
+        "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -298,6 +299,16 @@ rule boxplots_for_selected_traits:
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf"
     script:
         "src/derived_traits/selected_boxplots.R"
+
+rule diff_antenna_trait_radar:
+    # Draw radar plot for differential antenna traits.
+    input:
+        "results/data/derived_traits/derived_traits.csv",
+        "results/data/prepared/groups.csv"
+    output:
+        "results/figures/derived_traits/diff_antenna_trait_radar.pdf"
+    script:
+        "src/derived_traits/diff_antenna_radar.R"
 
 
 # ==================== Machine Learning ====================
