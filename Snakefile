@@ -272,16 +272,16 @@ rule calculate_derived_traits:
         PROCESSED_ABUNDANCE,
         "data/human_serum_glycans.csv"
     output:
-        "results/data/derived_traits/derived_traits.csv",
-        "results/data/derived_traits/filtered_derived_traits.csv",
-        "results/data/derived_traits/meta_properties.csv"
+        filtered_traits="results/data/derived_traits/filtered_derived_traits.csv",
+        all_traits="results/data/derived_traits/derived_traits.csv",
+        mp_table="results/data/derived_traits/meta_properties.csv"
     script:
         "src/derived_traits/derive_traits.py"
 
 rule trait_ancova:
     # Perform ANCOVA on derived traits.
     input:
-        traits="results/data/derived_traits/derived_traits.csv",
+        traits="results/data/derived_traits/filtered_derived_traits.csv",
         groups=GROUPS,
         clinical=CLINICAL
     output:
