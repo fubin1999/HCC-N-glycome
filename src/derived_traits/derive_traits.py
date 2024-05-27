@@ -14,13 +14,18 @@ structure_df = structure_df.rename(columns={"composition": "GlycanID", "structur
 
 input_data = load_data(abundance_df, structure_df)
 experiment = Experiment(input_data)
-experiment.run_workflow(corr_threshold=0.9)
+experiment.run_workflow(corr_threshold=1.0)
 
-traits_df = experiment.filtered_derived_trait_table  # "Sample" as index, traits as columns
+filtered_traits_df = experiment.filtered_derived_trait_table  # "Sample" as index, traits as columns
+filtered_traits_df = filtered_traits_df.reset_index()
+filtered_traits_df = filtered_traits_df.rename(columns={"Sample": "sample"})
+filtered_traits_df.to_csv(snakemake.output[0], index=False)
+
+traits_df = experiment.derived_trait_table
 traits_df = traits_df.reset_index()
 traits_df = traits_df.rename(columns={"Sample": "sample"})
-traits_df.to_csv(snakemake.output[0], index=False)
+traits_df.to_csv(snakemake.output[1], index=False)
 
 mp_df = experiment.meta_property_table
 mp_df.index.name = "glycan"
-mp_df.to_csv(snakemake.output[1], index=True)
+mp_df.to_csv(snakemake.output[2], index=True)

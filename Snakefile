@@ -272,6 +272,7 @@ rule calculate_derived_traits:
         "data/human_serum_glycans.csv"
     output:
         "results/data/derived_traits/derived_traits.csv",
+        "results/data/derived_traits/filtered_derived_traits.csv",
         "results/data/derived_traits/meta_properties.csv"
     script:
         "src/derived_traits/derive_traits.py"
