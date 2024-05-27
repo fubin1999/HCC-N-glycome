@@ -14,7 +14,7 @@ structure_df = structure_df.rename(columns={"composition": "GlycanID", "structur
 
 input_data = load_data(abundance_df, structure_df)
 experiment = Experiment(input_data)
-experiment.run_workflow(corr_threshold=1.0)
+experiment.run_workflow(corr_threshold=0.9)
 
 filtered_traits_df = experiment.filtered_derived_trait_table  # "Sample" as index, traits as columns
 filtered_traits_df = filtered_traits_df.reset_index()
