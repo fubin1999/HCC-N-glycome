@@ -18,6 +18,10 @@ bubble_data <- fold_change %>%
   mutate(comparison = paste0(group1, " / ", group2)) %>%
   mutate(signif = if_else(p.adj < 0.05, TRUE, FALSE)) %>%
   mutate(logFC = log2(FC), logp = -log10(p.adj)) %>%
+  mutate(
+    logp = if_else(is.infinite(logp), NA, logp),
+    logp = if_else(is.na(logp), max(logp, na.rm = TRUE), logp)
+  ) %>%
   select(trait, comparison, logFC, logp, signif)
 
 bubble_p <- ggplot(bubble_data, aes(trait, comparison)) +
