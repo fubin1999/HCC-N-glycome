@@ -31,6 +31,7 @@ rule all:
         "results/data/derived_traits/meta_properties.csv",
         "results/data/derived_traits/ancova_for_derived_traits.csv",
         "results/data/derived_traits/posthoc_for_derived_traits.csv",
+        "results/data/derived_traits/fold_change.csv",
 
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
@@ -289,6 +290,16 @@ rule trait_ancova:
         "results/data/derived_traits/posthoc_for_derived_traits.csv"
     script:
         "src/derived_traits/ancova_for_derived_traits.R"
+
+rule trait_fold_change:
+    # Calculate fold changes for each derived trait.
+    input:
+        "results/data/derived_traits/filtered_derived_traits.csv",
+        GROUPS
+    output:
+        "results/data/derived_traits/fold_change.csv"
+    script:
+        "src/derived_traits/fold_change.R"
 
 rule boxplots_for_selected_traits:
     # Draw boxplots for selected derived traits.
