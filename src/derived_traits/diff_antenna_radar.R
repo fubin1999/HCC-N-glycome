@@ -70,4 +70,4 @@ ant4_p <- plot_radar(plot_data %>% filter(ant == 4))
 ant1_p + ant2_p + ant3_p + ant4_p + plot_layout(guides = "collect") &
   theme(legend.position = "bottom")
 # tgutil::ggpreview(width = 10, height = 10)
-ggsave(snakemake@output[[1]], width = 10, height = 10)
+ggsave(snakemake@output[[1]], width = 8, height = 8)
