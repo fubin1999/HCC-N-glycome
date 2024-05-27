@@ -36,7 +36,7 @@ rule all:
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
         "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
-        "results/figures/derived_traits/diff_bubble_plot.pdf",
+        "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -322,15 +322,17 @@ rule diff_antenna_trait_radar:
     script:
         "src/derived_traits/diff_antenna_radar.R"
 
-rule trait_diff_bubble_plot:
-    # Draw bubble plot for differential derived traits.
+rule trait_diff_heatmap:
+    # Draw bubble plot and heatmap for differential derived traits.
     input:
-        "results/data/derived_traits/posthoc_for_derived_traits.csv",
-        "results/data/derived_traits/fold_change.csv"
+        traits="results/data/derived_traits/filtered_derived_traits.csv",
+        groups=GROUPS,
+        post_hoc="results/data/derived_traits/posthoc_for_derived_traits.csv",
+        fold_change="results/data/derived_traits/fold_change.csv"
     output:
-        "results/figures/derived_traits/diff_bubble_plot.pdf"
+        "results/figures/derived_traits/bubble_plot_and_heatmap.pdf"
     script:
-        "src/derived_traits/diff_bubble_plot.R"
+        "src/derived_traits/diff_bubble_heatmap.R"
 
 
 # ==================== Machine Learning ====================
