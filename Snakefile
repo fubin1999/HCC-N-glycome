@@ -34,6 +34,7 @@ rule all:
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
+        "results/data/ml/mrmr_result.csv",
         "results/data/ml/predictions.csv",
         "results/data/ml/roc_auc.csv",
         "results/data/ml/model_performance.csv",
@@ -44,7 +45,8 @@ rule all:
         "results/figures/ml/calibration_curve.pdf",
         "results/figures/ml/confusion_matrix.pdf",
         "results/figures/ml/probability_boxplots.pdf",
-        "results/figures/ml/model_metrics_table.pdf"
+        "results/figures/ml/model_metrics_table.pdf",
+        "results/figures/ml/mrmr_cv.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -317,6 +319,25 @@ rule plot_compare_model_heatmap:
         "results/figures/ml/model_comparison_heatmap.pdf"
     script:
         "src/ml/model_compare_heatmap.R"
+
+rule mrmr:
+    # Feature selection using mRMR
+    input:
+        "results/data/ml/train_data.csv",
+        "results/data/ml/feature_types.json"
+    output:
+        "results/data/ml/mrmr_result.csv"
+    script:
+        "src/ml/mrmr_on_glycans.py"
+
+rule plot_mrmr:
+    # Plot cross validation results for mRMR
+    input:
+        "results/data/ml/mrmr_result.csv"
+    output:
+        "results/figures/ml/mrmr_cv.pdf"
+    script:
+        "src/ml/plot_mrmr.R"
 
 rule make_predictions:
     # Predict on the test data and evalute the model.
