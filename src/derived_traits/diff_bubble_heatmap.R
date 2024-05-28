@@ -32,11 +32,13 @@ bubble_p <- ggplot(bubble_data, aes(trait, comparison)) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5),
+    axis.text.y = element_text(hjust = 1),
     legend.box = "horizontal"
   ) +
   scale_alpha_manual(values = c(0, 1)) +
   scale_size_continuous(range = c(1, 3.5)) +
-  scale_fill_gradient2(high = "#CD0000", low = "#27408B", mid = "white")
+  scale_fill_gradient2(high = "#CD0000", low = "#27408B", mid = "white") +
+  scale_y_discrete(position = "right")
 
 heatmap_data <- trait_data %>%
   pivot_longer(-sample, names_to = "trait", values_to = "value") %>%
@@ -55,12 +57,14 @@ heatmap_p <- ggplot(heatmap_data, aes(trait, group, fill = value)) +
   theme_minimal() +
   theme(
     axis.text.x = element_blank(),
+    axis.text.y = element_text(hjust = 1),
     panel.grid = element_blank()
   ) +
   scale_fill_gradient2(
     high = "#CD0000", low = "#27408B", mid = "white",
     breaks = c(-2, 0, 2), limits = c(-2, 2)
-  )
+  ) +
+  scale_y_discrete(position = "right")
 
 heatmap_p / bubble_p + plot_layout(guides = "collect") &
   theme(legend.direction = "horizontal", legend.position = "right")
