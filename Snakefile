@@ -272,7 +272,8 @@ rule calculate_derived_traits:
     # Calculate derived traits using GlyTrait
     input:
         PROCESSED_ABUNDANCE,
-        "data/human_serum_glycans.csv"
+        "data/human_serum_glycans.csv",
+        "src/derived_traits/struc_builtin_formulas.txt"
     output:
         filtered_traits="results/data/derived_traits/filtered_derived_traits.csv",
         all_traits="results/data/derived_traits/derived_traits.csv",
