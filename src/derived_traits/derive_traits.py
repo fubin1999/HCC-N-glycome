@@ -7,7 +7,7 @@ abundance_df = pd.read_csv(snakemake.input[0])
 abundance_df = abundance_df.rename(columns={"sample": "Sample"})
 
 structure_df = pd.read_csv(snakemake.input[1])
-structure_df = pd.read_csv("data/human_serum_glycans.csv")
+# structure_df = pd.read_csv("data/human_serum_glycans.csv")
 glycans = abundance_df.columns[1:].tolist()
 structure_df = structure_df[structure_df["composition"].isin(glycans)]
 structure_df = structure_df.reset_index(drop=True)
@@ -16,7 +16,7 @@ structure_df = structure_df.rename(columns={"composition": "GlycanID", "structur
 formula_file = snakemake.input[2]
 formulas = load_formulas_from_file(formula_file)
 input_data = load_data(abundance_df, structure_df)
-experiment = Experiment(input_data)
+experiment = Experiment(input_data=input_data)
 experiment.run_workflow(formulas=formulas, corr_threshold=0.9)
 
 filtered_traits_df = experiment.filtered_derived_trait_table  # "Sample" as index, traits as columns
