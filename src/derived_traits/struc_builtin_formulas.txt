@@ -312,6 +312,9 @@ A4F0S0G = [nG / 4] // [(type == 'complex') * (nAnt == 4) * (nF == 0) * (nS == 0)
 
 # Sialylation
 
+# Proportion of sialylated glycans
+TS = [nS > 0] / [1]
+
 # Average number of sialic acids on complex glycans
 CS = [nS] // [type == 'complex']
 
@@ -350,6 +353,9 @@ A3F0S = [nS / 3] // [(type == 'complex') * (nAnt == 3) * (nF == 0)]
 
 # Sialylation per antenna within non-fucosylated tetra-antennary glycans
 A4F0S = [nS / 4] // [(type == 'complex') * (nAnt == 4) * (nF == 0)]
+
+# Average degree of sialylation per galactose within complex glycans
+CGS = [nS / nG] // [type == 'complex']
 
 # Sialylation per galactose within monoantennary glycans
 A1GS = [nS / nG] // [(type == 'complex') * (nAnt == 1)]
