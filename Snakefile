@@ -37,6 +37,7 @@ rule all:
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
         "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
+        "results/figures/derived_traits/confounders.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -294,6 +295,15 @@ rule trait_fold_change:
         "results/data/derived_traits/fold_change.csv"
     script:
         "src/derived_traits/fold_change.R"
+
+rule trait_confounders:
+    # Plot dot plot for confounders' p-values.
+    input:
+        "results/data/derived_traits/ancova_for_derived_traits.csv"
+    output:
+        "results/figures/derived_traits/confounders.pdf"
+    script:
+        "src/derived_traits/confounder_dot_plot.R"
 
 rule boxplots_for_selected_traits:
     # Draw boxplots for selected derived traits.
