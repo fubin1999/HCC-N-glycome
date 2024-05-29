@@ -3,6 +3,26 @@
     "Version": "4.4.0",
     "Repositories": [
       {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.19/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.19/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.19/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.19/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/3.19/books"
+      },
+      {
         "Name": "CRAN",
         "URL": "https://packagemanager.posit.co/cran/latest"
       }
@@ -15,8 +35,8 @@
     "BiocGenerics": {
       "Package": "BiocGenerics",
       "Version": "0.50.0",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "R",
         "graphics",
@@ -39,8 +59,8 @@
     "BiocVersion": {
       "Package": "BiocVersion",
       "Version": "3.19.1",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "R"
       ],
@@ -184,8 +204,8 @@
     "IRanges": {
       "Package": "IRanges",
       "Version": "2.38.0",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "BiocGenerics",
         "R",
@@ -211,8 +231,7 @@
     "MASS": {
       "Package": "MASS",
       "Version": "7.3-60.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
+      "Source": "unknown",
       "Requirements": [
         "R",
         "grDevices",
@@ -300,8 +319,8 @@
     "S4Vectors": {
       "Package": "S4Vectors",
       "Version": "0.42.0",
-      "Source": "Repository",
-      "Repository": "https://bioconductor.org/packages/3.19/bioc",
+      "Source": "Bioconductor",
+      "Repository": "Bioconductor 3.19",
       "Requirements": [
         "BiocGenerics",
         "R",
