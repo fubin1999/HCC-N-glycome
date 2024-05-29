@@ -125,15 +125,6 @@ rule prepare_clinical:
     script:
         "src/prepare_data/prepare_clinical.R"
 
-rule other_glycan_markers:
-    # Calculate other HCC glycan markers
-    input:
-        PROCESSED_ABUNDANCE
-    output:
-        "results/data/prepared/other_glycan_markers.csv"
-    script:
-        "src/prepare_data/other_glycan_markers.R"
-
 
 # ==================== Data Quality ====================
 rule batch_effect_pca:
@@ -417,7 +408,6 @@ rule ml_roc:
         predictions="results/data/ml/predictions.csv",
         groups=GROUPS,
         clinical=CLINICAL,
-        other_glycan_markers="results/data/prepared/other_glycan_markers.csv"
     output:
         "results/figures/ml/roc_curves.pdf",
         "results/data/ml/roc_auc.csv"
