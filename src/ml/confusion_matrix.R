@@ -11,13 +11,10 @@ groups <- read_csv(snakemake@input[[2]])
 predictions <- predictions |> 
   inner_join(groups, by = "sample")
 
-get_cm <- function(data) {
-  data |> 
+plot_cm <- function(data) {
+  cm <- data |>
     mutate(target = as.factor(target), prediction = as.factor(prediction)) |>
     conf_mat(truth = target, estimate = prediction)
-}
-
-plot_cm <- function(cm) {
   autoplot(cm, type = "heatmap") +
     theme_minimal() +
     theme(
@@ -30,21 +27,41 @@ plot_cm <- function(cm) {
     scale_y_discrete(labels = c("HCC", "Control"))
 }
 
-global_cm <- get_cm(predictions)
-global_p <- plot_cm(global_cm) +
-  ggtitle("Test Set: Control/HCC")
+complex_global_p <- predictions %>%
+  filter(model == "HCC Fusion") %>%
+  plot_cm() +
+  ggtitle("Test Set: Control/HCC", subtitle = "HCC Fusion")
+complex_HC_p <- predictions %>%
+  filter(model == "HCC Fusion", group %in% c("HC", "HCC")) %>%
+  plot_cm() +
+  ggtitle("Test Set: HC/HCC", subtitle = "HCC Fusion")
+complex_MC_p <- predictions %>%
+  filter(model == "HCC Fusion", group %in% c("CHB", "HCC")) %>%
+  plot_cm() +
+  ggtitle("Test Set: CHB/HCC", subtitle = "HCC Fusion")
+complex_YC_p <- predictions %>%
+  filter(model == "HCC Fusion", group %in% c("LC", "HCC")) %>%
+  plot_cm() +
+  ggtitle("Test Set: LC/HCC", subtitle = "HCC Fusion")
 
-HC_cm <- get_cm(predictions |> filter(group %in% c("HC", "HCC")))
-HC_p <- plot_cm(HC_cm) +
-  ggtitle("Test Set: HC/HCC")
+simple_global_p <- predictions %>%
+  filter(model == "HCC Slim") %>%
+  plot_cm() +
+  ggtitle("Test Set: Control/HCC", subtitle = "HCC Slim")
+simple_HC_p <- predictions %>%
+  filter(model == "HCC Slim", group %in% c("HC", "HCC")) %>%
+  plot_cm() +
+  ggtitle("Test Set: HC/HCC", subtitle = "HCC Slim")
+simple_MC_p <- predictions %>%
+  filter(model == "HCC Slim", group %in% c("CHB", "HCC")) %>%
+  plot_cm() +
+  ggtitle("Test Set: CHB/HCC", subtitle = "HCC Slim")
+simple_YC_p <- predictions %>%
+  filter(model == "HCC Slim", group %in% c("LC", "HCC")) %>%
+  plot_cm() +
+  ggtitle("Test Set: LC/HCC", subtitle = "HCC Slim")
 
-MC_cm <- get_cm(predictions |> filter(group %in% c("CHB", "HCC")))
-MC_p <- plot_cm(MC_cm) +
-  ggtitle("Test Set: CHB/HCC")
-
-YC_cm <- get_cm(predictions |> filter(group %in% c("LC", "HCC")))
-YC_p <- plot_cm(YC_cm) +
-  ggtitle("Test Set: LC/HCC")
-
-global_p | HC_p | MC_p | YC_p
-ggsave(snakemake@output[[1]], width = 12, height = 3)
+(complex_global_p | complex_HC_p | complex_MC_p | complex_YC_p) /
+  (simple_global_p | simple_HC_p | simple_MC_p | simple_YC_p)
+# tgutil::ggpreview(width = 12, height = 6)
+ggsave(snakemake@output[[1]], width = 12, height = 6)
