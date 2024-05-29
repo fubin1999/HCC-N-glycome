@@ -52,7 +52,8 @@ rule all:
         "results/figures/ml/calibration_curve.pdf",
         "results/figures/ml/confusion_matrix.pdf",
         "results/figures/ml/probability_boxplots.pdf",
-        "results/figures/ml/model_metrics_table.pdf",
+        "results/figures/ml/complex_model_metrics_table.pdf",
+        "results/figures/ml/simple_model_metrics_table.pdf",
         "results/figures/ml/mrmr_cv.pdf",
         "results/figures/ml/mrmr_selected_corrplot.pdf"
 
@@ -417,7 +418,7 @@ rule ml_roc:
     input:
         predictions="results/data/ml/predictions.csv",
         groups=GROUPS,
-        clinical=CLINICAL,
+        clinical=CLINICAL
     output:
         "results/figures/ml/roc_curves.pdf",
         "results/data/ml/roc_auc.csv"
@@ -468,6 +469,7 @@ rule model_metrics_table:
     input:
         "results/data/ml/model_performance.csv"
     output:
-        "results/figures/ml/model_metrics_table.pdf"
+        "results/figures/ml/complex_model_metrics_table.pdf",
+        "results/figures/ml/simple_model_metrics_table.pdf"
     script:
         "src/ml/metrics_table.R"

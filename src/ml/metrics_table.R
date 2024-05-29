@@ -4,7 +4,7 @@ library(tidyverse)
 library(gt)
 library(webshot2)
 
-# metrics_file <- "results/data/ml/model_performance.csv"
+metrics_file <- "results/data/ml/model_performance.csv"
 metrics_file <- snakemake@input[[1]]
 metrics <- read_csv(metrics_file) |> 
   mutate(
@@ -22,10 +22,21 @@ metrics <- read_csv(metrics_file) |>
   ) |> 
   pivot_wider(names_from = metric, values_from = score)
 
-table <- gt(metrics, rowname_col = "comparison") |> 
-  tab_header(title = md("**Model Performance**")) |>
-  fmt_number(columns = 2:7, decimals = 3) |> 
-  tab_footnote("ROC AUC: Receiver Operating Characteristic Area Under the Curve") |> 
-  tab_footnote("PR AUC: Precision-Recall Area Under the Curve")
-# gtsave(table, "results/figures/ml/model_performance.pdf")
-gtsave(table, snakemake@output[[1]])
+render_table <- function (data, .subtitle) {
+  gt(data, rowname_col = "comparison") |>
+    tab_header(title = md("**Model Performance**"), subtitle = md(.subtitle)) |>
+    fmt_number(columns = 2:7, decimals = 3) |>
+    tab_footnote("ROC AUC: Receiver Operating Characteristic Area Under the Curve") |>
+    tab_footnote("PR AUC: Precision-Recall Area Under the Curve")
+}
+
+complex_table <- metrics %>%
+  filter(model == "Fusion") %>%
+  select(-model) %>%
+  render_table("HCC Fusion Classifier")
+simple_table <- metrics %>%
+  filter(model == "Slim") %>%
+  select(-model) %>%
+  render_table("HCC Slim Classifier")
+gtsave(complex_table, snakemake@output[[1]])
+gtsave(simple_table, snakemake@output[[2]])
