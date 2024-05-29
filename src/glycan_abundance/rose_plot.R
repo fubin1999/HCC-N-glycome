@@ -1,9 +1,8 @@
 source("renv/activate.R")
 
 library(tidyverse)
-library(geomtextpath)
 
-# post_hoc_result <- read_csv("results/data/diff_analysis/posthoc_for_glycans.csv")
+# post_hoc_result <- read_csv("results/data/glycan_abundance/posthoc_for_glycans.csv")
 post_hoc_result <- read_csv(snakemake@input[[1]])
 
 plot_data <- post_hoc_result %>%
@@ -18,7 +17,7 @@ plot_data <- post_hoc_result %>%
 ggplot(plot_data, aes(comparison, n)) +
   geom_col(aes(fill = regulate), alpha = 0.7) +
   geom_text(aes(label = n), position = position_stack(vjust = 0.5), color = "white") +
-  coord_curvedpolar() +
+  coord_polar() +
   labs(x = "", y = "") +
   theme_minimal() +
   theme(

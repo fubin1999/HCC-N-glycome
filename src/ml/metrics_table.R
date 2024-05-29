@@ -2,6 +2,7 @@ source("renv/activate.R")
 
 library(tidyverse)
 library(gt)
+library(webshot2)
 
 # metrics_file <- "results/data/ml/model_performance.csv"
 metrics_file <- snakemake@input[[1]]
