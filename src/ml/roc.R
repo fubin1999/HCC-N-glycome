@@ -15,18 +15,68 @@ groups <- read_csv(snakemake@input[["groups"]])
 clinical <- read_csv(snakemake@input[["clinical"]]) |>
   select(sample, AFP)
 
-predictions <- predictions |> 
-  left_join(groups, by = "sample") |> 
-  left_join(clinical, by = "sample")
+# Prepare data-----
+temp_data <- predictions %>%
+  select(-prediction) %>%
+  left_join(groups, by = "sample") %>%
+  left_join(clinical, by = "sample") %>%
+  mutate(model = case_match(
+    model, "HCC Fusion" ~ "fusion", "HCC Slim" ~ "slim"
+  )) %>%
+  pivot_wider(names_from = model, values_from = probability)
 
-# All data-----
-draw_roc_curve <- function (roc_list) {
+temp_data <- bind_rows(list(
+  `Control/HCC` = temp_data %>% mutate(group = if_else(group == "HCC", "HCC", "Control")),
+  `HC/HCC` = temp_data %>% filter(group %in% c("HC", "HCC")),
+  `CHB/HCC` = temp_data %>% filter(group %in% c("CHB", "HCC")),
+  `LC/HCC` = temp_data %>% filter(group %in% c("LC", "HCC"))
+), .id = "comparison") %>%
+  mutate(comparison = factor(comparison, levels = c("Control/HCC", "HC/HCC", "CHB/HCC", "LC/HCC")))
+
+prepared_data <- bind_rows(list(
+  `Test Set` = temp_data,
+  `Test Set (AFP-)` = temp_data %>% filter(AFP < 20)
+), .id = "subtype")
+
+# Perform ROC analysis-----
+roc_result <- prepared_data %>%
+  group_by(subtype, comparison) %>%
+  nest() %>%
+  mutate(
+    roc_fusion = map(data, ~ roc(data = .x, "target", "fusion", ci = TRUE)),
+    roc_slim = map(data, ~ roc(data = .x, "target", "slim", ci = TRUE)),
+    roc_AFP = map(data, ~ roc(data = .x, "target", "AFP", ci = TRUE))
+  ) %>%
+  ungroup() %>%
+  select(-data) %>%
+  pivot_longer(
+     -c(subtype, comparison),
+     names_to = "predictor",
+     values_to = "roc",
+     names_prefix = "roc_"
+  ) %>%
+  filter(!(subtype == "Test Set (AFP-)" & predictor == "AFP")) %>%
+  mutate(predictor = case_match(
+    predictor, "fusion" ~ "HCC Fusion", "slim" ~ "HCC Slim", "AFP" ~ "AFP"
+  ))
+
+# Tidy ROC AUC result-----
+roc_auc <- roc_result  %>%
+  mutate(
+    auc = map_dbl(roc, ~ auc(.x)),
+    ci_upper = map_dbl(roc, ~ .x$ci[3]),
+    ci_lower = map_dbl(roc, ~ .x$ci[1])
+  ) %>%
+  select(-roc)
+
+# Plot ROC curves-----
+draw_roc_curve <- function (roc_list, .title) {
   ggroc(roc_list) +
     geom_abline(slope = 1, intercept = 1, linetype = "dashed", color = "grey") +
-    labs(color = "") +
+    labs(color = "", title = .title) +
     theme_bw() +
     theme(
-      legend.position = c(0.65, 0.25),
+      legend.position = c(0.7, 0.25),
       panel.grid = element_blank(),
       legend.title = element_blank(),
       legend.background = element_blank(),
@@ -35,80 +85,18 @@ draw_roc_curve <- function (roc_list) {
     scale_color_manual(values = c("#CC5F5A", "#7A848D", "#A2AFA6"))
 }
 
-global_list <- list(
-  `HCC Fusion` = roc(predictions, response = "target", predictor = "probability", ci = TRUE),
-  `AFP` = roc(predictions, response = "target", predictor = "AFP", ci = TRUE)
-)
-global_p <- draw_roc_curve(global_list) +
-  ggtitle("Test Set: Control/HCC")
+roc_plots <- roc_result %>%
+  nest_by(subtype, comparison) %>%
+  mutate(
+    roc_list = list(deframe(data)),
+    plot = list(draw_roc_curve(roc_list, str_glue("{subtype}: {comparison}")))
+  ) %>%
+  select(-data, -roc_list) %>%
+  ungroup()
 
-HC_list <- list(
-  `HCC Fusion` = roc(predictions |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "probability", ci = TRUE),
-  `AFP` = roc(predictions |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "AFP", ci = TRUE)
-)
-HC_p <- draw_roc_curve(HC_list) +
-  ggtitle("Test Set: HC/HCC")
-
-MC_list <- list(
-  `HCC Fusion` = roc(predictions |> filter(group %in% c("CHB", "HCC")), response = "target", predictor = "probability", ci = TRUE),
-  `AFP` = roc(predictions |> filter(group %in% c("CHB", "HCC")), response = "target", predictor = "AFP", ci = TRUE)
-)
-MC_p <- draw_roc_curve(MC_list) +
-  ggtitle("Test Set: CHB/HCC")
-
-YC_list <- list(
-  `HCC Fusion` = roc(predictions |> filter(group %in% c("LC", "HCC")), response = "target", predictor = "probability", ci = TRUE),
-  `AFP` = roc(predictions |> filter(group %in% c("LC", "HCC")), response = "target", predictor = "AFP", ci = TRUE)
-)
-YC_p <- draw_roc_curve(YC_list) +
-  ggtitle("Test Set: LC/HCC")
-
-# AFP negative samples-----
-AFP_neg_samples <- predictions |> filter(AFP < 20)
-
-AC_global_list <- list(
-  `HCC Fusion` = roc(AFP_neg_samples, response = "target", predictor = "probability", ci = TRUE)
-)
-AN_global_p <- draw_roc_curve(AC_global_list) +
-  ggtitle("Test Set: Control/HCC, AFP(-)")
-
-AN_HC_list <- list(
-  `HCC Fusion` = roc(AFP_neg_samples |> filter(group %in% c("HC", "HCC")), response = "target", predictor = "probability", ci = TRUE)
-)
-AN_HC_p <- draw_roc_curve(AN_HC_list) +
-  ggtitle("Test Set: HC/HCC, AFP(-)")
-
-AN_MC_list <- list(
-  `HCC Fusion` = roc(AFP_neg_samples |> filter(group %in% c("CHB", "HCC")), response = "target", predictor = "probability", ci = TRUE)
-)
-AN_MC_p <- draw_roc_curve(AN_MC_list) +
-  ggtitle("Test Set: CHB/HCC, AFP(-)")
-
-AN_YC_list <- list(
-  `HCC Fusion` = roc(AFP_neg_samples |> filter(group %in% c("LC", "HCC")), response = "target", predictor = "probability", ci = TRUE)
-)
-AN_YC_p <- draw_roc_curve(AN_YC_list) +
-  ggtitle("Test Set: LC/HCC, AFP(-)")
-
-final_p <- (global_p | HC_p | MC_p | YC_p) /
-  (AN_global_p | AN_HC_p | AN_MC_p | AN_YC_p)
+final_plot <- reduce(roc_plots$plot, `+`) + plot_layout(nrow = 2)
 # tgutil::ggpreview(width = 12, height = 6)
-ggsave(snakemake@output[[1]], final_p, width = 12, height = 6)
 
-# Save results-----
-auc_df <- tribble(
-  ~data, ~between, ~predictor, ~AUC, ~ci_lower, ~ci_upper,
-  "all", "Control/HCC", "HCC Fusion", global_list[["HCC Fusion"]]$auc[1], global_list[["HCC Fusion"]]$ci[1], global_list[["HCC Fusion"]]$ci[3],
-  "all", "Control/HCC", "AFP", global_list[["AFP"]]$auc[1], global_list[["AFP"]]$ci[1], global_list[["AFP"]]$ci[3],
-  "all", "HC/HCC", "HCC Fusion", HC_list[["HCC Fusion"]]$auc[1], HC_list[["HCC Fusion"]]$ci[1], HC_list[["HCC Fusion"]]$ci[3],
-  "all", "HC/HCC", "AFP", HC_list[["AFP"]]$auc[1], HC_list[["AFP"]]$ci[1], HC_list[["AFP"]]$ci[3],
-  "all", "CHB/HCC", "HCC Fusion", MC_list[["HCC Fusion"]]$auc[1], MC_list[["HCC Fusion"]]$ci[1], MC_list[["HCC Fusion"]]$ci[3],
-  "all", "CHB/HCC", "AFP", MC_list[["AFP"]]$auc[1], MC_list[["AFP"]]$ci[1], MC_list[["AFP"]]$ci[3],
-  "all", "LC/HCC", "HCC Fusion", YC_list[["HCC Fusion"]]$auc[1], YC_list[["HCC Fusion"]]$ci[1], YC_list[["HCC Fusion"]]$ci[3],
-  "all", "LC/HCC", "AFP", YC_list[["AFP"]]$auc[1], YC_list[["AFP"]]$ci[1], YC_list[["AFP"]]$ci[3],
-  "AFP-", "Control/HCC", "HCC Fusion", AC_global_list[["HCC Fusion"]]$auc[1], AC_global_list[["HCC Fusion"]]$ci[1], AC_global_list[["HCC Fusion"]]$ci[3],
-  "AFP-", "HC/HCC", "HCC Fusion", AN_HC_list[["HCC Fusion"]]$auc[1], AN_HC_list[["HCC Fusion"]]$ci[1], AN_HC_list[["HCC Fusion"]]$ci[3],
-  "AFP-", "CHB/HCC", "HCC Fusion", AN_MC_list[["HCC Fusion"]]$auc[1], AN_MC_list[["HCC Fusion"]]$ci[1], AN_MC_list[["HCC Fusion"]]$ci[3],
-  "AFP-", "LC/HCC", "HCC Fusion", AN_YC_list[["HCC Fusion"]]$auc[1], AN_YC_list[["HCC Fusion"]]$ci[1], AN_YC_list[["HCC Fusion"]]$ci[3]
-)
-write_csv(auc_df, snakemake@output[[2]])
+# Save result------
+ggsave(snakemake@output[[1]], plot = final_plot, width = 12, height = 6)
+write_csv(roc_auc, snakemake@output[[2]])
