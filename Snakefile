@@ -52,7 +52,8 @@ rule all:
         "results/figures/ml/confusion_matrix.pdf",
         "results/figures/ml/probability_boxplots.pdf",
         "results/figures/ml/model_metrics_table.pdf",
-        "results/figures/ml/mrmr_cv.pdf"
+        "results/figures/ml/mrmr_cv.pdf",
+        "results/figures/ml/mrmr_selected_corrplot.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -388,6 +389,16 @@ rule plot_mrmr:
         "results/figures/ml/mrmr_cv.pdf"
     script:
         "src/ml/plot_mrmr.R"
+
+rule selected_corr:
+    # Plot corrplot for mRMR-selected glycans.
+    input:
+        "results/data/prepared/processed_abundance.csv",
+        "results/data/ml/mrmr_result.csv"
+    output:
+        "results/figures/ml/mrmr_selected_corrplot.pdf"
+    script:
+        "src/ml/mrmr_corrplot.R"
 
 rule make_predictions:
     # Predict on the test data and evalute the model.
