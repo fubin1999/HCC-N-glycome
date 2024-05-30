@@ -40,8 +40,7 @@ diff_glycans <- ancova_result |>
 
 posthoc_result <- data %>%
   filter(glycan %in% diff_glycans) %>%
-  group_by(glycan) %>%
-  post_hoc(log_value ~ group + sex + age, group) %>%
+  post_hoc(log_value ~ group + sex + age, group, glycan) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----

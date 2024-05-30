@@ -6,10 +6,10 @@ library(rstatix)
 source("src/utils/emeans_posthoc.R")
 
 # Read data-----
-# trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv") %>%
-#   select(sample, sex, age)
+trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv") %>%
+  select(sample, sex, age)
 
 trait_data <- read_csv(snakemake@input[["traits"]])
 groups <- read_csv(snakemake@input[["groups"]])
@@ -40,8 +40,7 @@ diff_traits <- ancova_result |>
 
 posthoc_result <- data %>%
   filter(trait %in% diff_traits) %>%
-  group_by(trait) %>%
-  post_hoc(value ~ group + sex + age, group) %>%
+  post_hoc(value ~ group + sex + age, group, trait) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----
