@@ -34,12 +34,14 @@ rule all:
         "results/data/derived_traits/ancova_for_derived_traits.csv",
         "results/data/derived_traits/posthoc_for_derived_traits.csv",
         "results/data/derived_traits/fold_change.csv",
+        "results/data/derived_traits/AFP_subtype_ancova.csv",
 
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
         "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
         "results/figures/derived_traits/confounders.pdf",
+        "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -350,6 +352,18 @@ rule trait_diff_heatmap:
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf"
     script:
         "src/derived_traits/diff_bubble_heatmap.R"
+
+rule AFP_subtype_trait_diff:
+    # Perform ANCOVA on derived traits between AFP negative and AFP positive HCC samples.
+    input:
+        "results/data/derived_traits/filtered_derived_traits.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/derived_traits/AFP_subtype_ancova.csv",
+        "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf"
+    script:
+        "src/derived_traits/AFP_subtype_ancova.R"
 
 
 # ==================== Machine Learning ====================
