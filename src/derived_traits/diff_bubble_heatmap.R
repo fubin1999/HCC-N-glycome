@@ -6,28 +6,31 @@ library(patchwork)
 # trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 # post_hoc_result <- read_csv("results/data/derived_traits/posthoc_for_derived_traits.csv")
-# fold_change <- read_csv("results/data/derived_traits/fold_change.csv")
 
 trait_data <- read_csv(snakemake@input[["traits"]])
 groups <- read_csv(snakemake@input[["groups"]])
 post_hoc_result <- read_csv(snakemake@input[["post_hoc"]])
-fold_change <- read_csv(snakemake@input[["fold_change"]])
 
-bubble_data <- fold_change %>%
-  inner_join(post_hoc_result, by = c("trait", "group1", "group2")) %>%
-  mutate(comparison = paste0(group1, " / ", group2)) %>%
-  mutate(signif = if_else(p.adj < 0.05, TRUE, FALSE)) %>%
-  mutate(logFC = log2(FC), logp = -log10(p.adj)) %>%
+bubble_data <- post_hoc_result %>%
   mutate(
+    comparison = paste0(group1, " / ", group2),
+    comparison = factor(comparison, levels = c(
+      "HC / CHB", "HC / LC", "HC / HCC",
+      "CHB / LC", "CHB / HCC", "LC / HCC"
+    ))
+  ) %>%
+  mutate(signif = if_else(p.adj < 0.05, TRUE, FALSE)) %>%
+  mutate(
+    logp = -log10(p.adj),
     logp = if_else(is.infinite(logp), NA, logp),
     logp = if_else(is.na(logp), max(logp, na.rm = TRUE), logp)
   ) %>%
-  select(trait, comparison, logFC, logp, signif)
+  select(trait, comparison, cohens_d, logp, signif)
 
 bubble_p <- ggplot(bubble_data, aes(trait, comparison)) +
-  geom_point(aes(fill = logFC, size = logp, alpha = signif), color = "grey30", shape = 21) +
+  geom_point(aes(fill = cohens_d, size = logp, alpha = signif), color = "grey30", shape = 21) +
   guides(alpha = "none") +
-  labs(x = "", y = "", color = expression(log[2]~FC), size = expression(-log[10]~p)) +
+  labs(x = "", y = "", fill = "Cohen's d", size = expression(-log[10]~p)) +
   coord_equal() +
   theme_minimal() +
   theme(

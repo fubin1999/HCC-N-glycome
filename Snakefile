@@ -345,8 +345,7 @@ rule trait_diff_heatmap:
     input:
         traits="results/data/derived_traits/filtered_derived_traits.csv",
         groups=GROUPS,
-        post_hoc="results/data/derived_traits/posthoc_for_derived_traits.csv",
-        fold_change="results/data/derived_traits/fold_change.csv"
+        post_hoc="results/data/derived_traits/posthoc_for_derived_traits.csv"
     output:
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf"
     script:
