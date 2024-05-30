@@ -8,6 +8,7 @@ rule all:
     input:
         # ===== Others =====
         "results/data/clinical/AFP_cutoff.csv",
+        "results/figures/clinical/AFP_cutoff.pdf",
 
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
@@ -149,7 +150,8 @@ rule AFP_cutoff:
         CLINICAL,
         GROUPS
     output:
-        "results/data/clinical/AFP_cutoff.csv"
+        "results/data/clinical/AFP_cutoff.csv",
+        "results/figures/clinical/AFP_cutoff.pdf"
     script:
         "src/clinical/AFP_cutoff.R"
 
