@@ -55,7 +55,8 @@ rule all:
         "results/figures/ml/complex_model_metrics_table.pdf",
         "results/figures/ml/simple_model_metrics_table.pdf",
         "results/figures/ml/mrmr_cv.pdf",
-        "results/figures/ml/mrmr_selected_corrplot.pdf"
+        "results/figures/ml/mrmr_selected_corrplot.pdf",
+        "results/figures/ml/forest_plot.pdf"
 
 
 # ==================== Prepare Data ====================
@@ -473,3 +474,12 @@ rule model_metrics_table:
         "results/figures/ml/simple_model_metrics_table.pdf"
     script:
         "src/ml/metrics_table.R"
+
+rule forest_plot:
+    # Draw a forest plot for the HCC Slim model.
+    input:
+        "results/data/ml/train_data.csv"
+    output:
+        "results/figures/ml/forest_plot.pdf"
+    script:
+        "src/ml/forest_plot.R"
