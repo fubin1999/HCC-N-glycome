@@ -25,6 +25,7 @@ rule all:
         "results/figures/glycan_abundance/violin_plots.pdf",
         "results/figures/glycan_abundance/diff_upset.pdf",
         "results/figures/glycan_abundance/confounders.pdf",
+        "results/figures/glycan_abundance/pca.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -260,6 +261,16 @@ rule glycan_roc:
         "results/figures/glycan_abundance/roc_curves.pdf"
     script:
         "src/glycan_abundance/roc.R"
+
+rule glycan_pca:
+    # Draw PCA plots for glycan abundance.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS
+    output:
+        "results/figures/glycan_abundance/pca.pdf"
+    script:
+        "src/glycan_abundance/pca.R"
 
 
 # ==================== Derived Traits ====================
