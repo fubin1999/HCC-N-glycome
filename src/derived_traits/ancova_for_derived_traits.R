@@ -3,8 +3,10 @@ source("renv/activate.R")
 library(tidyverse)
 library(rstatix)
 
+source("src/utils/emeans_posthoc.R")
+
 # Read data-----
-# trait_data <- read_csv("results/data/derived_traits/derived_traits.csv")
+# trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 # clinical <- read_csv("results/data/prepared/clinical.csv") %>%
 #   select(sample, sex, age)
@@ -39,17 +41,7 @@ diff_traits <- ancova_result |>
 posthoc_result <- data %>%
   filter(trait %in% diff_traits) %>%
   group_by(trait) %>%
-  nest() %>%
-  mutate(
-    lm_model = map(data, ~ lm(value ~ group + sex + age, data = .x)),
-    emm = map(lm_model, ~ emmeans::emmeans(.x, ~ group)),
-    pairwise_comparison = map(emm, ~ emmeans::contrast(.x, "pairwise", adjust = "tukey")),
-    result_df = map(pairwise_comparison, ~ as_tibble(.x))
-  ) %>%
-  select(trait, result_df) %>%
-  unnest(cols = result_df) %>%
-  separate_wider_delim(contrast, delim = " - ", names = c("group1", "group2")) %>%
-  rename(p.adj = p.value) %>%
+  post_hoc(value ~ group + sex + age, group) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----

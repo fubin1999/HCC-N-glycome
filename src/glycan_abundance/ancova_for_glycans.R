@@ -4,6 +4,8 @@ library(tidyverse)
 library(rstatix)
 library(broom)
 
+source("src/utils/emeans_posthoc.R")
+
 # Read data-----
 # glycan_abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
@@ -39,17 +41,7 @@ diff_glycans <- ancova_result |>
 posthoc_result <- data %>%
   filter(glycan %in% diff_glycans) %>%
   group_by(glycan) %>%
-  nest() %>%
-  mutate(
-    lm_model = map(data, ~ lm(log_value ~ group + sex + age, data = .x)),
-    emm = map(lm_model, ~ emmeans::emmeans(.x, ~ group)),
-    pairwise_comparison = map(emm, ~ emmeans::contrast(.x, "pairwise", adjust = "tukey")),
-    result_df = map(pairwise_comparison, ~ as_tibble(.x))
-  ) %>%
-  select(glycan, result_df) %>%
-  unnest(cols = result_df) %>%
-  separate_wider_delim(contrast, delim = " - ", names = c("group1", "group2")) %>%
-  rename(p.adj = p.value) %>%
+  post_hoc(log_value ~ group + sex + age, group) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----
