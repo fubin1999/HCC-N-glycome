@@ -35,7 +35,7 @@ temp_data <- bind_rows(list(
 
 prepared_data <- bind_rows(list(
   `Test Set` = temp_data,
-  `Test Set (AFP-)` = temp_data %>% filter(AFP < 20)
+  `Test Set (AFP-)` = temp_data %>% filter(AFP < 10)
 ), .id = "subtype")
 
 # Perform ROC analysis-----
