@@ -9,6 +9,7 @@ rule all:
         # ===== Others =====
         "results/data/clinical/AFP_cutoff.csv",
         "results/figures/clinical/AFP_cutoff.pdf",
+        "results/figures/clinical/clinical_heatmap.pdf",
 
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
@@ -156,6 +157,16 @@ rule AFP_cutoff:
         "results/figures/clinical/AFP_cutoff.pdf"
     script:
         "src/clinical/AFP_cutoff.R"
+
+rule clinical_heatmap:
+    # Draw heatmap to show clinical information.
+    input:
+        CLINICAL,
+        GROUPS
+    output:
+        "results/figures/clinical/clinical_heatmap.pdf"
+    script:
+        "src/clinical/clinical_heatmap.R"
 
 
 # ==================== Glycan Abundance ====================
