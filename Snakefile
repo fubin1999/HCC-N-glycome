@@ -377,6 +377,17 @@ rule AFP_subtype_trait_diff:
         "src/derived_traits/AFP_subtype_ancova.R"
 
 
+# ==================== TCGA Gene Expression ====================
+rule download_TCGA:
+    # Download TCGA gene expression data.
+    output:
+        "results/data/TCGA/query_summary.csv",
+        directory("results/data/GDCdata"),
+        "results/data/TCGA/prepared_data.rda"
+    script:
+        "src/TCGA/download.R"
+
+
 # ==================== Machine Learning ====================
 rule prepare_data_for_ml:
     # Prepare data for ML and split the dataset.
