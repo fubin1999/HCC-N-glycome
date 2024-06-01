@@ -46,6 +46,8 @@ rule all:
 
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
+        "results/data/residues/ancova_result.csv",
+        "results/data/residues/post_hoc_result.csv",
         
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -396,6 +398,18 @@ rule calculate_residues:
         "results/data/residues/glycan_residues.csv"
     script:
         "src/residues/calculate_residues.R"
+
+rule ancova_for_residues:
+    # Perform ANCOVA analysis on glycan residues.
+    input:
+        "results/data/residues/glycan_residues.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/residues/ancova_result.csv",
+        "results/data/residues/post_hoc_result.csv"
+    script:
+        "src/residues/ancova.R"
 
 
 # ==================== TCGA Gene Expression ====================
