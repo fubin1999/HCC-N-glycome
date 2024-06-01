@@ -47,6 +47,9 @@ rule all:
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
 
+        # ===== TCGA Figures =====
+        "results/figures/TCGA/volcano.pdf",
+
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
         "results/data/ml/mrmr_result.csv",
@@ -398,6 +401,16 @@ rule DEA_TCGA:
         "results/data/TCGA/dea_results.csv"
     script:
         "src/TCGA/DEA.R"
+
+rule volcano_TCGA:
+    # Draw volcano plot for TCGA gene expression.
+    input:
+        "results/data/TCGA/dea_results.csv",
+        "data/glycogenes.csv",
+    output:
+        "results/figures/TCGA/volcano.pdf"
+    script:
+        "src/TCGA/volcano.R"
 
 
 # ==================== Machine Learning ====================
