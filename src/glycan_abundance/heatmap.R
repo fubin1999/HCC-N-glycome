@@ -92,6 +92,7 @@ ht <- Heatmap(
     gp = gpar(fill = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A")))
   ),
   right_annotation = row_anno,
+  border = TRUE,
   show_column_names = FALSE,
   cluster_columns = FALSE,
   column_split = col_split,
