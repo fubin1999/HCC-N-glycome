@@ -43,6 +43,9 @@ rule all:
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
         "results/figures/derived_traits/confounders.pdf",
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
+        
+        # ===== TCGA Data =====
+        "results/data/TCGA/dea_results.csv",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -386,6 +389,15 @@ rule download_TCGA:
         "results/data/TCGA/prepared_data.rda"
     script:
         "src/TCGA/download.R"
+        
+rule DEA_TCGA:
+    # Perform differential expression analysis on TCGA data.
+    input:
+        "results/data/TCGA/prepared_data.rda"
+    output:
+        "results/data/TCGA/dea_results.csv"
+    script:
+        "src/TCGA/DEA.R"
 
 
 # ==================== Machine Learning ====================
