@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 
 raw_clinical <- read_csv(snakemake@input[["clinical"]])

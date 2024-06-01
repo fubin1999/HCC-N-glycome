@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 
 plates <- read_csv(snakemake@input[["plates"]])

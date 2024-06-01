@@ -1,4 +1,3 @@
-source("renv/activate.R")
 library(tidyverse)
 
 convert <- function(comp) {

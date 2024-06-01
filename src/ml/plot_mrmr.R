@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 
 # mrmr_result <- read_csv("results/data/ml/mrmr_result.csv")

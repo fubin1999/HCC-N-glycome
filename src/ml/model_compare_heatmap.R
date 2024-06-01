@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(ComplexHeatmap)
 library(circlize)
 library(tidyverse)

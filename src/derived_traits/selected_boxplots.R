@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 
 # trait_data <- read_csv("results/data/derived_traits/derived_traits.csv")

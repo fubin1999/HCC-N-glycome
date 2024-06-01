@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 library(rstatix)
 library(ggsignif)

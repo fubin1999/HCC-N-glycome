@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 
 pos_file <- snakemake@input[[1]]

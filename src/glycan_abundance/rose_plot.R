@@ -1,5 +1,3 @@
-source("renv/activate.R")
-
 library(tidyverse)
 
 # post_hoc_result <- read_csv("results/data/glycan_abundance/posthoc_for_glycans.csv")
