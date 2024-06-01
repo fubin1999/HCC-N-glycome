@@ -48,6 +48,9 @@ rule all:
         "results/data/residues/glycan_residues.csv",
         "results/data/residues/ancova_result.csv",
         "results/data/residues/post_hoc_result.csv",
+
+        # ===== Residues Figures =====
+        "results/figures/residues/residue_heatmap.pdf",
         
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -411,6 +414,16 @@ rule ancova_for_residues:
         "results/data/residues/post_hoc_result.csv"
     script:
         "src/residues/ancova.R"
+
+rule residue_heatmap:
+    # Draw heatmap for mean number of residues per group.
+    input:
+        "results/data/residues/glycan_residues.csv",
+        "results/data/prepared/groups.csv"
+    output:
+        "results/figures/residues/residue_heatmap.pdf"
+    script:
+        "src/residues/mean_heatmap.R"
 
 
 # ==================== TCGA Gene Expression ====================
