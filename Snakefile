@@ -54,6 +54,7 @@ rule all:
 
         # ===== TCGA Figures =====
         "results/figures/TCGA/volcano.pdf",
+        "results/figures/TCGA/heatmap.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -440,6 +441,17 @@ rule volcano_TCGA:
         "results/figures/TCGA/volcano.pdf"
     script:
         "src/TCGA/volcano.R"
+
+rule heatmap_TCGA:
+    # Draw heatmap for differential glycogenes.
+    input:
+        "results/data/TCGA/prepared_data.rda",
+        "results/data/TCGA/dea_results.csv",
+        "data/glycogenes.csv"
+    output:
+        "results/figures/TCGA/heatmap.pdf"
+    script:
+        "src/TCGA/heatmap.R"
 
 
 # ==================== Machine Learning ====================
