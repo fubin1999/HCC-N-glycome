@@ -43,6 +43,9 @@ rule all:
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
         "results/figures/derived_traits/confounders.pdf",
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
+
+        # ===== Residues Data =====
+        "results/data/residues/glycan_residues.csv",
         
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -381,6 +384,18 @@ rule AFP_subtype_trait_diff:
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf"
     script:
         "src/derived_traits/AFP_subtype_ancova.R"
+
+
+# ==================== Residue Analysis ====================
+rule calculate_residues:
+    # Calculate glycan residues (the abundance of each monosaccharide).
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/derived_traits/meta_properties.csv"
+    output:
+        "results/data/residues/glycan_residues.csv"
+    script:
+        "src/residues/calculate_residues.R"
 
 
 # ==================== TCGA Gene Expression ====================
