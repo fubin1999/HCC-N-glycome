@@ -24,8 +24,6 @@ dea_result <- TCGAanalyze_DEA(
   mat2 = filtered[,samplesTP],
   Cond1type = "Normal",
   Cond2type = "Tumor",
-  fdr.cut = 0.01 ,
-  logFC.cut = 1,
   method = "glmLRT"
 )
 
