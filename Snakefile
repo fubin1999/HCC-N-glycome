@@ -36,6 +36,7 @@ rule all:
         "results/data/derived_traits/posthoc_for_derived_traits.csv",
         "results/data/derived_traits/fold_change.csv",
         "results/data/derived_traits/AFP_subtype_ancova.csv",
+        "results/data/derived_traits/corr_with_clinical.csv",
 
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/heatmap.pdf",
@@ -44,6 +45,7 @@ rule all:
         "results/figures/derived_traits/diff_bubble.pdf",
         "results/figures/derived_traits/confounders.pdf",
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
+        "results/figures/derived_traits/corr_with_clinical.pdf",
 
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
@@ -400,6 +402,18 @@ rule trait_heatmap:
         "results/figures/derived_traits/heatmap.pdf"
     script:
         "src/derived_traits/heatmap.R"
+
+rule trait_cor_with_clinical:
+    # Draw corrplot for derived traits and clinical data.
+    input:
+        "results/data/derived_traits/filtered_derived_traits.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/derived_traits/corr_with_clinical.csv",
+        "results/figures/derived_traits/corr_with_clinical.pdf"
+    script:
+        "src/derived_traits/corr_with_clinical.R"
 
 
 # ==================== Residue Analysis ====================
