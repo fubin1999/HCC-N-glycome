@@ -14,7 +14,7 @@ groups <- read_csv(snakemake@input[[2]]) |>
 predictions <- predictions |> 
   inner_join(groups, by = "sample")
 
-ggplot(predictions, aes(group, probability)) +
+p <- ggplot(predictions, aes(group, probability)) +
   geom_hline(yintercept = 0.5, linetype = "dashed", color = "grey") +
   geom_quasirandom(aes(color = group)) +
   geom_signif(
@@ -32,4 +32,4 @@ ggplot(predictions, aes(group, probability)) +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.1))) +
   scale_color_manual(values = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"))
 # tgutil::ggpreview(width = 3, height = 3)
-ggsave(snakemake@output[[1]], width = 3, height = 3)
+ggsave(snakemake@output[[1]], plot = p, width = 3, height = 3)

@@ -34,6 +34,6 @@ sex_p <- ancova_result %>%
   filter(Effect == "sex") %>%
   plot_dot("Effect: Sex")
 
-age_p | sex_p
+final_p <- age_p | sex_p
 # tgutil::ggpreview(width = 10, height = 5)
-ggsave(snakemake@output[[1]], width = 10, height = 5)
+ggsave(snakemake@output[[1]], plot = final_p, width = 10, height = 5)

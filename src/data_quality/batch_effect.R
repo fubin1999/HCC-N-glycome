@@ -22,13 +22,11 @@ pca_data <- data |>
 pca <- prcomp(pca_data, center = TRUE, scale = TRUE)
 
 # Plot PCA-----
-fviz_pca_ind(
+p <- fviz_pca_ind(
   pca, 
   geom.ind = "point",
   col.ind = data |> distinct(sample, plate) |> pull(plate) |> as.factor(),
   addEllipses = TRUE,
 )
 # tgutil::ggpreview(width = 6, height = 5)
-ggsave(snakemake@output[[1]], width = 6, height = 5)
-# ggsave("results/figures/data_quality/batch_effect_pca.pdf", width = 6, height = 5)
-file.remove("Rplots.pdf")
+ggsave(snakemake@output[[1]], plot = p, width = 6, height = 5)

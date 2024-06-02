@@ -31,7 +31,7 @@ data <- post_hoc_result %>%
   left_join(row_order %>% mutate(rank = row_number()), by = "glycan")
 
 # Plot-----
-ggplot(data, aes(comparison, reorder(glycan, desc(rank)))) +
+p <- ggplot(data, aes(comparison, reorder(glycan, desc(rank)))) +
   geom_point(aes(color = logFC, size = logp, alpha = signif)) +
   guides(alpha = "none") +
   labs(x = "", y = "", color = expression(log[2]~FC), size = expression(-log[10]~p)) +
@@ -44,5 +44,5 @@ ggplot(data, aes(comparison, reorder(glycan, desc(rank)))) +
   scale_size_continuous(range = c(1, 3.5)) +
   scale_color_gradient2(high = "#CD0000", low = "#27408B", mid = "white")
 
-tgutil::ggpreview(width = 2, height = 7)
-ggsave(snakemake@output[[1]], width = 2, height = 7)
+# tgutil::ggpreview(width = 2, height = 7)
+ggsave(snakemake@output[[1]], plot = p, width = 2, height = 7)

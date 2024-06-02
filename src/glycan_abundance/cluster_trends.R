@@ -36,7 +36,7 @@ trend_plots <- data |>
   nest(.by = cluster) |> 
   arrange(cluster) |> 
   mutate(plot = map2(data, cluster, plot_trend))
-wrap_plots(trend_plots$plot, ncol = 1)
+final_p <- wrap_plots(trend_plots$plot, ncol = 1)
 
 # tgutil::ggpreview(width = 3, height = 10)
-ggsave(snakemake@output[[1]], width = 3, height = 10)
+ggsave(snakemake@output[[1]], plot = final_p, width = 3, height = 10)

@@ -97,6 +97,6 @@ roc_curves <- plot_roc(binary_result, "Control/HCC") +
   plot_roc(LC_HCC_result, "LC/HCC") +
   plot_layout(ncol = 2)
 
-roc_curves / auc_heatmap + plot_layout(heights = c(6, 1))
+p <- roc_curves / auc_heatmap + plot_layout(heights = c(6, 1))
 # tgutil::ggpreview(width = 10, height = 10)
-ggsave(snakemake@output[[2]], width = 10, height = 10)
+ggsave(snakemake@output[[2]], plot = p, width = 10, height = 10)

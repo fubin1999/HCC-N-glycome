@@ -59,7 +59,7 @@ simple_YC_p <- predictions %>%
   plot_cm() +
   ggtitle("Test Set: LC/HCC", subtitle = "HCC Slim")
 
-(complex_global_p | complex_HC_p | complex_MC_p | complex_YC_p) /
+p <- (complex_global_p | complex_HC_p | complex_MC_p | complex_YC_p) /
   (simple_global_p | simple_HC_p | simple_MC_p | simple_YC_p)
 # tgutil::ggpreview(width = 12, height = 6)
-ggsave(snakemake@output[[1]], width = 12, height = 6)
+ggsave(snakemake@output[[1]], plot = p, width = 12, height = 6)

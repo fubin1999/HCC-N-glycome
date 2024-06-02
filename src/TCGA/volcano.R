@@ -22,7 +22,7 @@ plot_data <- dea_result %>%
     ),
   )
 
-ggplot(plot_data, aes(logFC, -log10(FDR))) +
+p <- ggplot(plot_data, aes(logFC, -log10(FDR))) +
   geom_point(aes(color = regulate), shape = 16, size = 0.5) +
   geom_vline(xintercept = c(1, -1), linetype = "dashed") +
   geom_hline(yintercept = -log10(0.01), linetype = "dashed") +
@@ -38,4 +38,4 @@ ggplot(plot_data, aes(logFC, -log10(FDR))) +
     panel.grid = element_blank()
   )
 # tgutil::ggpreview(width = 4, height = 4)
-ggsave(snakemake@output[[1]], width = 4, height = 4)
+ggsave(snakemake@output[[1]], plot = p, width = 4, height = 4)

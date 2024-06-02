@@ -15,7 +15,7 @@ data <- trait_data %>%
 
 traits_to_plot <- c("THy", "CA1", "CA2", "CA3", "CA4", "CFc", "CFa", "CS", "CG", "CB")
 
-data %>%
+p <- data %>%
   filter(trait %in% traits_to_plot) %>%
   ggplot(aes(x = group, y = value, color = group)) +
   geom_boxplot(outlier.alpha = 0) +
@@ -30,4 +30,4 @@ data %>%
   ) +
   scale_color_manual(values = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"))
 # tgutil::ggpreview(width = 10, height = 5)
-ggsave(snakemake@output[[1]], width = 10, height = 5)
+ggsave(snakemake@output[[1]], plot = p, width = 10, height = 5)

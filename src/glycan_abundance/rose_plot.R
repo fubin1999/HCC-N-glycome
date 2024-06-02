@@ -12,7 +12,7 @@ plot_data <- post_hoc_result %>%
   select(glycan, comparison, signif, regulate) %>%
   summarise(n = sum(signif), .by = c(comparison, regulate))
 
-ggplot(plot_data, aes(comparison, n)) +
+p <- ggplot(plot_data, aes(comparison, n)) +
   geom_col(aes(fill = regulate), alpha = 0.7) +
   geom_text(aes(label = n), position = position_stack(vjust = 0.5), color = "white") +
   coord_polar() +
@@ -26,4 +26,4 @@ ggplot(plot_data, aes(comparison, n)) +
   ) +
   scale_fill_manual(values = c("up" = "#CC5F5A", "down" = "#97A5C0"))
 # tgutil::ggpreview(width = 4, height = 5)
-ggsave(snakemake@output[[1]], width = 3, height = 3.5)
+ggsave(snakemake@output[[1]], plot = p, width = 3, height = 3.5)

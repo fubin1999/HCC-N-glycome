@@ -27,7 +27,7 @@ diff_data <- data %>%
   filter(glycan %in% diff_glycans)
 
 # Draw boxplots-----
-ggplot(diff_data, aes(group, z_score, fill = group)) +
+p <- ggplot(diff_data, aes(group, z_score, fill = group)) +
   geom_violin() +
   facet_wrap(~ glycan, scales = "free", ncol = 6) +
   labs(x = "", y = "z-scores (log abundance)") +
@@ -37,4 +37,4 @@ ggplot(diff_data, aes(group, z_score, fill = group)) +
   ) +
   scale_fill_manual(values = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"))
 # tgutil::ggpreview(width = 12, height = 16)
-ggsave(snakemake@output[[1]], width = 12, height = 16)
+ggsave(snakemake@output[[1]], plot = p, width = 12, height = 16)

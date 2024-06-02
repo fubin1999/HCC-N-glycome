@@ -49,8 +49,8 @@ YC_p <- plot_data %>%
   scale_alpha_manual(values = c("LC" = 1, "HCC" = 1, "Others" = 0.1)) +
   theme_classic()
 
-HC_p + MC_p + YC_p & theme(
+p <- HC_p + MC_p + YC_p & theme(
   legend.position = "bottom"
 )
 # tgutil::ggpreview(width = 10, height = 4)
-ggsave(snakemake@output[[1]], width = 10, height = 4)
+ggsave(snakemake@output[[1]], plot = p, width = 10, height = 4)

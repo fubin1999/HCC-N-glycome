@@ -42,6 +42,6 @@ simple_p <- predictions %>%
   plot_calibration() +
   ggtitle("HCC Slim")
 
-complex_p + simple_p + plot_layout(nrow = 1)
+p <- complex_p + simple_p + plot_layout(nrow = 1)
 # tgutil::ggpreview(width = 6, height = 3)
-ggsave(snakemake@output[[1]], width = 6, height = 3)
+ggsave(snakemake@output[[1]], plot = p, width = 6, height = 3)
