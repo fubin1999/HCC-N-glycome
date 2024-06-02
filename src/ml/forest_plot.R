@@ -1,19 +1,18 @@
 library(tidyverse)
 library(broom)
 library(forestploter)
+library(grid)
 
-# train_data <- read_csv("results/data/ml/train_data.csv") %>%
-#   select(sample, group, H5N4F1, H4N4S1, H6N5F1S3, H3N4F1)
-train_data <- read_csv(snakemake@input[[1]]) %>%
-  select(sample, group, H5N4F1, H4N4S1, H6N5F1S3, H3N4F1)
+# train_data <- read_csv("results/data/ml/train_data.csv")
+train_data <- read_csv(snakemake@input[[1]])
 
 lr <- glm(
-  group ~ H5N4F1 + H4N4S1 + H6N5F1S3 + H3N4F1,
+  group ~ H5N4F1 + H4N4S1 + H6N5F1S3 + H3N4F1 + AFP + HBSAG + HBEAG + HBEAB + AST + ALT + GGT + ALB + TBIL + TP,
   family = binomial, data = train_data
 )
 lr_summary <- tidy(lr, conf.int = TRUE, exponentiate = TRUE) %>%
   filter(term != "(Intercept)") %>%
-  rename(Term = term) %>%
+  dplyr::rename(Factor = term) %>%
   mutate(`OR (95% CI)` = sprintf(
     "%.2f (%.2f, %.2f)",
     estimate, conf.low, conf.high)
@@ -22,13 +21,16 @@ lr_summary <- tidy(lr, conf.int = TRUE, exponentiate = TRUE) %>%
   mutate(` ` = paste(rep(" ", 20), collapse = " "))
 
 p <- forest(
-  lr_summary %>% select(Term, `P-value`, ` `, `OR (95% CI)`),
+  lr_summary %>% select(Factor, ` `, `P-value`, `OR (95% CI)`),
   est = lr_summary$estimate,
   lower = lr_summary$conf.low,
   upper = lr_summary$conf.high,
-  sizes = lr_summary$std.error,
-  ci_column = 3,
+  ci_column = 2,
   ref_line = 1
-)
-# tgutil::ggpreview(p, width = 6, height = 3)
-ggsave(snakemake@output[[1]], plot = p, width = 6, height = 3)
+) %>%
+  edit_plot(row = 1:4, gp = gpar(fontface = "bold")) %>%
+  add_border(part = "header", row = 1, where = "top") %>%
+  add_border(part = "header", row = 1, where = "bottom") %>%
+  add_border(part = "body", row = 4, where = "bottom")
+# tgutil::ggpreview(p, width = 6, height = 5)
+ggsave(snakemake@output[[1]], plot = p, width = 6, height = 5)
