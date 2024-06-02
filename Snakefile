@@ -41,7 +41,7 @@ rule all:
         "results/figures/derived_traits/heatmap.pdf",
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
         "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
-        "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
+        "results/figures/derived_traits/diff_bubble.pdf",
         "results/figures/derived_traits/confounders.pdf",
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
 
@@ -369,16 +369,14 @@ rule diff_antenna_trait_radar:
     script:
         "src/derived_traits/diff_antenna_radar.R"
 
-rule trait_diff_heatmap:
-    # Draw bubble plot and heatmap for differential derived traits.
+rule trait_diff_bubble:
+    # Draw bubble plot for differential derived traits.
     input:
-        traits="results/data/derived_traits/filtered_derived_traits.csv",
-        groups=GROUPS,
-        post_hoc="results/data/derived_traits/posthoc_for_derived_traits.csv"
+        "results/data/derived_traits/posthoc_for_derived_traits.csv"
     output:
-        "results/figures/derived_traits/bubble_plot_and_heatmap.pdf"
+        "results/figures/derived_traits/diff_bubble.pdf"
     script:
-        "src/derived_traits/diff_bubble_heatmap.R"
+        "src/derived_traits/diff_bubble.R"
 
 rule AFP_subtype_trait_diff:
     # Perform ANCOVA on derived traits between AFP negative and AFP positive HCC samples.
@@ -461,7 +459,7 @@ rule volcano_TCGA:
     # Draw volcano plot for TCGA gene expression.
     input:
         "results/data/TCGA/dea_results.csv",
-        "data/glycogenes.csv",
+        "data/glycogenes.csv"
     output:
         "results/figures/TCGA/volcano.pdf"
     script:
