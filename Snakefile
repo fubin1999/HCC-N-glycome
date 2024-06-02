@@ -18,6 +18,7 @@ rule all:
         "results/data/glycan_abundance/ancova_for_glycans.csv",
         "results/data/glycan_abundance/fold_change.csv",
         "results/data/glycan_abundance/roc_auc.csv",
+        "results/data/glycan_abundance/cor_with_AFP.csv",
 
         # ===== Glycan Abundance Figures =====
         "results/figures/glycan_abundance/diff_rose_plot.pdf",
@@ -28,6 +29,8 @@ rule all:
         "results/figures/glycan_abundance/diff_upset.pdf",
         "results/figures/glycan_abundance/confounders.pdf",
         "results/figures/glycan_abundance/pca.pdf",
+        "results/figures/glycan_abundance/cor_with_AFP_1.pdf",
+        "results/figures/glycan_abundance/cor_with_AFP_2.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -304,6 +307,22 @@ rule glycan_pca:
         "results/figures/glycan_abundance/pca.pdf"
     script:
         "src/glycan_abundance/pca.R"
+
+rule glycan_cor_with_AFP:
+    # Draw corrplot for glycans and AFP.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/glycan_abundance/cor_with_AFP.csv",
+        # There are too many glycans to display in a row,
+        # and corrplot object could not be jointed by cowplot,
+        # so the plot is splited into two.
+        "results/figures/glycan_abundance/cor_with_AFP_1.pdf",
+        "results/figures/glycan_abundance/cor_with_AFP_2.pdf"
+    script:
+        "src/glycan_abundance/corr_with_AFP.R"
 
 
 # ==================== Derived Traits ====================
