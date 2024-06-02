@@ -38,6 +38,7 @@ rule all:
         "results/data/derived_traits/AFP_subtype_ancova.csv",
 
         # ===== Derived Traits Figures =====
+        "results/figures/derived_traits/heatmap.pdf",
         "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
         "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
         "results/figures/derived_traits/bubble_plot_and_heatmap.pdf",
@@ -390,6 +391,17 @@ rule AFP_subtype_trait_diff:
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf"
     script:
         "src/derived_traits/AFP_subtype_ancova.R"
+
+rule trait_heatmap:
+    # Draw heatmap for derived traits.
+    input:
+        "results/data/derived_traits/filtered_derived_traits.csv",
+        GROUPS,
+        "results/data/derived_traits/posthoc_for_derived_traits.csv"
+    output:
+        "results/figures/derived_traits/heatmap.pdf"
+    script:
+        "src/derived_traits/heatmap.R"
 
 
 # ==================== Residue Analysis ====================
