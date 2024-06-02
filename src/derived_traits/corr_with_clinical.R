@@ -45,8 +45,9 @@ calcu_corr <- function (data) {
   data %>%
     group_by(trait, clinical) %>%
     cor_test(value, clinical_value, method = "spearman") %>%
+    adjust_pvalue() %>%
     as_tibble() %>%
-    select(trait, clinical, cor, p)
+    select(trait, clinical, cor, p, p.adj)
 }
 
 full_cor_result <- calcu_corr(data)
@@ -55,10 +56,10 @@ HCC_cor_result <- calcu_corr(HCC_data)
 plot_corrplot <- function (cor_result) {
   plot_data <- cor_result %>%
     mutate(
-      signif = p < 0.05,
+      signif = p.adj < 0.05,
       cor_direction = case_when(
-        p < 0.05 & cor > 0 ~ "Positive",
-        p < 0.05 & cor < 0 ~ "Negative",
+        p.adj < 0.05 & cor > 0 ~ "Positive",
+        p.adj < 0.05 & cor < 0 ~ "Negative",
         .default = "Not significant"
       ),
       cor_direction = factor(cor_direction, levels = c("Positive", "Negative", "Not significant"))

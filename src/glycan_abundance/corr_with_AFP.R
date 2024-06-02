@@ -30,8 +30,8 @@ colnames(cor_mat_2) <- corr_result$glycan[(nrow(corr_result)/2+1):nrow(corr_resu
 rownames(cor_mat_1) <- "AFP"
 rownames(cor_mat_2) <- "AFP"
 
-p_mat_1 <- corr_result$p[1:(nrow(corr_result)/2)] %>% t()
-p_mat_2 <- corr_result$p[(nrow(corr_result)/2+1):nrow(corr_result)] %>% t()
+p_mat_1 <- corr_result$p.adj[1:(nrow(corr_result)/2)] %>% t()
+p_mat_2 <- corr_result$p.adj[(nrow(corr_result)/2+1):nrow(corr_result)] %>% t()
 colnames(p_mat_1) <- colnames(cor_mat_1)
 colnames(p_mat_2) <- colnames(cor_mat_2)
 rownames(p_mat_1) <- "AFP"
