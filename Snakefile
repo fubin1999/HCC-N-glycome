@@ -411,7 +411,9 @@ rule trait_cor_with_clinical:
         CLINICAL
     output:
         "results/data/derived_traits/corr_with_clinical.csv",
-        "results/figures/derived_traits/corr_with_clinical.pdf"
+        "results/data/derived_traits/corr_with_clinical_HCC.csv",
+        "results/figures/derived_traits/corr_with_clinical.pdf",
+        "results/figures/derived_traits/corr_with_clinical_HCC.pdf"
     script:
         "src/derived_traits/corr_with_clinical.R"
 
