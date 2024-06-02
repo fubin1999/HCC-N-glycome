@@ -26,7 +26,7 @@ complex_model = HCCFusionClassifier(
 complex_model = CalibratedClassifierCV(complex_model, method="isotonic", cv=5)
 complex_model.fit(X_train, y_train)
 
-selected_features = ['H5N4F1', 'H4N4S1', 'H6N5F1S3', 'H3N4F1', 'AFP']
+selected_features = ['H5N4F1', 'H6N5F1S3', 'H3N4F1', 'AFP', 'HBEAG']
 simple_model = make_pipeline(StandardScaler(), LogisticRegression(random_state=42))
 simple_model = CalibratedClassifierCV(simple_model, method="isotonic", cv=5)
 simple_model.fit(X_train[selected_features], y_train)
