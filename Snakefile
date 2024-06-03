@@ -660,28 +660,42 @@ rule forest_plot:
 
 
 # ==================== Others ====================
-rule draw_glycans:
-    # Draw glycans with glycowork.
+rule draw_complete_glycans:
+    # Draw glycans with glycowork with linkage information.
     input:
         "data/glycan_strucutre_best_resolution.csv"
     output:
-        directory("results/figures/SNFG/complete/"),
+        directory("results/figures/SNFG/complete/")
+    run:
+        import csv
+        from pathlib import Path
+        from glycowork.motif.draw import GlycoDraw
+
+        output_dir = output[0]
+        Path(output_dir).mkdir(exist_ok=True, parents=True)
+        with open(input[0], encoding='utf-8-sig') as fp:
+            reader = csv.reader(fp)
+            next(reader)
+            for composition, structure in reader:
+                path = Path(output_dir) / f"{composition}.svg"
+                GlycoDraw(structure, filepath=str(path))
+
+rule draw_compact_glycans:
+    # Draw glycans with glycowork in the compact form.
+    input:
+        "data/glycan_structure_guess_linkage.csv"
+    output:
         directory("results/figures/SNFG/compact/")
     run:
         import csv
         from pathlib import Path
         from glycowork.motif.draw import GlycoDraw
 
-        complete_dir = output[0]
-        Path(complete_dir).mkdir(exist_ok=True, parents=True)
-        simple_dir = output[1]
-        Path(simple_dir).mkdir(exist_ok=True, parents=True)
-
+        output_dir = output[0]
+        Path(output_dir).mkdir(exist_ok=True, parents=True)
         with open(input[0], encoding='utf-8-sig') as fp:
             reader = csv.reader(fp)
             next(reader)
             for composition, structure in reader:
-                path1 = Path(complete_dir) / f"{composition}.svg"
-                path2 = Path(simple_dir) / f"{composition}.svg"
-                GlycoDraw(structure, filepath=str(path1))
-                GlycoDraw(structure, filepath=str(path2), compact=True, show_linkage=False)
+                path = Path(output_dir) / f"{composition}.svg"
+                GlycoDraw(structure, filepath=str(path), compact=True)
