@@ -10,8 +10,9 @@ rule all:
         "results/data/clinical/AFP_cutoff.csv",
         "results/figures/clinical/AFP_cutoff.pdf",
         "results/figures/clinical/clinical_heatmap.pdf",
-        "results/figures/SNFG/complete/",
-        "results/figures/SNFG/compact/",
+        "results/figures/SNFG/complete_svg/",
+        "results/figures/SNFG/compact_svg/",
+        "results/figures/SNFG/compact_pdf/",
 
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
@@ -665,7 +666,7 @@ rule draw_complete_glycans:
     input:
         "data/glycan_strucutre_best_resolution.csv"
     output:
-        directory("results/figures/SNFG/complete/")
+        directory("results/figures/SNFG/complete_svg/")
     run:
         import csv
         from pathlib import Path
@@ -685,7 +686,7 @@ rule draw_compact_glycans:
     input:
         "data/glycan_structure_guess_linkage.csv"
     output:
-        directory("results/figures/SNFG/compact/")
+        directory("results/figures/SNFG/compact_svg/")
     run:
         import csv
         from pathlib import Path
@@ -699,3 +700,20 @@ rule draw_compact_glycans:
             for composition, structure in reader:
                 path = Path(output_dir) / f"{composition}.svg"
                 GlycoDraw(structure, filepath=str(path), compact=True)
+
+rule convert_SNFG_svg_to_pdf:
+    input:
+        "results/figures/SNFG/compact_svg/"
+    output:
+        directory("results/figures/SNFG/compact_pdf/")
+    run:
+        from pathlib import Path
+        from svglib.svglib import svg2rlg
+        from reportlab.graphics import renderPDF
+        output_path = Path(output[0])
+        output_path.mkdir(parents=True)
+        for svg_file in Path(input[0]).glob("*.svg"):
+            name = svg_file.stem
+            pdf_file = output_path / f"{name}.pdf"
+            drawing = svg2rlg(str(svg_file))
+            renderPDF.drawToFile(drawing, str(pdf_file))
