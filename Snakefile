@@ -10,6 +10,8 @@ rule all:
         "results/data/clinical/AFP_cutoff.csv",
         "results/figures/clinical/AFP_cutoff.pdf",
         "results/figures/clinical/clinical_heatmap.pdf",
+        "results/figures/SNFG/complete/",
+        "results/figures/SNFG/compact/",
 
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
@@ -655,3 +657,31 @@ rule forest_plot:
         "results/figures/ml/forest_plot.pdf"
     script:
         "src/ml/forest_plot.R"
+
+
+# ==================== Others ====================
+rule draw_glycans:
+    # Draw glycans with glycowork.
+    input:
+        "data/glycan_strucutre_best_resolution.csv"
+    output:
+        directory("results/figures/SNFG/complete/"),
+        directory("results/figures/SNFG/compact/")
+    run:
+        import csv
+        from pathlib import Path
+        from glycowork.motif.draw import GlycoDraw
+
+        complete_dir = output[0]
+        Path(complete_dir).mkdir(exist_ok=True, parents=True)
+        simple_dir = output[1]
+        Path(simple_dir).mkdir(exist_ok=True, parents=True)
+
+        with open(input[0], encoding='utf-8-sig') as fp:
+            reader = csv.reader(fp)
+            next(reader)
+            for composition, structure in reader:
+                path1 = Path(complete_dir) / f"{composition}.svg"
+                path2 = Path(simple_dir) / f"{composition}.svg"
+                GlycoDraw(structure, filepath=str(path1))
+                GlycoDraw(structure, filepath=str(path2), compact=True, show_linkage=False)
