@@ -45,20 +45,11 @@ col_split <- groups |>
 col_split <- col_split[colnames(mat), ]
 col_split <- factor(col_split, levels = c("HC", "CHB", "LC", "HCC"))
 
-rela_abund <- data |> 
-  group_by(sample) |> 
-  mutate(value = value / sum(value) * 100) |> 
-  ungroup() |> 
-  summarise(median_abund = median(value), .by = glycan) |> 
-  mutate(Abund = log(median_abund)) |> 
-  select(-median_abund)
-
 row_anno_df <- mp_table |> 
   select(glycan, type, B, nAnt, nF, nS, nG) |> 
   rename(Type = type, Bisect = B) |> 
   sjmisc::rec(Type, rec = "high_mannose=high-mannose;else=copy", suffix = "") |> 
-  filter(glycan %in% diff_glycans) |> 
-  left_join(rela_abund, by = "glycan") |> 
+  filter(glycan %in% diff_glycans) |>
   column_to_rownames("glycan") |> 
   mutate(
     nAnt = factor(nAnt, ordered = TRUE),
@@ -67,7 +58,6 @@ row_anno_df <- mp_table |>
     nG = factor(nG, ordered = TRUE)
   )
 row_anno_df <- row_anno_df[rownames(mat),]
-abund_col <- colorRamp2(c(-4, 4), c("white", "pink2"))
 row_anno <- rowAnnotation(
   df = row_anno_df,
   annotation_name_side = "top",
@@ -77,8 +67,7 @@ row_anno <- rowAnnotation(
     nAnt = c(`0` = "grey95", `1` = "#CDE6F6", `2` = "#99C6E4", `3` = "#4888B1", `4` = "#0A446A"),
     nF = c(`0` = "grey95", `1` = "#FF8A8A", `2` = "#EF3A3A"),
     nS = c(`0` = "grey95", `1` = "#D6A7E8", `2` = "#B674D0", `3` = "#8131A1", `4` = "#6D158F"),
-    nG = c(`0` = "grey95", `1` = "#FFDCA4", `2` = "#FFCC79", `3` = "#DA972A", `4` = "#AC7213"),
-    Abund = abund_col
+    nG = c(`0` = "grey95", `1` = "#FFDCA4", `2` = "#FFCC79", `3` = "#DA972A", `4` = "#AC7213")
   )
 )
 
