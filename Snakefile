@@ -60,6 +60,7 @@ rule all:
 
         # ===== Residues Figures =====
         "results/figures/residues/residue_heatmap.pdf",
+        "results/figures/residues/residue_boxplots.pdf",
         
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -467,11 +468,21 @@ rule residue_heatmap:
     # Draw heatmap for mean number of residues per group.
     input:
         "results/data/residues/glycan_residues.csv",
-        "results/data/prepared/groups.csv"
+        GROUPS
     output:
         "results/figures/residues/residue_heatmap.pdf"
     script:
         "src/residues/mean_heatmap.R"
+
+rule residue_boxplots:
+    # Draw boxplots for residues.
+    input:
+        "results/data/residues/glycan_residues.csv",
+        GROUPS
+    output:
+        "results/figures/residues/residue_boxplots.pdf"
+    script:
+        "src/residues/boxplot.R"
 
 
 # ==================== TCGA Gene Expression ====================
