@@ -65,10 +65,12 @@ rule all:
         
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
+        "results/data/TCGA/consensus_cluster_result.csv",
 
         # ===== TCGA Figures =====
         "results/figures/TCGA/volcano.pdf",
         "results/figures/TCGA/heatmap.pdf",
+        "results/figures/TCGA/consensus_cluster/",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -537,6 +539,17 @@ rule heatmap_TCGA:
         "results/figures/TCGA/heatmap.pdf"
     script:
         "src/TCGA/heatmap.R"
+
+rule consensus_cluster:
+    # Perform consensus clustering using glycogenes on tumor samples.
+    input:
+        "results/data/TCGA/prepared_data.rda",
+        "data/glycogenes.csv"
+    output:
+        directory("results/figures/TCGA/consensus_cluster/"),
+        "results/data/TCGA/consensus_cluster_result.csv"
+    script:
+        "src/TCGA/consensus_cluster.R"
 
 
 # ==================== Machine Learning ====================
