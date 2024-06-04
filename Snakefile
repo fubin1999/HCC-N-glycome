@@ -52,6 +52,7 @@ rule all:
         "results/figures/derived_traits/confounders.pdf",
         "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
         "results/figures/derived_traits/corr_with_clinical.pdf",
+        "results/figures/derived_traits/scatter_with_clinical.pdf",
 
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
@@ -439,6 +440,18 @@ rule trait_cor_with_clinical:
         "results/figures/derived_traits/corr_with_clinical_HCC.pdf"
     script:
         "src/derived_traits/corr_with_clinical.R"
+
+rule scatter_with_clinical:
+    # Draw scatter plot for selected derived traits and clinical variables
+    # with high correlation.
+    input:
+        "results/data/derived_traits/filtered_derived_traits.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/figures/derived_traits/scatter_with_clinical.pdf"
+    script:
+        "src/derived_traits/scatter_with_clinical.R"
 
 
 # ==================== Residue Analysis ====================
