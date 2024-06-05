@@ -70,6 +70,7 @@ rule all:
 
         # ===== TCGA Figures =====
         "results/figures/TCGA/volcano.pdf",
+        "results/figures/TCGA/MA_plot.pdf",
         "results/figures/TCGA/heatmap.pdf",
         "results/figures/TCGA/consensus_cluster/",
         "results/figures/TCGA/cluster_dea_heatmap.pdf",
@@ -532,6 +533,16 @@ rule volcano_TCGA:
         "results/figures/TCGA/volcano.pdf"
     script:
         "src/TCGA/volcano.R"
+
+rule MA_TCGA:
+    # Draw MA plot for TCGA gene expression.
+    input:
+        "results/data/TCGA/dea_results.csv",
+        "data/glycogenes.csv"
+    output:
+        "results/figures/TCGA/MA_plot.pdf"
+    script:
+        "src/TCGA/MA_plot.R"
 
 rule heatmap_TCGA:
     # Draw heatmap for differential glycogenes.
