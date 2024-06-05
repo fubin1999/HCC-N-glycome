@@ -1,8 +1,8 @@
 library(tidyverse)
 library(corrplot)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# mrmr_result <- read_csv("results/data/ml/mrmr_result.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+mrmr_result <- read_csv("results/data/ml/mrmr_result.csv")
 abundance <- read_csv(snakemake@input[[1]])
 mrmr_result <- read_csv(snakemake@input[[2]])
 
@@ -23,9 +23,8 @@ plot_data %>%
   corrplot(
     tl.col = "black",
     type = "lower",
-    method = "color",
+    method = "ellipse",
     addCoef.col = "black",
-    diag = FALSE,
     order = "original",
     addgrid.col = "grey"
   )
