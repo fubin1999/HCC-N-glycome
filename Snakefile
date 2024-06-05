@@ -72,6 +72,7 @@ rule all:
         "results/figures/TCGA/volcano.pdf",
         "results/figures/TCGA/heatmap.pdf",
         "results/figures/TCGA/consensus_cluster/",
+        "results/figures/TCGA/cluster_dea_heatmap.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -561,6 +562,17 @@ rule DEA_cluster:
         "results/data/TCGA/cluster_dea_results.csv"
     script:
         "src/TCGA/DEA_cluster.R"
+
+rule TCGA_cluster_heatmap:
+    # Draw heatmap for different clusters.
+    input:
+        "results/data/TCGA/prepared_data.rda",
+        "results/data/TCGA/consensus_cluster_result.csv",
+        "data/glycogenes.csv"
+    output:
+        "results/figures/TCGA/cluster_dea_heatmap.pdf"
+    script:
+        "src/TCGA/heatmap_cluster.R"
 
 
 # ==================== Machine Learning ====================
