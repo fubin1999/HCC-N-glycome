@@ -62,7 +62,7 @@ rule all:
         # ===== Residues Figures =====
         "results/figures/residues/residue_heatmap.pdf",
         "results/figures/residues/residue_boxplots.pdf",
-        
+
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
@@ -73,6 +73,7 @@ rule all:
         "results/figures/TCGA/heatmap.pdf",
         "results/figures/TCGA/consensus_cluster/",
         "results/figures/TCGA/cluster_dea_heatmap.pdf",
+        "results/figures/TCGA/clinical_heatmap.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -573,6 +574,16 @@ rule TCGA_cluster_heatmap:
         "results/figures/TCGA/cluster_dea_heatmap.pdf"
     script:
         "src/TCGA/heatmap_cluster.R"
+
+rule TCGA_HCC_clinical_heatmap:
+    # Draw clinical heatmap for TCGA HCC samples.
+    input:
+        "results/data/TCGA/prepared_data.rda",
+        "results/data/TCGA/consensus_cluster_result.csv"
+    output:
+        "results/figures/TCGA/clinical_heatmap.pdf"
+    script:
+        "src/TCGA/clinical_heatmap_cluster.R"
 
 
 # ==================== Machine Learning ====================
