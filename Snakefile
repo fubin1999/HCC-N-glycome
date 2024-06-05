@@ -66,6 +66,7 @@ rule all:
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
+        "results/data/TCGA/cluster_dea_results.csv",
 
         # ===== TCGA Figures =====
         "results/figures/TCGA/volcano.pdf",
@@ -550,6 +551,16 @@ rule consensus_cluster:
         "results/data/TCGA/consensus_cluster_result.csv"
     script:
         "src/TCGA/consensus_cluster.R"
+
+rule DEA_cluster:
+    # DEA on the two clusters identified by consensus clustering.
+    input:
+        "results/data/TCGA/prepared_data.rda",
+        "results/data/TCGA/consensus_cluster_result.csv"
+    output:
+        "results/data/TCGA/cluster_dea_results.csv"
+    script:
+        "src/TCGA/DEA_cluster.R"
 
 
 # ==================== Machine Learning ====================
