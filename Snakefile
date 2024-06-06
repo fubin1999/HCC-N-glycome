@@ -94,7 +94,9 @@ rule all:
         "results/figures/ml/simple_model_metrics_table.pdf",
         "results/figures/ml/mrmr_cv.pdf",
         "results/figures/ml/mrmr_selected_corrplot.pdf",
-        "results/figures/ml/forest_plot.pdf"
+        "results/figures/ml/forest_plot.pdf",
+        "results/figures/ml/shap_summary.pdf",
+        "results/figures/ml/shap_waterfall/"
 
 
 # ==================== Prepare Data ====================
@@ -751,6 +753,17 @@ rule forest_plot:
         "results/figures/ml/forest_plot.pdf"
     script:
         "src/ml/forest_plot.R"
+
+rule shap:
+    # SHAP on HCC Slim.
+    input:
+        "results/data/ml/train_data.csv",
+        "results/data/ml/test_data.csv"
+    output:
+        "results/figures/ml/shap_summary.pdf",
+        directory("results/figures/ml/shap_waterfall/")
+    script:
+        "src/ml/shap.py"
 
 
 # ==================== Others ====================
