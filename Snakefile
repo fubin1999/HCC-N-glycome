@@ -12,6 +12,7 @@ rule all:
         "results/figures/clinical/clinical_heatmap.pdf",
         "results/figures/SNFG/complete_svg/",
         "results/figures/SNFG/compact_svg/",
+        "results/figures/SNFG/complete_pdf/",
         "results/figures/SNFG/compact_pdf/",
 
         # ===== Data Quality Figures =====
@@ -799,9 +800,9 @@ rule draw_compact_glycans:
 
 rule convert_SNFG_svg_to_pdf:
     input:
-        "results/figures/SNFG/compact_svg/"
+        "results/figures/SNFG/{type}_svg/"
     output:
-        directory("results/figures/SNFG/compact_pdf/")
+        directory("results/figures/SNFG/{type}_pdf/")
     run:
         from pathlib import Path
         from svglib.svglib import svg2rlg
