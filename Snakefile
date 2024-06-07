@@ -94,7 +94,8 @@ rule all:
         "results/figures/ml/simple_model_metrics_table.pdf",
         "results/figures/ml/forest_plot.pdf",
         "results/figures/ml/shap_summary.pdf",
-        "results/figures/ml/shap_waterfall/"
+        "results/figures/ml/shap_waterfall/",
+        "results/figures/ml/decision_tree.svg"
 
 
 # ==================== Prepare Data ====================
@@ -743,6 +744,16 @@ rule shap:
         directory("results/figures/ml/shap_waterfall/")
     script:
         "src/ml/shap.py"
+
+rule decision_tree:
+    # Visualize a decision tree classifier.
+    input:
+        "results/data/ml/train_data.csv",
+        "results/data/ml/test_data.csv"
+    output:
+        "results/figures/ml/decision_tree.svg"
+    notebook:
+        "src/ml/decision_tree.ipynb"
 
 
 # ==================== Others ====================
