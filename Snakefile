@@ -79,7 +79,6 @@ rule all:
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
-        "results/data/ml/mrmr_result.csv",
         "results/data/ml/all_combination_feature_selection_result.csv",
         "results/data/ml/predictions.csv",
         "results/data/ml/roc_auc.csv",
@@ -93,8 +92,6 @@ rule all:
         "results/figures/ml/probability_boxplots.pdf",
         "results/figures/ml/complex_model_metrics_table.pdf",
         "results/figures/ml/simple_model_metrics_table.pdf",
-        "results/figures/ml/mrmr_cv.pdf",
-        "results/figures/ml/mrmr_selected_corrplot.pdf",
         "results/figures/ml/forest_plot.pdf",
         "results/figures/ml/shap_summary.pdf",
         "results/figures/ml/shap_waterfall/"
@@ -645,25 +642,6 @@ rule plot_compare_model_heatmap:
     script:
         "src/ml/model_compare_heatmap.R"
 
-rule mrmr:
-    # Feature selection using mRMR
-    input:
-        "results/data/ml/train_data.csv",
-        "results/data/ml/feature_types.json"
-    output:
-        "results/data/ml/mrmr_result.csv"
-    script:
-        "src/ml/mrmr_on_glycans.py"
-
-rule plot_mrmr:
-    # Plot cross validation results for mRMR
-    input:
-        "results/data/ml/mrmr_result.csv"
-    output:
-        "results/figures/ml/mrmr_cv.pdf"
-    script:
-        "src/ml/plot_mrmr.R"
-
 rule all_combination_feature_selection:
     # Feature selection using all combinations of features
     input:
@@ -673,16 +651,6 @@ rule all_combination_feature_selection:
         "results/data/ml/all_combination_feature_selection_result.csv"
     script:
         "src/ml/all_combination_feature_selection.py"
-
-rule selected_corr:
-    # Plot corrplot for mRMR-selected glycans.
-    input:
-        "results/data/prepared/processed_abundance.csv",
-        "results/data/ml/mrmr_result.csv"
-    output:
-        "results/figures/ml/mrmr_selected_corrplot.pdf"
-    script:
-        "src/ml/mrmr_corrplot.R"
 
 rule make_predictions:
     # Predict on the test data and evalute the model.
