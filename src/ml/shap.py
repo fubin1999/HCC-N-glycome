@@ -13,7 +13,7 @@ import shap
 train_data = pd.read_csv(snakemake.input[0], index_col=0)
 test_data = pd.read_csv(snakemake.input[1], index_col=0)
 
-features = ['H5N4F1', 'H6N5F1S3', 'H3N4F1', 'AFP', 'HBEAG']
+features = ["H7N6F1S3", "H6N2", "H3N5", "H4N3S1"]
 
 X_train = train_data[features]
 y_train = train_data["group"]

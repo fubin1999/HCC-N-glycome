@@ -7,7 +7,7 @@ library(grid)
 train_data <- read_csv(snakemake@input[[1]])
 
 lr <- glm(
-  group ~ H5N4F1 + H4N4S1 + H6N5F1S3 + H3N4F1 + AFP + HBSAG + HBEAG + HBEAB + AST + ALT + GGT + ALB + TBIL + TP,
+  group ~ H7N6F1S3 + H6N2 + H3N5 + H4N3S1 + AFP + HBSAG + HBEAG + HBEAB + AST + ALT + GGT + ALB + TBIL + TP,
   family = binomial, data = train_data
 )
 lr_summary <- tidy(lr, conf.int = TRUE, exponentiate = TRUE) %>%
