@@ -80,6 +80,7 @@ rule all:
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
         "results/data/ml/mrmr_result.csv",
+        "results/data/ml/all_combination_feature_selection_result.csv",
         "results/data/ml/predictions.csv",
         "results/data/ml/roc_auc.csv",
         "results/data/ml/model_performance.csv",
@@ -662,6 +663,16 @@ rule plot_mrmr:
         "results/figures/ml/mrmr_cv.pdf"
     script:
         "src/ml/plot_mrmr.R"
+
+rule all_combination_feature_selection:
+    # Feature selection using all combinations of features
+    input:
+        "results/data/ml/train_data.csv",
+        "results/data/glycan_abundance/glycan_clusters.csv"
+    output:
+        "results/data/ml/all_combination_feature_selection_result.csv"
+    script:
+        "src/ml/all_combination_feature_selection.py"
 
 rule selected_corr:
     # Plot corrplot for mRMR-selected glycans.
