@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pandas as pd
 import numpy as np
-from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
@@ -21,7 +20,6 @@ X_test = test_data[features]
 y_test = test_data["group"]
 
 simple_model = make_pipeline(StandardScaler(), LogisticRegression(random_state=42))
-simple_model = CalibratedClassifierCV(simple_model, method="isotonic", cv=5)
 simple_model.fit(X_train, y_train)
 
 y_proba = simple_model.predict_proba(X_test)[:, 1]

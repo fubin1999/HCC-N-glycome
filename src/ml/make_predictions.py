@@ -28,7 +28,6 @@ complex_model.fit(X_train, y_train)
 
 selected_features = ["H7N6F1S3", "H5N4", "H3N5", "H4N3S1"]
 simple_model = make_pipeline(StandardScaler(), LogisticRegression(random_state=42))
-simple_model = CalibratedClassifierCV(simple_model, method="isotonic", cv=5)
 simple_model.fit(X_train[selected_features], y_train)
 
 y_pred_complex = complex_model.predict(X_test)
