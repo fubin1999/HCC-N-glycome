@@ -82,12 +82,12 @@ rule all:
         "results/data/ml/model_comparison.csv",
         "results/data/ml/all_combination_feature_selection_result.csv",
         "results/data/ml/predictions.csv",
-        "results/data/ml/roc_auc.csv",
         "results/data/ml/model_performance.csv",
 
         # ===== Machine Learning Figures =====
         "results/figures/ml/model_comparison_heatmap.pdf",
         "results/figures/ml/roc_curves.pdf",
+        "results/figures/ml/pr_curves.pdf",
         "results/figures/ml/calibration_curve.pdf",
         "results/figures/ml/confusion_matrix.pdf",
         "results/figures/ml/probability_boxplots.pdf",
@@ -665,17 +665,17 @@ rule make_predictions:
     script:
         "src/ml/make_predictions.py"
 
-rule ml_roc:
-    # Calculate ROC AUCs for different groups and plot ROC curves.
+rule model_roc_and_pr_curves:
+    # Plot ROC curves and PR curves for two models and AFP.
     input:
         predictions="results/data/ml/predictions.csv",
         groups=GROUPS,
         clinical=CLINICAL
     output:
         "results/figures/ml/roc_curves.pdf",
-        "results/data/ml/roc_auc.csv"
+        "results/figures/ml/pr_curves.pdf"
     script:
-        "src/ml/roc.R"
+        "src/ml/pr_roc.R"
 
 rule confusion_matrix:
     # Draw confusion matrix for the model.
