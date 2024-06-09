@@ -64,6 +64,9 @@ rule all:
         "results/figures/residues/residue_heatmap.pdf",
         "results/figures/residues/residue_boxplots.pdf",
 
+        # ===== GlyCompare =====
+        "results/data/glyCompareCT/",
+
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
@@ -505,6 +508,33 @@ rule residue_boxplots:
         "results/figures/residues/residue_boxplots.pdf"
     script:
         "src/residues/boxplot.R"
+
+
+# ==================== GlyCompare ====================
+GLYCOMPARE_CLI = "/Users/fubin/Python/glyCompareCT/glyCompareCT"
+
+rule prepare_for_glycompare:
+    # Prepare data format for GlyCompareCT.
+    input:
+        "data/glycan_structure_guess_linkage.csv"
+    output:
+        temp("results/data/glycompare_structures.csv")
+    run:
+        import pandas as pd
+        df = pd.read_csv(input[0])
+        df = df.rename(columns={"composition": "Name", "structure": "Glycan Structure"})
+        df.to_csv(output[0], index=False)
+
+
+rule run_glycompare:
+    # Run GlyCompareCT.
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/glycompare_structures.csv"
+    output:
+        directory("results/data/glyCompareCT/")
+    shell:
+        "{GLYCOMPARE_CLI} structure -a {input[0]} -v {input[1]} -o {output[0]} -p glycoCT -r N -c 8"
 
 
 # ==================== TCGA Gene Expression ====================
