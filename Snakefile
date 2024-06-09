@@ -65,7 +65,7 @@ rule all:
         "results/figures/residues/residue_boxplots.pdf",
 
         # ===== GlyCompare Data =====
-        "results/data/GlyCompare/",
+        "results/data/GlyCompare_results/",
 
         # ===== GlyCompare Figures =====
         "results/figures/SNFG/glycomotifs/",
@@ -534,7 +534,7 @@ rule run_glycompare:
         PROCESSED_ABUNDANCE,
         "results/data/glycompare_structures.csv"
     output:
-        directory("results/data/GlyCompare/")
+        directory("results/data/GlyCompare_results/")
     shell:
         "{GLYCOMPARE_CLI} structure -a {input[0]} -v {input[1]} -o {output[0]} -p glycoCT -r N -c 8"
 
