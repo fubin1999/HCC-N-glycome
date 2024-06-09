@@ -64,8 +64,11 @@ rule all:
         "results/figures/residues/residue_heatmap.pdf",
         "results/figures/residues/residue_boxplots.pdf",
 
-        # ===== GlyCompare =====
+        # ===== GlyCompare Data =====
         "results/data/GlyCompare/",
+
+        # ===== GlyCompare Figures =====
+        "results/figures/SNFG/glycomotifs/",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -534,6 +537,26 @@ rule run_glycompare:
         directory("results/data/GlyCompare/")
     shell:
         "{GLYCOMPARE_CLI} structure -a {input[0]} -v {input[1]} -o {output[0]} -p glycoCT -r N -c 8"
+
+rule plot_motif_SNFG:
+    # Draw SNFG cartoons for GlyCompare motifs.
+    input:
+        "results/data/GlyCompare/GlyCompare_output_data/GlyCompare_motif_annotation.csv"
+    output:
+        directory("results/figures/SNFG/glycomotifs/")
+    run:
+        import csv
+        from pathlib import Path
+        from glycowork.motif.draw import GlycoDraw
+
+        output_dir = output[0]
+        Path(output_dir).mkdir(exist_ok=True, parents=True)
+        with open(input[0], encoding='utf-8-sig') as fp:
+            reader = csv.reader(fp)
+            next(reader)
+            for motif, _, _, structure in reader:
+                path = Path(output_dir) / f"{motif}.svg"
+                GlycoDraw(structure, filepath=str(path), compact=True)
 
 
 # ==================== TCGA Gene Expression ====================
