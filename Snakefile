@@ -64,12 +64,14 @@ rule all:
         "results/figures/residues/residue_heatmap.pdf",
         "results/figures/residues/residue_boxplots.pdf",
 
-        # ===== GlyCompare Data =====
+        # ===== Motif Data =====
         "results/data/GlyCompare_results/",
         "results/data/motifs/motifs.csv",
         "results/data/motifs/motif_structures.csv",
+        "results/data/motifs/ancova_result.csv",
+        "results/data/motifs/post_hoc_result.csv",
 
-        # ===== GlyCompare Figures =====
+        # ===== Motif Figures =====
         "results/figures/SNFG/glycomotifs/",
 
         # ===== TCGA Data =====
@@ -581,6 +583,18 @@ rule tidy_glycompare_results:
         struc = struc.rename(columns={"glycoCT": "structure"})
         struc.index.name = "motif"
         struc.to_csv(output[1])
+
+rule motif_ANCOVA:
+    # Perform ANCOVA on glycomotifs.
+    input:
+        "results/data/motifs/motifs.csv",
+        "results/data/prepared/groups.csv",
+        "results/data/prepared/clinical.csv",
+    output:
+        "results/data/motifs/ancova_result.csv",
+        "results/data/motifs/post_hoc_result.csv"
+    script:
+        "src/motif/ancova.R"
 
 
 # ==================== TCGA Gene Expression ====================
