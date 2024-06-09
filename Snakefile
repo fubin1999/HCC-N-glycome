@@ -66,6 +66,8 @@ rule all:
 
         # ===== GlyCompare Data =====
         "results/data/GlyCompare_results/",
+        "results/data/motifs/motifs.csv",
+        "results/data/motifs/motif_structures.csv",
 
         # ===== GlyCompare Figures =====
         "results/figures/SNFG/glycomotifs/",
@@ -557,6 +559,28 @@ rule plot_motif_SNFG:
             for motif, _, _, structure in reader:
                 path = Path(output_dir) / f"{motif}.svg"
                 GlycoDraw(structure, filepath=str(path), compact=True)
+
+rule tidy_glycompare_results:
+    # Convert the results of GlyCompare into tidy formats.
+    input:
+        "results/data/GlyCompare_results/GlyCompare_output_data/GlyCompare_motif_abd_table.csv",
+        "results/data/GlyCompare_results/GlyCompare_output_data/GlyCompare_motif_annotation.csv",
+    output:
+        "results/data/motifs/motifs.csv",
+        "results/data/motifs/motif_structures.csv"
+    run:
+        import pandas as pd
+
+        abund = pd.read_csv(input[0], index_col=0)
+        abund = abund.T
+        abund.index.name = "sample"
+        abund.to_csv(output[0])
+
+        struc = pd.read_csv(input[1], index_col=0)
+        struc = struc[["glycoCT"]]
+        struc = struc.rename(columns={"glycoCT": "structure"})
+        struc.index.name = "motif"
+        struc.to_csv(output[1])
 
 
 # ==================== TCGA Gene Expression ====================
