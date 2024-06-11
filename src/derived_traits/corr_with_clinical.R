@@ -78,10 +78,13 @@ plot_corrplot <- function (cor_result) {
 
   plot_heatmap <- function (data, y_axis_title) {
     ggplot(data, aes(trait, clinical)) +
-      geom_point(aes(size = abs(cor), color = cor_direction), shape = 16) +
+      geom_point(aes(size = abs(cor), color = cor_direction), shape = 16, show.legend = TRUE) +
       scale_size_continuous(range = c(0.1, 4), limits = c(0, 0.5), breaks = c(0.1, 0.3, 0.5)) +
-      scale_color_manual(values = c(Positive = "#D26F32", Negative = "#275D87", `Not significant` = "grey")) +
-      labs(size = "|Corr. Coef.|", color = "Relation") +
+      scale_color_manual(
+        limits = c("Positive", "Negative", "Not significant"),
+        values = c("Positive" = "#D26F32", "Negative" = "#275D87", "Not significant" = "grey")
+      ) +
+      labs(size = "|Spearman's rho|", color = "Relation") +
       coord_fixed(ratio = 1.5) +
       theme_bw()
   }
