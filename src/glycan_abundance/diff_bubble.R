@@ -1,9 +1,9 @@
 library(tidyverse)
 
 # Read data-----
-# post_hoc_result <- read_csv("results/data/diff_analysis/posthoc_for_glycans.csv")
-# fold_change <- read_csv("results/data/diff_analysis/fold_change.csv")
-# row_order <- read_csv("results/data/diff_analysis/glycan_clusters.csv")
+# post_hoc_result <- read_csv("results/data/glycan_abundance/posthoc_for_glycans.csv")
+# fold_change <- read_csv("results/data/glycan_abundance/fold_change.csv")
+# row_order <- read_csv("results/data/glycan_abundance/glycan_clusters.csv")
 
 post_hoc_result <- read_csv(snakemake@input[["post_hoc"]])
 fold_change <- read_csv(snakemake@input[["fold_change"]])
@@ -14,10 +14,10 @@ data <- post_hoc_result %>%
   select(glycan, group1, group2, p.adj) %>%
   inner_join(fold_change, by = c("glycan", "group1", "group2")) %>%
   mutate(
-    comparison = str_glue("{group1} vs {group2}"),
+    comparison = str_glue("{group1} / {group2}"),
     comparison = factor(
       comparison,
-      levels = c("HC vs HCC", "CHB vs HCC", "LC vs HCC", "HC vs LC", "CHB vs LC", "HC vs CHB")
+      levels = c("HC / CHB", "HC / LC", "HC / HCC", "CHB / LC", "CHB / HCC", "LC / HCC")
     )
   ) %>%
   select(-group1, -group2) %>%
@@ -38,11 +38,12 @@ p <- ggplot(data, aes(comparison, reorder(glycan, desc(rank)))) +
   theme_minimal() +
   theme(
     axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5),
-    axis.text.y = element_blank()
+    axis.text.y = element_blank(),
+    legend.direction = "horizontal"
   ) +
   scale_alpha_manual(values = c(0, 1)) +
   scale_size_continuous(range = c(1, 3.5)) +
   scale_color_gradient2(high = "#CD0000", low = "#27408B", mid = "white")
 
-# tgutil::ggpreview(width = 2, height = 7)
-ggsave(snakemake@output[[1]], plot = p, width = 2, height = 7)
+# tgutil::ggpreview(width = 3.8, height = 7)
+ggsave(snakemake@output[[1]], plot = p, width = 3.8, height = 7)
