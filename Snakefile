@@ -453,10 +453,10 @@ rule trait_cor_with_clinical:
         GROUPS,
         CLINICAL
     output:
-        "results/data/derived_traits/corr_with_clinical.csv",
+        "results/data/corr_with_clinical/corr_with_clinical.csv",
         "results/data/derived_traits/corr_with_clinical_HCC.csv"
     script:
-        "src/derived_traits/corr_with_clinical.R"
+        "src/corr_with_clinical/corr_with_clinical.R"
 
 rule trait_corrplot_with_clinical:
     # Draw corrplot for derived traits with clinical information.
@@ -467,7 +467,7 @@ rule trait_corrplot_with_clinical:
         "results/figures/derived_traits/corr_with_clinical.pdf",
         "results/figures/derived_traits/corr_with_clinical_HCC.pdf"
     script:
-        "src/derived_traits/corrplot_with_clinical.R"
+        "src/corr_with_clinical/corrplot_with_clinical.R"
 
 rule scatter_with_clinical:
     # Draw scatter plot for selected derived traits and clinical variables
@@ -481,7 +481,7 @@ rule scatter_with_clinical:
     output:
         "results/figures/derived_traits/scatter_with_clinical.pdf"
     script:
-        "src/derived_traits/scatter_with_clinical.R"
+        "src/corr_with_clinical/scatter_with_clinical.R"
 
 
 # ==================== Residue Analysis ====================
