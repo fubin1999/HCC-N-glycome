@@ -24,7 +24,7 @@ data <- glycan_abundance %>%
 ancova_result <- data |> 
   group_by(glycan) |>
   anova_test(
-    log_value ~ group + age + sex,
+    log_value ~ age * sex + group,
     white.adjust = TRUE,
     effect.size = "pes"
   ) |>
@@ -38,7 +38,7 @@ diff_glycans <- ancova_result |>
 
 posthoc_result <- data %>%
   filter(glycan %in% diff_glycans) %>%
-  post_hoc(log_value ~ group + sex + age, group, glycan) %>%
+  post_hoc(log_value ~ age * sex + group, group, glycan) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----

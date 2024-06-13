@@ -31,7 +31,7 @@ data <- data %>%
 ancova_result <- data |>
   group_by(motif) |>
   anova_test(
-    log_value ~ group + age + sex,
+    log_value ~ age * sex + group,
     white.adjust = TRUE,
     effect.size = "pes"
   ) |>
@@ -45,7 +45,7 @@ diff_motifs <- ancova_result |>
 
 posthoc_result <- data %>%
   filter(motif %in% diff_motifs) %>%
-  post_hoc(log_value ~ group + sex + age, group, motif) %>%
+  post_hoc(log_value ~ age * sex + group, group, motif) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----

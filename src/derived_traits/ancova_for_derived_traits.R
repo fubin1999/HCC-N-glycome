@@ -24,7 +24,7 @@ data <- trait_data %>%
 ancova_result <- data |>
   group_by(trait) |>
   anova_test(
-    value ~ group + age + sex,
+    value ~ age * sex + group,
     white.adjust = TRUE,
     effect.size = "pes"
   ) |>
@@ -38,7 +38,7 @@ diff_traits <- ancova_result |>
 
 posthoc_result <- data %>%
   filter(trait %in% diff_traits) %>%
-  post_hoc(value ~ group + sex + age, group, trait) %>%
+  post_hoc(value ~ age * sex + group, group, trait) %>%
   add_significance(p.col = "p.adj")
 
 # Save results-----

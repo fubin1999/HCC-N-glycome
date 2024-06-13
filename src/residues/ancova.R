@@ -21,14 +21,14 @@ data <- residues %>%
 
 ancova_result <- data %>%
   group_by(residue) %>%
-  anova_test(value ~ group + age + sex, white.adjust = TRUE) %>%
+  anova_test(value ~ age * sex + group, white.adjust = TRUE) %>%
   adjust_pvalue() %>%
   add_significance("p.adj") %>%
   as_tibble() %>%
   select(-`p<.05`)
 
 post_hoc_result <- data %>%
-  post_hoc(value ~ group + age + sex, group, residue)
+  post_hoc(value ~ age * sex + group, group, residue)
 
 write_csv(ancova_result, snakemake@output[[1]])
 write_csv(post_hoc_result, snakemake@output[[2]])
