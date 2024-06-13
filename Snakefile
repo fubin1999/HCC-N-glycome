@@ -473,9 +473,11 @@ rule scatter_with_clinical:
     # Draw scatter plot for selected derived traits and clinical variables
     # with high correlation.
     input:
-        "results/data/derived_traits/filtered_derived_traits.csv",
-        GROUPS,
-        CLINICAL
+        traits="results/data/derived_traits/filtered_derived_traits.csv",
+        groups=GROUPS,
+        clinical=CLINICAL,
+        corr_result_all="results/data/derived_traits/corr_with_clinical.csv",
+        corr_result_HCC="results/data/derived_traits/corr_with_clinical_HCC.csv"
     output:
         "results/figures/derived_traits/scatter_with_clinical.pdf"
     script:
