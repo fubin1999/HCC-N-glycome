@@ -90,12 +90,13 @@ rule all:
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
-        "results/data/ml/all_combination_feature_selection_result.csv",
+        "results/data/ml/mrmr_result.csv",
         "results/data/ml/predictions.csv",
         "results/data/ml/model_performance.csv",
 
         # ===== Machine Learning Figures =====
         "results/figures/ml/model_comparison_heatmap.pdf",
+        "results/figures/ml/mrmr_auc.pdf",
         "results/figures/ml/roc_curves.pdf",
         "results/figures/ml/pr_curves.pdf",
         "results/figures/ml/calibration_curve.pdf",
@@ -745,15 +746,24 @@ rule plot_compare_model_heatmap:
     script:
         "src/ml/model_compare_heatmap.R"
 
-rule all_combination_feature_selection:
-    # Feature selection using all combinations of features
+rule mrmr_feature_selection:
+    # Perform mRMR to select glycans.
     input:
         "results/data/ml/train_data.csv",
-        "results/data/glycan_abundance/glycan_clusters.csv"
+        "results/data/ml/feature_types.json"
     output:
-        "results/data/ml/all_combination_feature_selection_result.csv"
+        "results/data/ml/mrmr_result.csv"
     script:
-        "src/ml/all_combination_feature_selection.py"
+        "src/ml/mrmr.py"
+
+rule plot_mrmr:
+    # Plot number of features vs. AUC for mRMR.
+    input:
+        "results/data/ml/mrmr_result.csv"
+    output:
+        "results/figures/ml/mrmr_auc.pdf"
+    script:
+        "src/ml/plot_mrmr.R"
 
 rule make_predictions:
     # Predict on the test data and evalute the model.
