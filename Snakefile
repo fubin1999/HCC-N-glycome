@@ -88,6 +88,7 @@ rule all:
         "results/figures/TCGA/cluster_dea_heatmap.pdf",
         "results/figures/TCGA/clinical_heatmap.pdf",
         "results/figures/TCGA/cox_forest_plot.pdf",
+        "results/figures/TCGA/cluster_KM.pdf",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -720,6 +721,16 @@ rule TCGA_gene_cox_forest_plot:
         "results/figures/TCGA/cox_forest_plot.pdf"
     script:
         "src/TCGA/cox_forest.R"
+
+rule TCGA_cluster_KM:
+    # Draw KM Curve for two clusters.
+    input:
+        "results/data/TCGA/prepared_data.rda",
+        "results/data/TCGA/consensus_cluster_result.csv"
+    output:
+        "results/figures/TCGA/cluster_KM.pdf"
+    script:
+        "src/TCGA/cluster_survival.R"
 
 
 # ==================== Machine Learning ====================
