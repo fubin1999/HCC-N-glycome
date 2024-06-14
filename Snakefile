@@ -78,6 +78,7 @@ rule all:
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
         "results/data/TCGA/cluster_dea_results.csv",
+        "results/data/TCGA/cox.csv",
 
         # ===== TCGA Figures =====
         "results/figures/TCGA/volcano.pdf",
@@ -86,7 +87,6 @@ rule all:
         "results/figures/TCGA/consensus_cluster/",
         "results/figures/TCGA/cluster_dea_heatmap.pdf",
         "results/figures/TCGA/clinical_heatmap.pdf",
-        "results/figures/TCGA/survival/",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -701,15 +701,15 @@ rule TCGA_HCC_clinical_heatmap:
     script:
         "src/TCGA/clinical_heatmap_cluster.R"
 
-rule TCGA_survival:
-    # Draw survival plots for glycogenes.
+rule TCGA_single_gene_survival:
+    # Perform Cox PH on each glycogenes.
     input:
         "results/data/TCGA/prepared_data.rda",
         "data/glycogenes.csv"
     output:
-        directory("results/figures/TCGA/survival/")
+        "results/data/TCGA/cox.csv"
     script:
-        "src/TCGA/survival.R"
+        "src/TCGA/single_gene_survival.R"
 
 
 # ==================== Machine Learning ====================
