@@ -33,7 +33,7 @@ rownames(expr_mat_sub) <- column_to_rownames(gene_info, "gene_id")[rownames(expr
 col_split <- column_to_rownames(clusters, "barcode")[HCC_samples,1]
 
 col_fun <- colorRamp2(c(-1.5, 0, 1.5), c("green", "black", "red"))
-pdf(snakemake@output[[1]], width = 5, height = 8)
+pdf(snakemake@output[[1]], width = 5, height = 10)
 Heatmap(
   expr_mat_sub,
   name = "Z-score",

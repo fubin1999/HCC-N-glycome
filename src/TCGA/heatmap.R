@@ -3,9 +3,9 @@ library(ComplexHeatmap)
 library(circlize)
 library(tidyverse)
 
-# load("results/data/TCGA/prepared_data.rda")
-# dea_result <- read_csv("results/data/TCGA/dea_results.csv")
-# glyco_genes <- read_csv("data/glycogenes.csv") %>% pull(gene_name)
+load("results/data/TCGA/prepared_data.rda")
+dea_result <- read_csv("results/data/TCGA/dea_results.csv")
+glyco_genes <- read_csv("data/glycogenes.csv") %>% pull(gene_name)
 
 load(snakemake@input[[1]])
 dea_result <- read_csv(snakemake@input[[2]])
@@ -57,7 +57,7 @@ mat_to_plot <- normed %>%
 
 col_split <- sample_info$sample_type
 
-pdf(snakemake@output[[1]], width = 4, height = 6)
+pdf(snakemake@output[[1]], width = 4, height = 10)
 col_fun <- colorRamp2(c(-2., 0, 2.), c("green", "black", "red"))
 Heatmap(
   mat_to_plot,
