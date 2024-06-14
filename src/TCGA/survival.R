@@ -54,7 +54,7 @@ survival_results <- survival_data %>%
   mutate(fit = list(survfit(Surv(os, vital_status) ~ group, data = data)))
 
 p_values <- survival_results %>%
-  mutate(p_value = surv_pvalue(fit, data)) %>%
+  mutate(p_value = surv_pvalue(fit, data, method = "sqrtN")) %>%
   select(gene_name, p_value) %>%
   unnest(p_value)
 
