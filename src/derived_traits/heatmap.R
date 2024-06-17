@@ -54,6 +54,7 @@ Heatmap(
   height = unit(nrow(mat) / 2.5, "cm"),
   cluster_columns = FALSE,
   row_split = row_split,
-  cluster_row_slices = FALSE
+  cluster_row_slices = FALSE,
+  rect_gp = gpar(col = "white", lwd = 1)
 )
 dev.off()
