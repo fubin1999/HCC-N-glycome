@@ -24,7 +24,6 @@ HC_p <- plot_data %>%
   mutate(group = factor(group, levels = c("HC", "HCC", "Others"))) %>%
   ggplot(aes(PC2, PC1, color = group, alpha = group)) +
   geom_point(shape = 16) +
-  stat_ellipse() +
   scale_color_manual(values = c("HC" = "#7A848D", "HCC" = "#CC5F5A", "Others" = "black")) +
   scale_alpha_manual(values = c("HC" = 1, "HCC" = 1, "Others" = 0.1)) +
   theme_classic()
@@ -34,7 +33,6 @@ MC_p <- plot_data %>%
   mutate(group = factor(group, levels = c("CHB", "HCC", "Others"))) %>%
   ggplot(aes(PC2, PC1, color = group, alpha = group)) +
   geom_point(shape = 16) +
-  stat_ellipse() +
   scale_color_manual(values = c("CHB" = "#A2AFA6", "HCC" = "#CC5F5A", "Others" = "black")) +
   scale_alpha_manual(values = c("CHB" = 1, "HCC" = 1, "Others" = 0.1)) +
   theme_classic()
@@ -44,7 +42,6 @@ YC_p <- plot_data %>%
   mutate(group = factor(group, levels = c("LC", "HCC", "Others"))) %>%
   ggplot(aes(PC2, PC1, color = group, alpha = group)) +
   geom_point(shape = 16) +
-  stat_ellipse() +
   scale_color_manual(values = c("LC" = "#FEC37D", "HCC" = "#CC5F5A", "Others" = "black")) +
   scale_alpha_manual(values = c("LC" = 1, "HCC" = 1, "Others" = 0.1)) +
   theme_classic()
