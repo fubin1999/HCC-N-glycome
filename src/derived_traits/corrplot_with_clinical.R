@@ -57,13 +57,13 @@ plot_corrplot <- function (cor_result) {
         values = c("Positive" = "#D26F32", "Negative" = "#275D87", "Not significant" = "grey")
       ) +
       labs(size = "|Spearman's rho|", color = "Relation") +
-      coord_fixed(ratio = 1.5) +
       theme_bw()
   }
 
   function_p <- plot_data %>%
     filter(clinical_type == "Liver Function") %>%
     plot_heatmap("Liver Function") +
+    labs(y = "Liver Function") +
     theme(
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -71,6 +71,7 @@ plot_corrplot <- function (cor_result) {
   hepatitis_p <- plot_data %>%
     filter(clinical_type == "Hepatitis Related") %>%
     plot_heatmap("Hepatitis Related") +
+    labs(y = "Hepatitis") +
     theme(
       axis.text.x = element_blank(),
       axis.ticks.x = element_blank(),
@@ -78,23 +79,25 @@ plot_corrplot <- function (cor_result) {
   marker_p <- plot_data %>%
     filter(clinical_type == "Tumor Markers") %>%
     plot_heatmap("Tumor Markers") +
+    labs(y = "Markers") +
     theme(
       axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)
     )
 
   hepatitis_p / function_p / marker_p +
     plot_layout(guides = "collect") &
+    coord_fixed() &
     theme(
       legend.position = "top",
       axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
+      axis.title.y.left = element_text(size = 10),
     ) &
     scale_y_discrete(position = "right")
 }
 
 full_p <- plot_corrplot(full_cor_result)
 HCC_p <- plot_corrplot(HCC_cor_result)
-# tgutil::ggpreview(width = 8, height = 6)
+# tgutil::ggpreview(plot = full_p, width = 8, height = 6)
 
 ggsave(snakemake@output[[1]], plot = full_p, width = 8, height = 6)
 ggsave(snakemake@output[[2]], plot = HCC_p, width = 8, height = 6)
