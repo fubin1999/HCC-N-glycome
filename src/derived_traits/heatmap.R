@@ -28,13 +28,15 @@ plot_data <- data %>%
   summarise(mean_value = mean(value), .groups = "drop") %>%
   pivot_wider(names_from = group, values_from = mean_value) %>%
   mutate(trait_type = case_when(
-    str_ends(trait, "Fc") ~ "Core-Fucosylation",
-    str_ends(trait, "Fa") ~ "Arm-Fucosylation",
+    str_ends(trait, "F") ~ "Fucosylation",
     str_ends(trait, "S") ~ "Sialylation",
     str_ends(trait, "G") ~ "Galactosylation",
-    str_ends(trait, "B") ~ "Bisectioon",
+    str_ends(trait, "B") ~ "Bisection",
     .default = "Complexity"
-  ))
+  )) %>%
+  mutate(trait_type = factor(trait_type, levels = c(
+    "Complexity", "Bisection", "Galactosylation", "Fucosylation", "Sialylation"
+  )))
 
 mat <- plot_data %>%
   select(-trait_type) %>%
