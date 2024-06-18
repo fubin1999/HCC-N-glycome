@@ -48,7 +48,7 @@ rule all:
 
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/heatmap.pdf",
-        "results/figures/derived_traits/boxplots_for_selected_traits.pdf",
+        "results/figures/derived_traits/boxplots/",
         "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
         "results/figures/derived_traits/diff_bubble.pdf",
         "results/figures/derived_traits/confounders.pdf",
@@ -402,9 +402,10 @@ rule boxplots_for_selected_traits:
     # Draw boxplots for selected derived traits.
     input:
         "results/data/derived_traits/derived_traits.csv",
-        "results/data/prepared/groups.csv"
+        "results/data/prepared/groups.csv",
+        "results/data/derived_traits/posthoc_for_derived_traits.csv"
     output:
-        "results/figures/derived_traits/boxplots_for_selected_traits.pdf"
+        directory("results/figures/derived_traits/boxplots/")
     script:
         "src/derived_traits/selected_boxplots.R"
 
