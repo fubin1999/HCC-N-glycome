@@ -49,10 +49,9 @@ rule all:
         # ===== Derived Traits Figures =====
         "results/figures/derived_traits/heatmap.pdf",
         "results/figures/derived_traits/boxplots/",
-        "results/figures/derived_traits/diff_antenna_trait_radar.pdf",
         "results/figures/derived_traits/diff_bubble.pdf",
         "results/figures/derived_traits/confounders.pdf",
-        "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf",
+        "results/figures/derived_traits/TF_AFP_subtype_boxplot.pdf",
         "results/figures/derived_traits/corr_with_clinical.pdf",
         "results/figures/derived_traits/scatter_with_clinical.pdf",
 
@@ -409,16 +408,6 @@ rule boxplots_for_selected_traits:
     script:
         "src/derived_traits/selected_boxplots.R"
 
-rule diff_antenna_trait_radar:
-    # Draw radar plot for differential antenna traits.
-    input:
-        "results/data/derived_traits/derived_traits.csv",
-        "results/data/prepared/groups.csv"
-    output:
-        "results/figures/derived_traits/diff_antenna_trait_radar.pdf"
-    script:
-        "src/derived_traits/diff_antenna_radar.R"
-
 rule trait_diff_bubble:
     # Draw bubble plot for differential derived traits.
     input:
@@ -436,7 +425,7 @@ rule AFP_subtype_trait_diff:
         CLINICAL
     output:
         "results/data/derived_traits/AFP_subtype_ancova.csv",
-        "results/figures/derived_traits/CFc_AFP_subtype_boxplot.pdf"
+        "results/figures/derived_traits/TF_AFP_subtype_boxplot.pdf"
     script:
         "src/derived_traits/AFP_subtype_ancova.R"
 

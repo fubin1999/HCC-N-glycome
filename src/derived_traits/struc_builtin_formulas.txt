@@ -25,94 +25,52 @@ CA3 = [nAnt == 3] // [type == 'complex']
 CA4 = [nAnt == 4] // [type == 'complex']
 
 
-# Core Fucosylation
+# Fucosylation
 
-# Core fucosylation within complex type glycans
-CFc = [nFc > 0] // [type == 'complex']
+# Proportion of fucosylated glycans
+TF = [nF > 0] / [1]
 
-# Core fucosylation within monoantennary glycans
-A1Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 1)]
+# Fucosylation within monoantennary glycans
+A1F = [nF > 0] // [(type == 'complex') * (nAnt == 1)]
 
-# Core fucosylation within diantennary glycans
-A2Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 2)]
+# Fucosylation within diantennary glycans
+A2F = [nF > 0] // [(type == 'complex') * (nAnt == 2)]
 
-# Core fucosylation within triantennary glycans
-A3Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 3)]
+# Fucosylation within triantennary glycans
+A3F = [nF > 0] // [(type == 'complex') * (nAnt == 3)]
 
-# Core fucosylation within tetra-antennary glycans
-A4Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 4)]
+# Fucosylation within tetra-antennary glycans
+A4F = [nF > 0] // [(type == 'complex') * (nAnt == 4)]
 
-# Core fucosylation within sialylated monoantennary glycans
-A1SFc = [nFc > 0] // [(type == 'complex') * (nAnt == 1) * (nS > 0)]
+# Fucosylation within sialylated monoantennary glycans
+A1SF = [nF > 0] // [(type == 'complex') * (nAnt == 1) * (nS > 0)]
 
-# Core fucosylation within sialylated diantennary glycans
-A2SFc = [nFc > 0] // [(type == 'complex') * (nAnt == 2) * (nS > 0)]
+# Fucosylation within sialylated diantennary glycans
+A2SF = [nF > 0] // [(type == 'complex') * (nAnt == 2) * (nS > 0)]
 
-# Core fucosylation within sialylated triantennary glycans
-A3SFc = [nFc > 0] // [(type == 'complex') * (nAnt == 3) * (nS > 0)]
+# Fucosylation within sialylated triantennary glycans
+A3SF = [nF > 0] // [(type == 'complex') * (nAnt == 3) * (nS > 0)]
 
-# Core fucosylation within sialylated tetra-antennary glycans
-A4SFc = [nFc > 0] // [(type == 'complex') * (nAnt == 4) * (nS > 0)]
+# Fucosylation within sialylated tetra-antennary glycans
+A4SF = [nF > 0] // [(type == 'complex') * (nAnt == 4) * (nS > 0)]
 
-# Core fucosylation within non-sialylated monoantennary glycans
-A1S0Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 1) * (nS == 0)]
+# Fucosylation within non-sialylated monoantennary glycans
+A1S0F = [nF > 0] // [(type == 'complex') * (nAnt == 1) * (nS == 0)]
 
-# Core fucosylation within non-sialylated diantennary glycans
-A2S0Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 2) * (nS == 0)]
+# Fucosylation within non-sialylated diantennary glycans
+A2S0F = [nF > 0] // [(type == 'complex') * (nAnt == 2) * (nS == 0)]
 
-# Core fucosylation within non-sialylated triantennary glycans
-A3S0Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 3) * (nS == 0)]
+# Fucosylation within non-sialylated triantennary glycans
+A3S0F = [nF > 0] // [(type == 'complex') * (nAnt == 3) * (nS == 0)]
 
-# Core fucosylation within non-sialylated tetra-antennary glycans
-A4S0Fc = [nFc > 0] // [(type == 'complex') * (nAnt == 4) * (nS == 0)]
-
-
-# Antennary fucosylation
-
-# Antennary fucosylation within complex type glycans
-CFa = [nFa] // [type == 'complex']
-
-# Antennary fucosylation within monoantennary glycans
-A1Fa = [nFa] // [(type == 'complex') * (nAnt == 1)]
-
-# Antennary fucosylation within diantennary glycans
-A2Fa = [nFa] // [(type == 'complex') * (nAnt == 2)]
-
-# Antennary fucosylation within triantennary glycans
-A3Fa = [nFa] // [(type == 'complex') * (nAnt == 3)]
-
-# Antennary fucosylation within tetra-antennary glycans
-A4Fa = [nFa] // [(type == 'complex') * (nAnt == 4)]
-
-# Antennary fucosylation within sialylated monoantennary glycans
-A1SFa = [nFa] // [(type == 'complex') * (nAnt == 1) * (nS > 0)]
-
-# Antennary fucosylation within sialylated diantennary glycans
-A2SFa = [nFa] // [(type == 'complex') * (nAnt == 2) * (nS > 0)]
-
-# Antennary fucosylation within sialylated triantennary glycans
-A3SFa = [nFa] // [(type == 'complex') * (nAnt == 3) * (nS > 0)]
-
-# Antennary fucosylation within sialylated tetra-antennary glycans
-A4SFa = [nFa] // [(type == 'complex') * (nAnt == 4) * (nS > 0)]
-
-# Antennary fucosylation within non-sialylated monoantennary glycans
-A1S0Fa = [nFa] // [(type == 'complex') * (nAnt == 1) * (nS == 0)]
-
-# Antennary fucosylation within non-sialylated diantennary glycans
-A2S0Fa = [nFa] // [(type == 'complex') * (nAnt == 2) * (nS == 0)]
-
-# Antennary fucosylation within non-sialylated triantennary glycans
-A3S0Fa = [nFa] // [(type == 'complex') * (nAnt == 3) * (nS == 0)]
-
-# Antennary fucosylation within non-sialylated tetra-antennary glycans
-A4S0Fa = [nFa] // [(type == 'complex') * (nAnt == 4) * (nS == 0)]
+# Fucosylation within non-sialylated tetra-antennary glycans
+A4S0F = [nF > 0] // [(type == 'complex') * (nAnt == 4) * (nS == 0)]
 
 
 # Bisection
 
-# Relative abundance of species with a bisecting GlcNAc within all complex glycans
-CB = [B] // [type == 'complex']
+# Proportion of bisecting glycans
+TB = [B] / [1]
 
 # Relative abundance of species with a bisecting GlcNAc within diantennary glycans
 A2B = [B] // [(type == 'complex') * (nAnt == 2)]
@@ -162,8 +120,8 @@ A4S0B = [B] // [(type == 'complex') * (nAnt == 4) * (nS == 0)]
 
 # Galactosylaiton
 
-# Average number of galactoses on complex glycans
-CG = [nG] // [type == 'complex']
+# Average number of galactoses per antenna on complex glycans
+CG = [nG / nAnt] // [type == 'complex']
 
 # Galactosylation per antenna within monoantennary glycans
 A1G = [nG] // [(type == 'complex') * (nAnt == 1)]
@@ -230,9 +188,6 @@ A4S0G = [nG / 4] // [(type == 'complex') * (nAnt == 4) * (nS == 0)]
 
 # Proportion of sialylated glycans
 TS = [nS > 0] / [1]
-
-# Average number of sialic acids on complex glycans
-CS = [nS] // [type == 'complex']
 
 # Average degree of sialylation per galactose within complex glycans
 CGS = [nS / nG] // [type == 'complex']

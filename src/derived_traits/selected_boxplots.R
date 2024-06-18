@@ -22,11 +22,11 @@ trait_df <- tribble(
   "CA2", "Proportion of bi-antennary glycans\nwithin complex glycans", TRUE,
   "CA3", "Proportion of tri-antennary glycans\nwithin complex glycans", TRUE,
   "CA4", "Proportion of tetra-antennary glycans\nwithin complex glycans", TRUE,
-  "CS", "Average number of sialic acids\non complex glycans", FALSE,
-  "CG", "Average number of galactoses\non complex glycans", FALSE,
-  "CFc", "Proportion of core-fucosylated glycans\nwithin complex glycans", TRUE,
-  "CFa", "Proportion of arm-fucosylated glycans\nwithin complex glycans", TRUE,
-  "CB", "Proportion of bisecting glycans\nithin complex glycans", TRUE
+  "CGS", "Average number of sialic acids per galactose\non complex glycans", FALSE,
+  "TS", "Proportion of sialylated glycans", TRUE,
+  "CG", "Average number of galactoses per antenna\non complex glycans", FALSE,
+  "TF", "Proportion of core-fucosylated glycans", TRUE,
+  "TB", "Proportion of bisecting glycans", TRUE
 )
 
 plot_data <- data %>%
