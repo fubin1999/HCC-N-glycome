@@ -44,6 +44,7 @@ cor_eigen_with_mean <- cluster_means %>%
 
 final_result <- eigen_glycans %>%
   left_join(cor_eigen_with_mean %>% select(cluster, cor)) %>%
-  mutate(eigen_glycan = if_else(cor > 0, eigen_glycan, -eigen_glycan))
+  mutate(eigen_glycan = if_else(cor > 0, eigen_glycan, -eigen_glycan)) %>%
+  select(-cor)
 
 write_csv(final_result, snakemake@output[[1]])
