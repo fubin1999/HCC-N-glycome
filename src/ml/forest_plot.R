@@ -7,7 +7,7 @@ library(grid)
 train_data <- read_csv(snakemake@input[[1]])
 
 lr <- glm(
-  group ~ H5N4F1 + H4N4S1 + H6N5F1S3 + H3N4F1 + AFP + HBSAG + HBEAG + HBEAB + AST + ALT + GGT + ALB + TBIL + TP,
+  group ~ H5N4F1 + H6N4S1 + H4N4S1 + H6N3 + H6N5F2S3 + H3N4F1 + H5N4F1S1 + H4N5F1S1 + H7N6F1S4,
   family = binomial, data = train_data
 )
 lr_summary <- tidy(lr, conf.int = TRUE, exponentiate = TRUE) %>%
@@ -33,4 +33,4 @@ p <- forest(
   add_border(part = "header", row = 1, where = "bottom") %>%
   add_border(part = "body", row = 4, where = "bottom")
 # tgutil::ggpreview(p, width = 6, height = 5)
-ggsave(snakemake@output[[1]], plot = p, width = 6, height = 5)
+ggsave(snakemake@output[[1]], plot = p, width = 6, height = 7)

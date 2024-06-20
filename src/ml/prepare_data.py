@@ -25,7 +25,7 @@ data["group"] = data["group"] == "HCC"
 clinical_features = clinical.columns.tolist()
 glycan_features = abundance.columns.tolist()
 
-train_data, test_data = train_test_split(data, test_size=128, random_state=43, stratify=groups_4, shuffle=True)
+train_data, test_data = train_test_split(data, test_size=128, random_state=2, stratify=groups_4, shuffle=True)
 feature_types = {"clinical": clinical_features, "glycan": glycan_features}
 
 train_data.to_csv(snakemake.output["train_data"], index=True)
