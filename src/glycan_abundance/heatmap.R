@@ -56,7 +56,7 @@ ht <- Heatmap(
   show_column_names = FALSE,
   cluster_columns = FALSE,
   column_split = col_split,
-  row_km = 4,
+  row_km = 5,
   row_km_repeats = 100,
   row_title = "Cluster %s",
   cluster_row_slices = FALSE,
