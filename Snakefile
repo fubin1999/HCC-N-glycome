@@ -36,6 +36,7 @@ rule all:
         "results/figures/glycan_abundance/pca.pdf",
         "results/figures/glycan_abundance/cor_with_AFP_1.pdf",
         "results/figures/glycan_abundance/cor_with_AFP_2.pdf",
+        "results/figures/glycan_abundance/glycan_properties.pdf",
 
         # ===== Derived Traits Data =====
         "results/data/derived_traits/derived_traits.csv",
@@ -295,6 +296,16 @@ rule glycan_cluster_trends:
         "results/figures/glycan_abundance/glycan_cluster_trends.pdf"
     script:
         "src/glycan_abundance/cluster_trends.R"
+
+rule plot_cluster_properties:
+    # Plot heatmap showing glycans' properties.
+    input:
+        "results/data/glycan_abundance/glycan_clusters.csv",
+        "results/data/derived_traits/meta_properties.csv"
+    output:
+        "results/figures/glycan_abundance/glycan_properties.pdf"
+    script:
+        "src/glycan_abundance/cluster_properties.R"
 
 rule violin_plots:
     # Plot violin plots for all significant glycans.
