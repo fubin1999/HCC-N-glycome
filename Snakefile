@@ -289,9 +289,8 @@ rule diff_bubble:
 rule glycan_cluster_trends:
     # Plot the alteration trends of glycan clusters from the heatmap about.
     input:
-        abundance=PROCESSED_ABUNDANCE,
-        groups=GROUPS,
-        clusters="results/data/glycan_abundance/glycan_clusters.csv"
+        "results/data/glycan_abundance/eigen_glycans.csv",
+        GROUPS
     output:
         "results/figures/glycan_abundance/glycan_cluster_trends.pdf"
     script:

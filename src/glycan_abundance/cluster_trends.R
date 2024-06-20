@@ -1,42 +1,50 @@
 library(tidyverse)
 library(patchwork)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clusters <- read_csv("results/data/diff_analysis/glycan_clusters.csv")
-abundance <- read_csv(snakemake@input[["abundance"]])
-groups <- read_csv(snakemake@input[["groups"]])
-clusters <- read_csv(snakemake@input[["clusters"]])
+# eigen_glycans <- read_csv("results/data/glycan_abundance/eigen_glycans.csv")
+# groups <- read_csv("results/data/prepared/groups.csv") %>%
+#   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
-data <- abundance |>
-  pivot_longer(-sample, names_to = "glycan", values_to = "value") |>
-  inner_join(groups, by = "sample") |> 
-  filter(group != "QC") |>
-  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) |> 
-  mutate(value = log(value)) |> 
-  group_by(glycan) |> 
-  mutate(value = (value - mean(value)) / sd(value)) |> 
-  ungroup() |> 
-  summarise(mean = mean(value), .by = c(glycan, group)) |>
-  inner_join(clusters, by = "glycan")
+eigen_glycans <- read_csv(snakemake@input[[1]])
+groups <- read_csv(snakemake@input[[2]]) %>%
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
-plot_trend <- function(data, .cluster) {
-  data |> 
-    ggplot(aes(group, mean, group = glycan)) +
-    geom_line(color = "steelblue", linewidth = 1, alpha = 0.5) +
-    labs(x = "", y = "Mean Z-score", title = str_glue("Cluster {.cluster}")) +
-    theme_minimal() +
+data <- eigen_glycans %>%
+  left_join(groups, by = "sample")
+
+plot_data <- data %>%
+  summarise(
+    mean = mean(eigen_glycan),
+    sd = sd(eigen_glycan),
+    ci_upper = Rmisc::CI(eigen_glycan)[["upper"]],
+    ci_lower = Rmisc::CI(eigen_glycan)[["lower"]],
+    .by = c(group, cluster)
+  )
+
+plot_trend <- function (data, .title) {
+  data %>%
+    ggplot(aes(group, mean, group = 1)) +
+    geom_ribbon(aes(ymin = ci_upper, ymax = ci_lower), alpha = 0.1, fill = "steelblue") +
+    geom_line(color = "steelblue") +
+    labs(title = .title, y = "Eigenglycan (scaled)") +
+    theme_classic() +
     theme(
-      panel.grid.major.x = element_line(color = "grey30", linetype = "dashed"),
-      plot.title = element_text(hjust = 0.5)
-    )
+      axis.line = element_blank(),
+      axis.ticks.x = element_blank(),
+      panel.grid.major.x = element_line(),
+      axis.title.x = element_blank()
+    ) +
+    scale_x_discrete(expand = expansion(mult = c(0.01, 0.05)))
 }
 
-trend_plots <- data |> 
-  nest(.by = cluster) |> 
-  arrange(cluster) |> 
-  mutate(plot = map2(data, cluster, plot_trend))
-final_p <- wrap_plots(trend_plots$plot, ncol = 1)
+plots <- plot_data %>%
+  nest_by(cluster) %>%
+  mutate(
+    title = str_c("Cluster ", cluster),
+    plot = list(plot_trend(data, title))
+  ) %>%
+  select(cluster, plot)
 
-# tgutil::ggpreview(width = 3, height = 10)
-ggsave(snakemake@output[[1]], plot = final_p, width = 3, height = 10)
+final_p <- reduce(plots$plot, `+`) + plot_layout(nrow = 1)
+# tgutil::ggpreview(plot = final_p, width = 12, height = 3)
+ggsave(snakemake@output[[1]], width = 12, height = 3)
