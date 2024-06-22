@@ -24,6 +24,8 @@ rule all:
         # ===== Glycan Abundance Data =====
         "results/data/glycan_abundance/ancova_for_glycans.csv",
         "results/data/glycan_abundance/eigen_glycans.csv",
+        "results/data/glycan_abundance/cluster_ancova.csv",
+        "results/data/glycan_abundance/cluster_post_hoc.csv",
         "results/data/glycan_abundance/fold_change.csv",
         "results/data/glycan_abundance/roc_auc.csv",
         "results/data/glycan_abundance/cor_with_AFP.csv",
@@ -310,6 +312,18 @@ rule eigen_glycans:
         "results/data/glycan_abundance/eigen_glycans.csv"
     script:
         "src/glycan_abundance/eigen_glycans.R"
+
+rule cluster_ancova:
+    # ANCOVA for glycan clusters.
+    input:
+        "results/data/glycan_abundance/eigen_glycans.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/glycan_abundance/cluster_ancova.csv",
+        "results/data/glycan_abundance/cluster_post_hoc.csv"
+    script:
+        "src/glycan_abundance/cluster_ancova.R"
 
 rule diff_bubble:
     # Draw bubble plot for p-values and fold changes of glycans.
