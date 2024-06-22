@@ -7,6 +7,7 @@ CLINICAL = PREPARED_DIR + "clinical.csv"
 rule all:
     input:
         # ===== Others =====
+        "results/data/prepared/raw_abundance_full.csv",
         "results/data/clinical/AFP_cutoff.csv",
         "results/figures/clinical/AFP_cutoff.pdf",
         "results/figures/clinical/clinical_heatmap.pdf",
@@ -136,13 +137,22 @@ rule run_glyhunter:
     shell:
         "glyhunter run {input.mass_list} -d {input.db} -o {output}"
 
+rule run_glyhunter_default_db:
+    # Run GlyHunter with default serum N-glycan database.
+    input:
+        "data/mass_list/plate{no}.xlsx"
+    output:
+        directory("results/data/glyhunter_results_full/plate{no}/")
+    shell:
+        "glyhunter run {input} -o {output}"
+
 rule assign_maldi_pos:
     # Match the MALDI positions of GlyHunter results to samples.
     input:
         "data/MALDI_positions.csv",
-        "results/data/glyhunter_results/plate{no}/"
+        "results/data/glyhunter_results{sub}/plate{no}/"
     output:
-        "results/data/data_per_plate/plate{no}.csv"
+        "results/data/data_per_plate{sub}/plate{no}.csv"
     script:
         "src/prepare_data/assign_maldi_pos.R"
 
@@ -152,6 +162,15 @@ rule combine_data_per_plate:
         expand("results/data/data_per_plate/plate{no}.csv", no=range(1, 9))
     output:
         RAW_ABUNDANCE
+    script:
+        "src/prepare_data/combine_data_per_plate.R"
+
+rule combine_data_per_plate_full:
+    # Combine all GlyHunter results into a single file.
+    input:
+        expand("results/data/data_per_plate_full/plate{no}.csv", no=range(1, 9))
+    output:
+        "results/data/prepared/raw_abundance_full.csv"
     script:
         "src/prepare_data/combine_data_per_plate.R"
 
