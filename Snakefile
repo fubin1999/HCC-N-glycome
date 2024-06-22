@@ -24,11 +24,13 @@ rule all:
         "results/data/glycan_abundance/fold_change.csv",
         "results/data/glycan_abundance/roc_auc.csv",
         "results/data/glycan_abundance/cor_with_AFP.csv",
+        "results/data/glycan_abundance/glycan_cluster_cor_with_clinical.csv",
 
         # ===== Glycan Abundance Figures =====
         "results/figures/glycan_abundance/diff_rose_plot.pdf",
         "results/figures/glycan_abundance/diff_glycan_heatmap.pdf",
         "results/figures/glycan_abundance/glycan_cluster_trends.pdf",
+        "results/figures/glycan_abundance/glycan_cluster_cor_with_clinical.pdf",
         "results/figures/glycan_abundance/diff_bubble.pdf",
         "results/figures/glycan_abundance/violin_plots.pdf",
         "results/figures/glycan_abundance/diff_upset.pdf",
@@ -306,6 +308,18 @@ rule plot_cluster_properties:
         "results/figures/glycan_abundance/glycan_properties.pdf"
     script:
         "src/glycan_abundance/cluster_properties.R"
+
+rule cluster_cor_with_clinical:
+    # Calculate and plot correlation of glycan clusters with clinical data.
+    input:
+        "results/data/glycan_abundance/eigen_glycans.csv",
+        "results/data/prepared/groups.csv",
+        "results/data/prepared/clinical.csv"
+    output:
+        "results/data/glycan_abundance/glycan_cluster_cor_with_clinical.csv",
+        "results/figures/glycan_abundance/glycan_cluster_cor_with_clinical.pdf"
+    script:
+        "src/glycan_abundance/cluster_cor_with_clinical.R"
 
 rule violin_plots:
     # Plot violin plots for all significant glycans.
