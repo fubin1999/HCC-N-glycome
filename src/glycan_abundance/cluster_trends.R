@@ -67,7 +67,7 @@ plots <- plot_data %>%
   nest_by(cluster, .key = "value_data") %>%
   left_join(nest_by(p_value_data, cluster, .key = "p_data"), by = "cluster") %>%
   mutate(
-    title = str_c("GCN", cluster),
+    title = str_c("GCM", cluster),
     plot = list(plot_trend(value_data, p_data, title))
   ) %>%
   select(cluster, plot)

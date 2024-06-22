@@ -36,7 +36,7 @@ Heatmap(
   cluster_rows = FALSE,
   cluster_columns = FALSE,
   column_split = col_split,
-  column_title = "Cluster %s",
+  column_title = "GCM%s",
   column_gap = unit(2, "mm"),
   rect_gp = gpar(col = "white", lwd = 2)
 )

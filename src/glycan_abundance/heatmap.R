@@ -58,7 +58,7 @@ ht <- Heatmap(
   column_split = col_split,
   row_km = 5,
   row_km_repeats = 100,
-  row_title = "Cluster %s",
+  row_title = "GCM%s",
   cluster_row_slices = FALSE,
   heatmap_legend_param = list(direction = "horizontal")
 )

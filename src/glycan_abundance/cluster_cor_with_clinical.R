@@ -25,7 +25,7 @@ cor_result <- eigen_glycans %>%
 plot_data <- cor_result %>%
   select(cluster, clinical, cor, p.adj.signif) %>%
   mutate(
-    cluster_name = str_c("GCN", cluster),
+    cluster_name = str_c("GCM", cluster),
     sig_label = if_else(p.adj.signif == "ns", "", p.adj.signif)
   )
 
