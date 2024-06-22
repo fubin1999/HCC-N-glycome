@@ -36,6 +36,7 @@ rule all:
         "results/figures/glycan_abundance/diff_glycan_heatmap.pdf",
         "results/figures/glycan_abundance/glycan_cluster_trends.pdf",
         "results/figures/glycan_abundance/glycan_cluster_cor_with_clinical.pdf",
+        "results/figures/glycan_abundance/cluster_corrplot.pdf",
         "results/figures/glycan_abundance/diff_bubble.pdf",
         "results/figures/glycan_abundance/violin_plots.pdf",
         "results/figures/glycan_abundance/diff_upset.pdf",
@@ -356,6 +357,15 @@ rule plot_cluster_properties:
         "results/figures/glycan_abundance/glycan_properties.pdf"
     script:
         "src/glycan_abundance/cluster_properties.R"
+
+rule cluster_corrplot:
+    # Draw cluster corrplot.
+    input:
+        "results/data/glycan_abundance/eigen_glycans.csv"
+    output:
+        "results/figures/glycan_abundance/cluster_corrplot.pdf"
+    script:
+        "src/glycan_abundance/cluster_cor.R"
 
 rule cluster_cor_with_clinical:
     # Calculate and plot correlation of glycan clusters with clinical data.
