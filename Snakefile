@@ -340,7 +340,8 @@ rule glycan_cluster_trends:
     # Plot the alteration trends of glycan clusters from the heatmap about.
     input:
         "results/data/glycan_abundance/eigen_glycans.csv",
-        GROUPS
+        GROUPS,
+        "results/data/glycan_abundance/cluster_post_hoc.csv"
     output:
         "results/figures/glycan_abundance/glycan_cluster_trends.pdf"
     script:

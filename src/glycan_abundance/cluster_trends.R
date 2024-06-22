@@ -1,13 +1,17 @@
 library(tidyverse)
 library(patchwork)
+library(rstatix)
+library(ggprism)
 
-# eigen_glycans <- read_csv("results/data/glycan_abundance/eigen_glycans.csv")
-# groups <- read_csv("results/data/prepared/groups.csv") %>%
-#   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
+eigen_glycans <- read_csv("results/data/glycan_abundance/eigen_glycans.csv")
+groups <- read_csv("results/data/prepared/groups.csv") %>%
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
+post_hoc_result <- read_csv("results/data/glycan_abundance/cluster_post_hoc.csv")
 
 eigen_glycans <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]]) %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
+post_hoc_result <- read_csv(snakemake@input[[3]])
 
 data <- eigen_glycans %>%
   left_join(groups, by = "sample")
@@ -21,11 +25,33 @@ plot_data <- data %>%
     .by = c(group, cluster)
   )
 
-plot_trend <- function (data, .title) {
+max_y_pos <- plot_data %>%
+  group_by(cluster) %>%
+  summarise(
+    range = max(ci_upper) - min(ci_lower),
+    max = max(ci_upper)
+  )
+
+p_value_data <- post_hoc_result %>%
+  add_significance("p.adj", output.col = "label") %>%
+  select(cluster, group1, group2, label) %>%
+  left_join(max_y_pos, by = "cluster") %>%
+  mutate(y.position = case_when(
+    (group1 == "HC") & (group2 == "CHB") ~ max + range * 0.1,
+    (group1 == "CHB") & (group2 == "LC") ~ max + range * 0.1,
+    (group1 == "LC") & (group2 == "HCC") ~ max + range * 0.1,
+    (group1 == "HC") & (group2 == "LC") ~ max + range * 0.2,
+    (group1 == "CHB") & (group2 == "HCC") ~ max + range * 0.35,
+    (group1 == "HC") & (group2 == "HCC") ~ max + range * 0.45
+  )) %>%
+  select(cluster, group1, group2, label, y.position)
+
+plot_trend <- function (data, p_val_df, .title) {
   data %>%
     ggplot(aes(group, mean, group = 1)) +
     geom_ribbon(aes(ymin = ci_upper, ymax = ci_lower), alpha = 0.1, fill = "steelblue") +
     geom_line(color = "steelblue") +
+    add_pvalue(p_val_df, bracket.size = 0.3) +
     labs(title = .title, y = "Eigenglycan (scaled)") +
     theme_classic() +
     theme(
@@ -38,10 +64,11 @@ plot_trend <- function (data, .title) {
 }
 
 plots <- plot_data %>%
-  nest_by(cluster) %>%
+  nest_by(cluster, .key = "value_data") %>%
+  left_join(nest_by(p_value_data, cluster, .key = "p_data"), by = "cluster") %>%
   mutate(
-    title = str_c("Cluster ", cluster),
-    plot = list(plot_trend(data, title))
+    title = str_c("GCN", cluster),
+    plot = list(plot_trend(value_data, p_data, title))
   ) %>%
   select(cluster, plot)
 
