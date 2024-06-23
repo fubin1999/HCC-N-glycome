@@ -72,6 +72,7 @@ rule all:
 
         # ===== Molecular Subtype Data =====
         "results/data/subtype/cc_result.csv",
+        "results/data/subtype/subtype_clinical_diff.csv",
 
         # ===== Molecular Subtype Figures =====
         "results/figures/subtype/cc_result/",
@@ -574,6 +575,16 @@ rule HCC_consensus_clustering:
         "results/data/subtype/cc_result.csv"
     script:
         "src/subtype/subtype.R"
+
+rule subtype_clinical_diff:
+    # Perform wilcox test on clinical data between two subtypes.
+    input:
+        "results/data/subtype/cc_result.csv",
+        CLINICAL
+    output:
+        "results/data/subtype/subtype_clinical_diff.csv"
+    script:
+        "src/subtype/subtype_with_clinical.R"
 
 
 # ==================== Residue Analysis ====================
