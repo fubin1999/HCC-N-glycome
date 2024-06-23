@@ -70,6 +70,12 @@ rule all:
         "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
         "results/figures/cor_with_clinical/trait_scatter_with_clinical.pdf",
 
+        # ===== Molecular Subtype Data =====
+        "results/data/subtype/cc_result.csv",
+
+        # ===== Molecular Subtype Figures =====
+        "results/figures/subtype/cc_result/",
+
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
         "results/data/residues/ancova_result.csv",
@@ -555,6 +561,19 @@ rule scatter_with_clinical:
         "results/figures/cor_with_clinical/trait_scatter_with_clinical.pdf"
     script:
         "src/cor_with_clinical/trait_scatter_with_clinical.R"
+
+
+# ==================== Molecular Subtype ====================
+rule HCC_consensus_clustering:
+    # Consensus clustering for HCC samples.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS
+    output:
+        directory("results/figures/subtype/cc_result/"),
+        "results/data/subtype/cc_result.csv"
+    script:
+        "src/subtype/subtype.R"
 
 
 # ==================== Residue Analysis ====================
