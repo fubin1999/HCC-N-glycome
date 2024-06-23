@@ -5,10 +5,6 @@ library(broom)
 source("src/utils/emeans_posthoc.R")
 
 # Read data-----
-# glycan_abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-
 glycan_abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
 clinical <- read_csv(snakemake@input[["clinical"]])

@@ -1,10 +1,6 @@
 library(tidyverse)
 library(rstatix)
 
-# eigen_glycans <- read_csv("results/data/glycan_abundance/eigen_glycans.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-
 eigen_glycans <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clinical <- read_csv(snakemake@input[[3]])

@@ -1,6 +1,9 @@
 PREPARED_DIR = "results/data/prepared/"
 RAW_ABUNDANCE = PREPARED_DIR + "raw_abundance.csv"
 PROCESSED_ABUNDANCE = PREPARED_DIR + "processed_abundance.csv"
+ALL_DERIVED_TRAITS = PREPARED_DIR + "derived_traits.csv"
+FILTERED_DERIVED_TRAITS = PREPARED_DIR + "filtered_derived_traits.csv"
+META_PROPERTIES = PREPARED_DIR + "meta_properties.csv"
 GROUPS = PREPARED_DIR + "groups.csv"
 CLINICAL = PREPARED_DIR + "clinical.csv"
 
@@ -21,49 +24,51 @@ rule all:
         "results/figures/data_quality/glycan_count_venn_full.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
 
-        # ===== Glycan Abundance Data =====
-        "results/data/glycan_abundance/ancova_for_glycans.csv",
-        "results/data/glycan_abundance/eigen_glycans.csv",
-        "results/data/glycan_abundance/cluster_ancova.csv",
-        "results/data/glycan_abundance/cluster_post_hoc.csv",
-        "results/data/glycan_abundance/fold_change.csv",
-        "results/data/glycan_abundance/roc_auc.csv",
-        "results/data/glycan_abundance/cor_with_AFP.csv",
-        "results/data/glycan_abundance/glycan_cluster_cor_with_clinical.csv",
+        # ===== Differential Analysis Data =====
+        "results/data/diff_analysis/glycan_ancova.csv",
+        "results/data/diff_analysis/glycan_post_hoc.csv",
+        "results/data/diff_analysis/glycan_fold_change.csv",
+        "results/data/diff_analysis/trait_ancova.csv",
+        "results/data/diff_analysis/trait_post_hoc.csv",
+        "results/data/diff_analysis/trait_fold_change.csv",
 
-        # ===== Glycan Abundance Figures =====
-        "results/figures/glycan_abundance/diff_rose_plot.pdf",
-        "results/figures/glycan_abundance/diff_glycan_heatmap.pdf",
-        "results/figures/glycan_abundance/glycan_cluster_trends.pdf",
-        "results/figures/glycan_abundance/glycan_cluster_cor_with_clinical.pdf",
-        "results/figures/glycan_abundance/cluster_corrplot.pdf",
-        "results/figures/glycan_abundance/diff_bubble.pdf",
-        "results/figures/glycan_abundance/violin_plots.pdf",
-        "results/figures/glycan_abundance/diff_upset.pdf",
-        "results/figures/glycan_abundance/confounders.pdf",
-        "results/figures/glycan_abundance/pca.pdf",
-        "results/figures/glycan_abundance/cor_with_AFP_1.pdf",
-        "results/figures/glycan_abundance/cor_with_AFP_2.pdf",
-        "results/figures/glycan_abundance/glycan_properties.pdf",
+        # ===== Differential Analysis Figures =====
+        "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
+        "results/figures/diff_analysis/glycan_heatmap.pdf",
+        "results/figures/diff_analysis/glycan_violin_plots.pdf",
+        "results/figures/diff_analysis/glycan_diff_bubble.pdf",
+        "results/figures/diff_analysis/glycan_diff_upset.pdf",
+        "results/figures/diff_analysis/glycan_confounders.pdf",
+        "results/figures/diff_analysis/glycan_pca.pdf",
+        "results/figures/diff_analysis/trait_confounders.pdf",
+        "results/figures/diff_analysis/trait_boxplots/",
+        "results/figures/diff_analysis/trait_diff_bubble.pdf",
+        "results/figures/diff_analysis/trait_heatmap.pdf",
 
-        # ===== Derived Traits Data =====
-        "results/data/derived_traits/derived_traits.csv",
-        "results/data/derived_traits/meta_properties.csv",
-        "results/data/derived_traits/ancova_for_derived_traits.csv",
-        "results/data/derived_traits/posthoc_for_derived_traits.csv",
-        "results/data/derived_traits/fold_change.csv",
-        "results/data/derived_traits/AFP_subtype_ancova.csv",
-        "results/data/derived_traits/corr_with_clinical.csv",
-        "results/data/derived_traits/corr_with_clinical_HCC.csv",
+        # ===== Glycan Coexpression Module Data =====
+        "results/data/glycan_coexpr/glycan_clusters.csv",
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        "results/data/glycan_coexpr/cluster_ancova.csv",
+        "results/data/glycan_coexpr/cluster_post_hoc.csv",
+        "results/data/glycan_coexpr/cluster_cor_with_clinical.csv",
 
-        # ===== Derived Traits Figures =====
-        "results/figures/derived_traits/heatmap.pdf",
-        "results/figures/derived_traits/boxplots/",
-        "results/figures/derived_traits/diff_bubble.pdf",
-        "results/figures/derived_traits/confounders.pdf",
-        "results/figures/derived_traits/TF_AFP_subtype_boxplot.pdf",
-        "results/figures/derived_traits/corr_with_clinical.pdf",
-        "results/figures/derived_traits/scatter_with_clinical.pdf",
+        # ===== Glycan Coexpression Module Figures =====
+        "results/figures/glycan_coexpr/glycan_cluster_trends.pdf",
+        "results/figures/glycan_coexpr/glycan_property_heatmap.pdf",
+        "results/figures/glycan_coexpr/cluster_corrplot.pdf",
+        "results/figures/glycan_coexpr/cluster_cor_with_clinical.pdf",
+
+        # ===== Correlation with Clinical Data =====
+        "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
+        "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
+        "results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv",
+
+        # ===== Correlation with Clinical Figures =====
+        "results/figures/cor_with_clinical/glycan_cor_with_AFP_1.pdf",
+        "results/figures/cor_with_clinical/glycan_cor_with_AFP_2.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
+        "results/figures/cor_with_clinical/trait_scatter_with_clinical.pdf",
 
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
@@ -210,6 +215,19 @@ rule prepare_clinical:
     script:
         "src/prepare_data/prepare_clinical.R"
 
+rule calculate_derived_traits:
+    # Calculate derived traits using GlyTrait
+    input:
+        PROCESSED_ABUNDANCE,
+        "data/human_serum_glycans.csv",
+        "src/prepare_data/struc_builtin_formulas.txt"
+    output:
+        filtered_traits=FILTERED_DERIVED_TRAITS,
+        all_traits=ALL_DERIVED_TRAITS,
+        mp_table=META_PROPERTIES
+    script:
+        "src/prepare_data/derive_traits.py"
+
 
 # ==================== Data Quality ====================
 rule batch_effect_pca:
@@ -258,167 +276,91 @@ rule clinical_heatmap:
         "src/clinical/clinical_heatmap.R"
 
 
-# ==================== Glycan Abundance ====================
-rule ancova_for_glycans:
+# ==================== Differential Analysis ====================
+rule glycan_ancova:
     # Perform ANCOVA for each glycan.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
         clinical=CLINICAL
     output:
-        ancova="results/data/glycan_abundance/ancova_for_glycans.csv",
-        posthoc="results/data/glycan_abundance/posthoc_for_glycans.csv"
+        ancova="results/data/diff_analysis/glycan_ancova.csv",
+        posthoc="results/data/diff_analysis/glycan_post_hoc.csv"
     script:
-        "src/glycan_abundance/ancova_for_glycans.R"
+        "src/diff_analysis/glycan_ancova.R"
 
-rule fold_change:
+rule glycan_fold_change:
     # Calculate fold changes for each glycan.
     input:
         PROCESSED_ABUNDANCE,
         GROUPS
     output:
-        "results/data/glycan_abundance/fold_change.csv"
+        "results/data/diff_analysis/glycan_fold_change.csv"
     script:
-        "src/glycan_abundance/fold_change.R"
+        "src/diff_analysis/glycan_fold_change.R"
 
-rule diff_rose_plot:
+rule glycan_diff_rose_plot:
     # Draw rose plot for differential glycans between each group pair.
     input:
-        "results/data/glycan_abundance/posthoc_for_glycans.csv"
+        "results/data/diff_analysis/glycan_post_hoc.csv"
     output:
-        "results/figures/glycan_abundance/diff_rose_plot.pdf"
+        "results/figures/diff_analysis/glycan_diff_rose_plot.pdf"
     script:
-        "src/glycan_abundance/rose_plot.R"
+        "src/diff_analysis/glycan_diff_rose_plot.R"
 
-rule diff_glycan_heatmap:
+rule glycan_heatmap:
     # Draw heatmap for differential glycans.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        ancova_result="results/data/glycan_abundance/ancova_for_glycans.csv",
-        mp_table="results/data/derived_traits/meta_properties.csv"
+        ancova_result="results/data/diff_analysis/glycan_ancova.csv",
+        mp_table=META_PROPERTIES
     output:
-        "results/figures/glycan_abundance/diff_glycan_heatmap.pdf",
-        "results/data/glycan_abundance/glycan_clusters.csv"
+        "results/figures/diff_analysis/glycan_heatmap.pdf",
+        "results/data/glycan_coexpr/glycan_clusters.csv"
     script:
-        "src/glycan_abundance/heatmap.R"
+        "src/diff_analysis/glycan_heatmap.R"
 
-rule eigen_glycans:
-    # Calculate the eigen value for each glycan cluster.
-    input:
-        PROCESSED_ABUNDANCE,
-        GROUPS,
-        "results/data/glycan_abundance/glycan_clusters.csv"
-    output:
-        "results/data/glycan_abundance/eigen_glycans.csv"
-    script:
-        "src/glycan_abundance/eigen_glycans.R"
-
-rule cluster_ancova:
-    # ANCOVA for glycan clusters.
-    input:
-        "results/data/glycan_abundance/eigen_glycans.csv",
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/glycan_abundance/cluster_ancova.csv",
-        "results/data/glycan_abundance/cluster_post_hoc.csv"
-    script:
-        "src/glycan_abundance/cluster_ancova.R"
-
-rule diff_bubble:
+rule glycan_diff_bubble:
     # Draw bubble plot for p-values and fold changes of glycans.
     input:
-        post_hoc="results/data/glycan_abundance/posthoc_for_glycans.csv",
-        fold_change="results/data/glycan_abundance/fold_change.csv",
-        row_order="results/data/glycan_abundance/glycan_clusters.csv"
+        post_hoc="results/data/diff_analysis/glycan_post_hoc.csv",
+        fold_change="results/data/diff_analysis/glycan_fold_change.csv",
+        row_order="results/data/glycan_coexpr/glycan_clusters.csv"
     output:
-        "results/figures/glycan_abundance/diff_bubble.pdf"
+        "results/figures/diff_analysis/glycan_diff_bubble.pdf"
     script:
-        "src/glycan_abundance/diff_bubble.R"
+        "src/diff_analysis/glycan_diff_bubble.R"
 
-rule glycan_cluster_trends:
-    # Plot the alteration trends of glycan clusters from the heatmap about.
-    input:
-        "results/data/glycan_abundance/eigen_glycans.csv",
-        GROUPS,
-        "results/data/glycan_abundance/cluster_post_hoc.csv"
-    output:
-        "results/figures/glycan_abundance/glycan_cluster_trends.pdf"
-    script:
-        "src/glycan_abundance/cluster_trends.R"
-
-rule plot_cluster_properties:
-    # Plot heatmap showing glycans' properties.
-    input:
-        "results/data/glycan_abundance/glycan_clusters.csv",
-        "results/data/derived_traits/meta_properties.csv"
-    output:
-        "results/figures/glycan_abundance/glycan_properties.pdf"
-    script:
-        "src/glycan_abundance/cluster_properties.R"
-
-rule cluster_corrplot:
-    # Draw cluster corrplot.
-    input:
-        "results/data/glycan_abundance/eigen_glycans.csv"
-    output:
-        "results/figures/glycan_abundance/cluster_corrplot.pdf"
-    script:
-        "src/glycan_abundance/cluster_cor.R"
-
-rule cluster_cor_with_clinical:
-    # Calculate and plot correlation of glycan clusters with clinical data.
-    input:
-        "results/data/glycan_abundance/eigen_glycans.csv",
-        "results/data/prepared/groups.csv",
-        "results/data/prepared/clinical.csv"
-    output:
-        "results/data/glycan_abundance/glycan_cluster_cor_with_clinical.csv",
-        "results/figures/glycan_abundance/glycan_cluster_cor_with_clinical.pdf"
-    script:
-        "src/glycan_abundance/cluster_cor_with_clinical.R"
-
-rule violin_plots:
+rule glycan_violin_plots:
     # Plot violin plots for all significant glycans.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        ancova_result="results/data/glycan_abundance/ancova_for_glycans.csv"
+        ancova_result="results/data/diff_analysis/glycan_ancova.csv"
     output:
-        "results/figures/glycan_abundance/violin_plots.pdf"
+        "results/figures/diff_analysis/glycan_violin_plots.pdf"
     script:
-        "src/glycan_abundance/violin_plots.R"
+        "src/diff_analysis/glycan_violin_plots.R"
 
-rule diff_upset:
+rule glycan_diff_upset:
     # Plot upset plot for the number of significant glycans
     # between each group paires.
     input:
-        "results/data/glycan_abundance/posthoc_for_glycans.csv"
+        "results/data/diff_analysis/glycan_post_hoc.csv"
     output:
-        "results/figures/glycan_abundance/diff_upset.pdf"
+        "results/figures/diff_analysis/glycan_diff_upset.pdf"
     script:
-        "src/glycan_abundance/diff_upset.R"
+        "src/diff_analysis/glycan_diff_upset.R"
 
-rule confounders:
+rule glycan_confounders:
     # Plot dot plot for confounders' p-values.
     input:
-        "results/data/glycan_abundance/ancova_for_glycans.csv"
+        "results/data/diff_analysis/glycan_ancova.csv"
     output:
-        "results/figures/glycan_abundance/confounders.pdf"
+        "results/figures/diff_analysis/glycan_confounders.pdf"
     script:
-        "src/glycan_abundance/confounder_dot_plot.R"
-
-rule glycan_roc:
-    # Perform ROC analysis on glycans, and draw ROC curves.
-    input:
-        PROCESSED_ABUNDANCE,
-        GROUPS
-    output:
-        "results/data/glycan_abundance/roc_auc.csv",
-        "results/figures/glycan_abundance/roc_curves.pdf"
-    script:
-        "src/glycan_abundance/roc.R"
+        "src/diff_analysis/glycan_confounder_dot_plot.R"
 
 rule glycan_pca:
     # Draw PCA plots for glycan abundance.
@@ -426,10 +368,141 @@ rule glycan_pca:
         PROCESSED_ABUNDANCE,
         GROUPS
     output:
-        "results/figures/glycan_abundance/pca.pdf"
+        "results/figures/diff_analysis/glycan_pca.pdf"
     script:
-        "src/glycan_abundance/pca.R"
+        "src/diff_analysis/glycan_pca.R"
 
+rule trait_ancova:
+    # Perform ANCOVA on derived traits.
+    input:
+        traits=FILTERED_DERIVED_TRAITS,
+        groups=GROUPS,
+        clinical=CLINICAL
+    output:
+        "results/data/diff_analysis/trait_ancova.csv",
+        "results/data/diff_analysis/trait_post_hoc.csv"
+    script:
+        "src/diff_analysis/trait_ancova.R"
+
+rule trait_fold_change:
+    # Calculate fold changes for each derived trait.
+    input:
+        FILTERED_DERIVED_TRAITS,
+        GROUPS
+    output:
+        "results/data/diff_analysis/trait_fold_change.csv"
+    script:
+        "src/diff_analysis/trait_fold_change.R"
+
+rule trait_confounders:
+    # Plot dot plot for confounders' p-values.
+    input:
+        "results/data/diff_analysis/trait_ancova.csv"
+    output:
+        "results/figures/diff_analysis/trait_confounders.pdf"
+    script:
+        "src/diff_analysis/trait_confounder_dot_plot.R"
+
+rule trait_boxplots:
+    # Draw boxplots for selected derived traits.
+    input:
+        ALL_DERIVED_TRAITS,
+        GROUPS,
+        "results/data/diff_analysis/trait_post_hoc.csv"
+    output:
+        directory("results/figures/diff_analysis/trait_boxplots/")
+    script:
+        "src/diff_analysis/trait_boxplots.R"
+
+rule trait_diff_bubble:
+    # Draw bubble plot for differential derived traits.
+    input:
+        "results/data/diff_analysis/trait_post_hoc.csv"
+    output:
+        "results/figures/diff_analysis/trait_diff_bubble.pdf"
+    script:
+        "src/diff_analysis/trait_diff_bubble.R"
+
+rule trait_heatmap:
+    # Draw heatmap for derived traits.
+    input:
+        FILTERED_DERIVED_TRAITS,
+        GROUPS,
+        "results/data/diff_analysis/trait_post_hoc.csv"
+    output:
+        "results/figures/diff_analysis/trait_heatmap.pdf"
+    script:
+        "src/diff_analysis/trait_heatmap.R"
+    
+
+# ==================== Glycan Coexpression Module ====================
+rule eigen_glycans:
+    # Calculate the eigen value for each glycan cluster.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS,
+        "results/data/glycan_coexpr/glycan_clusters.csv"
+    output:
+        "results/data/glycan_coexpr/eigen_glycans.csv"
+    script:
+        "src/glycan_coexpr/eigen_glycans.R"
+
+rule cluster_ancova:
+    # ANCOVA for glycan clusters.
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/glycan_coexpr/cluster_ancova.csv",
+        "results/data/glycan_coexpr/cluster_post_hoc.csv"
+    script:
+        "src/glycan_coexpr/cluster_ancova.R"
+
+rule plot_cluster_trends:
+    # Plot the alteration trends of glycan clusters from the heatmap about.
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        GROUPS,
+        "results/data/glycan_coexpr/cluster_post_hoc.csv"
+    output:
+        "results/figures/glycan_coexpr/glycan_cluster_trends.pdf"
+    script:
+        "src/glycan_coexpr/plot_cluster_trends.R"
+
+rule plot_cluster_properties:
+    # Plot heatmap showing glycans' properties.
+    input:
+        "results/data/glycan_coexpr/glycan_clusters.csv",
+        META_PROPERTIES
+    output:
+        "results/figures/glycan_coexpr/glycan_property_heatmap.pdf"
+    script:
+        "src/glycan_coexpr/cluster_property_heatmap.R"
+
+rule cluster_corrplot:
+    # Draw cluster corrplot.
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv"
+    output:
+        "results/figures/glycan_coexpr/cluster_corrplot.pdf"
+    script:
+        "src/glycan_coexpr/cluster_cor.R"
+
+rule cluster_cor_with_clinical:
+    # Calculate and plot correlation of glycan clusters with clinical data.
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/glycan_coexpr/cluster_cor_with_clinical.csv",
+        "results/figures/glycan_coexpr/cluster_cor_with_clinical.pdf"
+    script:
+        "src/glycan_coexpr/cluster_cor_with_clinical.R"
+
+
+# ==================== Correlation with Clinical Data ====================
 rule glycan_cor_with_AFP:
     # Draw corrplot for glycans and AFP.
     input:
@@ -437,140 +510,51 @@ rule glycan_cor_with_AFP:
         GROUPS,
         CLINICAL
     output:
-        "results/data/glycan_abundance/cor_with_AFP.csv",
+        "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
         # There are too many glycans to display in a row,
         # and corrplot object could not be jointed by cowplot,
         # so the plot is splited into two.
-        "results/figures/glycan_abundance/cor_with_AFP_1.pdf",
-        "results/figures/glycan_abundance/cor_with_AFP_2.pdf"
+        "results/figures/cor_with_clinical/glycan_cor_with_AFP_1.pdf",
+        "results/figures/cor_with_clinical/glycan_cor_with_AFP_2.pdf"
     script:
-        "src/glycan_abundance/corr_with_AFP.R"
-
-
-# ==================== Derived Traits ====================
-rule calculate_derived_traits:
-    # Calculate derived traits using GlyTrait
-    input:
-        PROCESSED_ABUNDANCE,
-        "data/human_serum_glycans.csv",
-        "src/derived_traits/struc_builtin_formulas.txt"
-    output:
-        filtered_traits="results/data/derived_traits/filtered_derived_traits.csv",
-        all_traits="results/data/derived_traits/derived_traits.csv",
-        mp_table="results/data/derived_traits/meta_properties.csv"
-    script:
-        "src/derived_traits/derive_traits.py"
-
-rule trait_ancova:
-    # Perform ANCOVA on derived traits.
-    input:
-        traits="results/data/derived_traits/filtered_derived_traits.csv",
-        groups=GROUPS,
-        clinical=CLINICAL
-    output:
-        "results/data/derived_traits/ancova_for_derived_traits.csv",
-        "results/data/derived_traits/posthoc_for_derived_traits.csv"
-    script:
-        "src/derived_traits/ancova_for_derived_traits.R"
-
-rule trait_fold_change:
-    # Calculate fold changes for each derived trait.
-    input:
-        "results/data/derived_traits/filtered_derived_traits.csv",
-        GROUPS
-    output:
-        "results/data/derived_traits/fold_change.csv"
-    script:
-        "src/derived_traits/fold_change.R"
-
-rule trait_confounders:
-    # Plot dot plot for confounders' p-values.
-    input:
-        "results/data/derived_traits/ancova_for_derived_traits.csv"
-    output:
-        "results/figures/derived_traits/confounders.pdf"
-    script:
-        "src/derived_traits/confounder_dot_plot.R"
-
-rule boxplots_for_selected_traits:
-    # Draw boxplots for selected derived traits.
-    input:
-        "results/data/derived_traits/derived_traits.csv",
-        "results/data/prepared/groups.csv",
-        "results/data/derived_traits/posthoc_for_derived_traits.csv"
-    output:
-        directory("results/figures/derived_traits/boxplots/")
-    script:
-        "src/derived_traits/selected_boxplots.R"
-
-rule trait_diff_bubble:
-    # Draw bubble plot for differential derived traits.
-    input:
-        "results/data/derived_traits/posthoc_for_derived_traits.csv"
-    output:
-        "results/figures/derived_traits/diff_bubble.pdf"
-    script:
-        "src/derived_traits/diff_bubble.R"
-
-rule AFP_subtype_trait_diff:
-    # Perform ANCOVA on derived traits between AFP negative and AFP positive HCC samples.
-    input:
-        "results/data/derived_traits/filtered_derived_traits.csv",
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/derived_traits/AFP_subtype_ancova.csv",
-        "results/figures/derived_traits/TF_AFP_subtype_boxplot.pdf"
-    script:
-        "src/derived_traits/AFP_subtype_ancova.R"
-
-rule trait_heatmap:
-    # Draw heatmap for derived traits.
-    input:
-        "results/data/derived_traits/filtered_derived_traits.csv",
-        GROUPS,
-        "results/data/derived_traits/posthoc_for_derived_traits.csv"
-    output:
-        "results/figures/derived_traits/heatmap.pdf"
-    script:
-        "src/derived_traits/heatmap.R"
+        "src/cor_with_clinical/glycan_cor_with_AFP.R"
 
 rule trait_cor_with_clinical:
     # Correlation of derived traits with clinical information.
     input:
-        "results/data/derived_traits/filtered_derived_traits.csv",
+        FILTERED_DERIVED_TRAITS,
         GROUPS,
         CLINICAL
     output:
-        "results/data/derived_traits/corr_with_clinical.csv",
-        "results/data/derived_traits/corr_with_clinical_HCC.csv"
+        "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
+        "results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv"
     script:
-        "src/derived_traits/corr_with_clinical.R"
+        "src/cor_with_clinical/trait_cor_with_clinical.R"
 
 rule trait_corrplot_with_clinical:
     # Draw corrplot for derived traits with clinical information.
     input:
-        "results/data/derived_traits/corr_with_clinical.csv",
-        "results/data/derived_traits/corr_with_clinical_HCC.csv"
+        "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
+        "results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv"
     output:
-        "results/figures/derived_traits/corr_with_clinical.pdf",
-        "results/figures/derived_traits/corr_with_clinical_HCC.pdf"
+        "results/figures/cor_with_clinical/trait_cor_with_clinical.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf"
     script:
-        "src/derived_traits/corrplot_with_clinical.R"
+        "src/cor_with_clinical/trait_corrplot_with_clinical.R"
 
 rule scatter_with_clinical:
     # Draw scatter plot for selected derived traits and clinical variables
     # with high correlation.
     input:
-        traits="results/data/derived_traits/filtered_derived_traits.csv",
+        traits=FILTERED_DERIVED_TRAITS,
         groups=GROUPS,
         clinical=CLINICAL,
-        corr_result_all="results/data/derived_traits/corr_with_clinical.csv",
-        corr_result_HCC="results/data/derived_traits/corr_with_clinical_HCC.csv"
+        corr_result_all="results/data/cor_with_clinical/trait_cor_with_clinical.csv",
+        corr_result_HCC="results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv"
     output:
-        "results/figures/derived_traits/scatter_with_clinical.pdf"
+        "results/figures/cor_with_clinical/trait_scatter_with_clinical.pdf"
     script:
-        "src/derived_traits/scatter_with_clinical.R"
+        "src/cor_with_clinical/trait_scatter_with_clinical.R"
 
 
 # ==================== Residue Analysis ====================

@@ -1,7 +1,6 @@
 library(tidyverse)
 library(corrplot)
 
-# eigen_glycans <- read_csv("results/data/glycan_abundance/eigen_glycans.csv")
 eigen_glycans <- read_csv(snakemake@input[[1]])
 
 wider <- eigen_glycans %>%

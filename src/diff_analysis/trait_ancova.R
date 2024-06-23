@@ -4,11 +4,6 @@ library(rstatix)
 source("src/utils/emeans_posthoc.R")
 
 # Read data-----
-trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
-groups <- read_csv("results/data/prepared/groups.csv")
-clinical <- read_csv("results/data/prepared/clinical.csv") %>%
-  select(sample, sex, age)
-
 trait_data <- read_csv(snakemake@input[["traits"]])
 groups <- read_csv(snakemake@input[["groups"]])
 clinical <- read_csv(snakemake@input[["clinical"]]) %>%

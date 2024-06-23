@@ -1,10 +1,6 @@
 library(tidyverse)
 
 # Read data-----
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# ancova_result <- read_csv("results/data/diff_analysis/ancova_for_glycans.csv")
-
 abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
 ancova_result <- read_csv(snakemake@input[["ancova_result"]])

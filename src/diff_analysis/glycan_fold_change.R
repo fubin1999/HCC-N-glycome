@@ -1,8 +1,6 @@
 library(tidyverse)
 
 # Read data-----
-# glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
 glycan_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 

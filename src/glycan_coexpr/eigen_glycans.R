@@ -2,11 +2,6 @@ library(tidyverse)
 library(broom)
 library(rstatix)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clusters <- read_csv("results/data/glycan_abundance/glycan_clusters.csv") %>%
-#   mutate(cluster = factor(as.integer(cluster)))
-
 abundance <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clusters <- read_csv(snakemake@input[[3]]) %>%

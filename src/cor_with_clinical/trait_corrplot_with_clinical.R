@@ -1,8 +1,6 @@
 library(tidyverse)
 library(patchwork)
 
-# full_cor_result <- read_csv("results/data/derived_traits/corr_with_clinical.csv")
-# HCC_cor_result <- read_csv("results/data/derived_traits/corr_with_clinical_HCC.csv")
 full_cor_result <- read_csv(snakemake@input[[1]])
 HCC_cor_result <- read_csv(snakemake@input[[2]])
 

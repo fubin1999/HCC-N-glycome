@@ -1,8 +1,6 @@
 library(tidyverse)
 
 # Read data-----
-# trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
 trait_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 

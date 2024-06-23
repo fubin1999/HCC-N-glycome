@@ -1,6 +1,5 @@
 library(tidyverse)
 
-# post_hoc_result <- read_csv("results/data/glycan_abundance/posthoc_for_glycans.csv")
 post_hoc_result <- read_csv(snakemake@input[[1]])
 
 plot_data <- post_hoc_result %>%

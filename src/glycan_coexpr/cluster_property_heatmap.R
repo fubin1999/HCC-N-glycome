@@ -1,9 +1,6 @@
 library(tidyverse)
 library(ComplexHeatmap)
 
-# clusters <- read_csv("results/data/glycan_abundance/glycan_clusters.csv")
-# mp_table <- read_csv("results/data/derived_traits/meta_properties.csv")
-
 clusters <- read_csv(snakemake@input[[1]])
 mp_table <- read_csv(snakemake@input[[2]])
 

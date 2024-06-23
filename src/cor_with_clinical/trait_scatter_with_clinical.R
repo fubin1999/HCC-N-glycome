@@ -1,13 +1,6 @@
 library(tidyverse)
 library(patchwork)
 
-# trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv") %>%
-#   select(-age, -sex)
-# corr_result_all <- read_csv("results/data/derived_traits/corr_with_clinical.csv")
-# corr_result_HCC <- read_csv("results/data/derived_traits/corr_with_clinical_HCC.csv")
-
 trait_data <- read_csv(snakemake@input[["traits"]])
 groups <- read_csv(snakemake@input[["groups"]])
 clinical <- read_csv(snakemake@input[["clinical"]]) %>%

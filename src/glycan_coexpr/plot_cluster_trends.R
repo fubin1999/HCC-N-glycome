@@ -3,11 +3,6 @@ library(patchwork)
 library(rstatix)
 library(ggprism)
 
-eigen_glycans <- read_csv("results/data/glycan_abundance/eigen_glycans.csv")
-groups <- read_csv("results/data/prepared/groups.csv") %>%
-  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
-post_hoc_result <- read_csv("results/data/glycan_abundance/cluster_post_hoc.csv")
-
 eigen_glycans <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]]) %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))

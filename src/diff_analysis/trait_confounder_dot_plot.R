@@ -2,7 +2,6 @@ library(tidyverse)
 library(ggrepel)
 library(patchwork)
 
-# ancova_result <- read_csv("results/data/derived_traits/ancova_for_derived_traits.csv")
 ancova_result <- read_csv(snakemake@input[[1]])
 
 plot_dot <- function(data, .title) {

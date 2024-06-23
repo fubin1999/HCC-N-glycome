@@ -1,10 +1,6 @@
 library(tidyverse)
 
 # Read data-----
-# post_hoc_result <- read_csv("results/data/glycan_abundance/posthoc_for_glycans.csv")
-# fold_change <- read_csv("results/data/glycan_abundance/fold_change.csv")
-# row_order <- read_csv("results/data/glycan_abundance/glycan_clusters.csv")
-
 post_hoc_result <- read_csv(snakemake@input[["post_hoc"]])
 fold_change <- read_csv(snakemake@input[["fold_change"]])
 row_order <- read_csv(snakemake@input[["row_order"]])

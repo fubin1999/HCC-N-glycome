@@ -2,10 +2,6 @@ library(tidyverse)
 library(corrplot)
 library(rstatix)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-
 abundance <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clinical <- read_csv(snakemake@input[[3]])

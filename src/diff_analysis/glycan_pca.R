@@ -2,8 +2,6 @@ library(tidyverse)
 library(broom)
 library(patchwork)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
 abundance <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 

@@ -1,7 +1,6 @@
 library(tidyverse)
 library(patchwork)
 
-# post_hoc_result <- read_csv("results/data/derived_traits/posthoc_for_derived_traits.csv")
 post_hoc_result <- read_csv(snakemake@input[[1]])
 
 bubble_data <- post_hoc_result %>%

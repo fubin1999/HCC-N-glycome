@@ -2,11 +2,6 @@ library(tidyverse)
 library(rstatix)
 library(patchwork)
 
-# trait_data <- read_csv("results/data/derived_traits/filtered_derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv") %>%
-#   select(-age, -sex)
-
 trait_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clinical <- read_csv(snakemake@input[[3]]) %>%

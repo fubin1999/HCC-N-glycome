@@ -1,10 +1,6 @@
 library(tidyverse)
 library(ggprism)
 
-# trait_data <- read_csv("results/data/derived_traits/derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# post_hoc_result <- read_csv("results/data/derived_traits/posthoc_for_derived_traits.csv")
-
 trait_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 post_hoc_result <- read_csv(snakemake@input[[3]])
