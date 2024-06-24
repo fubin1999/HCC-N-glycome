@@ -73,6 +73,7 @@ rule all:
         # ===== Molecular Subtype Data =====
         "results/data/subtype/cc_result.csv",
         "results/data/subtype/subtype_clinical_diff.csv",
+        "results/data/subtype/subtype_trait_diff.csv",
 
         # ===== Molecular Subtype Figures =====
         "results/figures/subtype/cc_result/",
@@ -590,13 +591,23 @@ rule subtype_clinical_diff:
 rule subtype_clinical_boxplots:
     # Draw boxplots for different clinical variables between subtypes.
     input:
-        "results/data/prepared/clinical.csv",
+        CLINICAL,
         "results/data/subtype/cc_result.csv",
         "results/data/subtype/subtype_clinical_diff.csv"
     output:
         "results/figures/subtype/clinical_boxplots.pdf"
     script:
         "src/subtype/subtype_clinical_boxplots.R"
+
+rule subtype_trait_diff:
+    # Perform t-test on derived traits between subtypes.
+    input:
+        FILTERED_DERIVED_TRAITS,
+        "results/data/subtype/cc_result.csv"
+    output:
+        "results/data/subtype/subtype_trait_diff.csv"
+    script:
+        "src/subtype/subtype_with_traits.R"
 
 
 # ==================== Residue Analysis ====================
