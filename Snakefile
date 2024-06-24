@@ -74,6 +74,7 @@ rule all:
         "results/data/subtype/cc_result.csv",
         "results/data/subtype/subtype_clinical_diff.csv",
         "results/data/subtype/subtype_trait_diff.csv",
+        "results/data/subtype/subtype_ancova_with_HC.csv",
 
         # ===== Molecular Subtype Figures =====
         "results/figures/subtype/cc_result/",
@@ -611,6 +612,18 @@ rule subtype_trait_heatmap:
         "results/figures/subtype/trait_heatmap.pdf"
     script:
         "src/subtype/subtype_heatmap.R"
+
+rule subtype_glycan_ancova_with_HC:
+    # Perform ANCOVA for glycans in HC and two HCC subtypes.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        clinical=CLINICAL,
+        subtypes="results/data/subtype/cc_result.csv"
+    output:
+        "results/data/subtype/subtype_ancova_with_HC.csv"
+    script:
+        "src/subtype/subtype_ancova_with_HC.R"
 
 
 # ==================== GlyCompare ====================
