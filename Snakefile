@@ -78,6 +78,7 @@ rule all:
         # ===== Molecular Subtype Figures =====
         "results/figures/subtype/cc_result/",
         "results/figures/subtype/clinical_boxplots.pdf",
+        "results/figures/subtype/trait_heatmap.pdf",
 
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
@@ -608,6 +609,17 @@ rule subtype_trait_diff:
         "results/data/subtype/subtype_trait_diff.csv"
     script:
         "src/subtype/subtype_with_traits.R"
+
+rule subtype_trait_heatmap:
+    # Plot heatmap for different derived traits between subtypes.
+    input:
+        FILTERED_DERIVED_TRAITS,
+        "results/data/subtype/cc_result.csv",
+        "results/data/subtype/subtype_trait_diff.csv"
+    output:
+        "results/figures/subtype/trait_heatmap.pdf"
+    script:
+        "src/subtype/subtype_heatmap.R"
 
 
 # ==================== Residue Analysis ====================
