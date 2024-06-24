@@ -81,6 +81,7 @@ rule all:
         "results/figures/subtype/cc_result/",
         "results/figures/subtype/clinical_boxplots.pdf",
         "results/figures/subtype/trait_heatmap.pdf",
+        "results/figures/subtype/subtype_compare_p.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -635,6 +636,15 @@ rule subtype_glycan_ancova_with_HC:
         "results/data/subtype/subtype_ancova_with_HC.csv"
     script:
         "src/subtype/subtype_ancova_with_HC.R"
+
+rule subtype_compare_glycan_p_values:
+    # Compare the p values for difference between two subtypes with HC.
+    input:
+        "results/data/subtype/subtype_ancova_with_HC.csv"
+    output:
+        "results/figures/subtype/subtype_compare_p.pdf"
+    script:
+        "src/subtype/subtype_compare_p.R"
 
 
 # ==================== GlyCompare ====================
