@@ -80,15 +80,6 @@ rule all:
         "results/figures/subtype/clinical_boxplots.pdf",
         "results/figures/subtype/trait_heatmap.pdf",
 
-        # ===== Residues Data =====
-        "results/data/residues/glycan_residues.csv",
-        "results/data/residues/ancova_result.csv",
-        "results/data/residues/post_hoc_result.csv",
-
-        # ===== Residues Figures =====
-        "results/figures/residues/residue_heatmap.pdf",
-        "results/figures/residues/residue_boxplots.pdf",
-
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
         # "results/data/motifs/motifs.csv",
@@ -620,50 +611,6 @@ rule subtype_trait_heatmap:
         "results/figures/subtype/trait_heatmap.pdf"
     script:
         "src/subtype/subtype_heatmap.R"
-
-
-# ==================== Residue Analysis ====================
-rule calculate_residues:
-    # Calculate glycan residues (the abundance of each monosaccharide).
-    input:
-        PROCESSED_ABUNDANCE,
-        "results/data/derived_traits/meta_properties.csv"
-    output:
-        "results/data/residues/glycan_residues.csv"
-    script:
-        "src/residues/calculate_residues.R"
-
-rule ancova_for_residues:
-    # Perform ANCOVA analysis on glycan residues.
-    input:
-        "results/data/residues/glycan_residues.csv",
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/residues/ancova_result.csv",
-        "results/data/residues/post_hoc_result.csv"
-    script:
-        "src/residues/ancova.R"
-
-rule residue_heatmap:
-    # Draw heatmap for mean number of residues per group.
-    input:
-        "results/data/residues/glycan_residues.csv",
-        GROUPS
-    output:
-        "results/figures/residues/residue_heatmap.pdf"
-    script:
-        "src/residues/mean_heatmap.R"
-
-rule residue_boxplots:
-    # Draw boxplots for residues.
-    input:
-        "results/data/residues/glycan_residues.csv",
-        GROUPS
-    output:
-        "results/figures/residues/residue_boxplots.pdf"
-    script:
-        "src/residues/boxplot.R"
 
 
 # ==================== GlyCompare ====================
