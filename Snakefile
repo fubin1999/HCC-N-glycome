@@ -76,6 +76,7 @@ rule all:
 
         # ===== Molecular Subtype Figures =====
         "results/figures/subtype/cc_result/",
+        "results/figures/subtype/clinical_boxplots.pdf",
 
         # ===== Residues Data =====
         "results/data/residues/glycan_residues.csv",
@@ -585,6 +586,17 @@ rule subtype_clinical_diff:
         "results/data/subtype/subtype_clinical_diff.csv"
     script:
         "src/subtype/subtype_with_clinical.R"
+
+rule subtype_clinical_boxplots:
+    # Draw boxplots for different clinical variables between subtypes.
+    input:
+        "results/data/prepared/clinical.csv",
+        "results/data/subtype/cc_result.csv",
+        "results/data/subtype/subtype_clinical_diff.csv"
+    output:
+        "results/figures/subtype/clinical_boxplots.pdf"
+    script:
+        "src/subtype/subtype_clinical_boxplots.R"
 
 
 # ==================== Residue Analysis ====================
