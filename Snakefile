@@ -73,6 +73,7 @@ rule all:
         # ===== Molecular Subtype Data =====
         "results/data/subtype/cc_result.csv",
         "results/data/subtype/subtype_clinical_diff.csv",
+        "results/data/subtype/subtype_glycan_diff.csv",
         "results/data/subtype/subtype_trait_diff.csv",
         "results/data/subtype/subtype_ancova_with_HC.csv",
 
@@ -601,6 +602,16 @@ rule subtype_trait_diff:
         "results/data/subtype/subtype_trait_diff.csv"
     script:
         "src/subtype/subtype_with_traits.R"
+
+rule subtype_glycan_diff:
+    # Perform t-test on glycan abundance between subtypes.
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/subtype/cc_result.csv"
+    output:
+        "results/data/subtype/subtype_glycan_diff.csv"
+    script:
+        "src/subtype/subtype_with_glycans.R"
 
 rule subtype_trait_heatmap:
     # Plot heatmap for different derived traits between subtypes.
