@@ -1,8 +1,15 @@
 library(tidyverse)
 library(patchwork)
 
+# full_cor_result <- read_csv("results/data/cor_with_clinical/trait_cor_with_clinical.csv")
+# sub_cor_result <- read_csv("results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv")
+
 full_cor_result <- read_csv(snakemake@input[[1]])
-HCC_cor_result <- read_csv(snakemake@input[[2]])
+sub_cor_result <- read_csv(snakemake@input[[2]])
+
+data <- full_cor_result %>%
+  mutate(group = "All") %>%
+  bind_rows(sub_cor_result)
 
 clinical_type <- tribble(
   ~clinical, ~clinical_type,
@@ -93,9 +100,20 @@ plot_corrplot <- function (cor_result) {
     scale_y_discrete(position = "right")
 }
 
-full_p <- plot_corrplot(full_cor_result)
-HCC_p <- plot_corrplot(HCC_cor_result)
-# tgutil::ggpreview(plot = full_p, width = 8, height = 6)
+plots <- data %>%
+  nest_by(group) %>%
+  mutate(plot = list(plot_corrplot(data))) %>%
+  select(-data)
+# tgutil::ggpreview(plot = plots[["plot"]][[1]], width = 8, height = 6)
 
-ggsave(snakemake@output[[1]], plot = full_p, width = 8, height = 6)
-ggsave(snakemake@output[[2]], plot = HCC_p, width = 8, height = 6)
+all_p <- plots %>% filter(group == "All") %>% pull(plot) %>% .[[1]]
+HC_p <- plots %>% filter(group == "HC") %>% pull(plot) %>% .[[1]]
+CHB_p <- plots %>% filter(group == "CHB") %>% pull(plot) %>% .[[1]]
+LC_p <- plots %>% filter(group == "LC") %>% pull(plot) %>% .[[1]]
+HCC_p <- plots %>% filter(group == "HCC") %>% pull(plot) %>% .[[1]]
+
+ggsave(snakemake@output[["all"]], plot = all_p, width = 8, height = 6)
+ggsave(snakemake@output[["HC"]], plot = HC_p, width = 8, height = 6)
+ggsave(snakemake@output[["CHB"]], plot = CHB_p, width = 8, height = 6)
+ggsave(snakemake@output[["LC"]], plot = LC_p, width = 8, height = 6)
+ggsave(snakemake@output[["HCC"]], plot = HCC_p, width = 8, height = 6)

@@ -61,14 +61,16 @@ rule all:
         # ===== Correlation with Clinical Data =====
         "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv",
+        "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv",
 
         # ===== Correlation with Clinical Figures =====
         "results/figures/cor_with_clinical/glycan_cor_with_AFP_1.pdf",
         "results/figures/cor_with_clinical/glycan_cor_with_AFP_2.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical_all.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical_HC.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical_CHB.pdf",
+        "results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
         "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
-        "results/figures/cor_with_clinical/trait_scatter_with_clinical.pdf",
 
         # ===== Molecular Subtype Data =====
         "results/data/subtype/cc_result.csv",
@@ -531,7 +533,7 @@ rule trait_cor_with_clinical:
         CLINICAL
     output:
         "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv"
+        "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv"
     script:
         "src/cor_with_clinical/trait_cor_with_clinical.R"
 
@@ -539,26 +541,15 @@ rule trait_corrplot_with_clinical:
     # Draw corrplot for derived traits with clinical information.
     input:
         "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv"
+        "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv"
     output:
-        "results/figures/cor_with_clinical/trait_cor_with_clinical.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf"
+        all="results/figures/cor_with_clinical/trait_cor_with_clinical_all.pdf",
+        HC="results/figures/cor_with_clinical/trait_cor_with_clinical_HC.pdf",
+        CHB="results/figures/cor_with_clinical/trait_cor_with_clinical_CHB.pdf",
+        LC="results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
+        HCC="results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf"
     script:
         "src/cor_with_clinical/trait_corrplot_with_clinical.R"
-
-rule scatter_with_clinical:
-    # Draw scatter plot for selected derived traits and clinical variables
-    # with high correlation.
-    input:
-        traits=FILTERED_DERIVED_TRAITS,
-        groups=GROUPS,
-        clinical=CLINICAL,
-        corr_result_all="results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        corr_result_HCC="results/data/cor_with_clinical/trait_cor_with_clinical_HCC.csv"
-    output:
-        "results/figures/cor_with_clinical/trait_scatter_with_clinical.pdf"
-    script:
-        "src/cor_with_clinical/trait_scatter_with_clinical.R"
 
 
 # ==================== Molecular Subtype ====================

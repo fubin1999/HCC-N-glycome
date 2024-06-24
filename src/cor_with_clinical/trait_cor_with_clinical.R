@@ -15,9 +15,6 @@ data <- trait_data %>%
     by = "sample", relationship = "many-to-many"
   )
 
-HCC_data <- data %>%
-  filter(group == "HCC")
-
 calcu_corr <- function (data) {
   data %>%
     group_by(trait, clinical) %>%
@@ -28,7 +25,12 @@ calcu_corr <- function (data) {
 }
 
 full_cor_result <- calcu_corr(data)
-HCC_cor_result <- calcu_corr(HCC_data)
+
+sub_cor_result <- data %>%
+  nest_by(group) %>%
+  mutate(cor_result = list(calcu_corr(data))) %>%
+  select(-data) %>%
+  unnest(cor_result)
 
 write_csv(full_cor_result, snakemake@output[[1]])
-write_csv(HCC_cor_result, snakemake@output[[2]])
+write_csv(sub_cor_result, snakemake@output[[2]])
