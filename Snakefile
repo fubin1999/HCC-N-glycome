@@ -39,7 +39,6 @@ rule all:
         # ===== Differential Analysis Figures =====
         "results/figures/diff_analysis/detect_rate_diff.pdf",
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
-        "results/figures/diff_analysis/glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
         "results/figures/diff_analysis/glycan_diff_upset.pdf",
@@ -58,6 +57,7 @@ rule all:
         "results/data/glycan_coexpr/cluster_cor_with_clinical.csv",
 
         # ===== Glycan Coexpression Module Figures =====
+        "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf",
         "results/figures/glycan_coexpr/glycan_cluster_trends.pdf",
         "results/figures/glycan_coexpr/glycan_property_heatmap.pdf",
         "results/figures/glycan_coexpr/cluster_corrplot.pdf",
@@ -360,10 +360,10 @@ rule glycan_heatmap:
         ancova_result="results/data/diff_analysis/glycan_ancova.csv",
         mp_table=META_PROPERTIES
     output:
-        "results/figures/diff_analysis/glycan_heatmap.pdf",
+        "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf",
         "results/data/glycan_coexpr/glycan_clusters.csv"
     script:
-        "src/diff_analysis/glycan_heatmap.R"
+        "src/glycan_coexpr/cluster_heatmap.R"
 
 rule glycan_diff_bubble:
     # Draw bubble plot for p-values and fold changes of glycans.

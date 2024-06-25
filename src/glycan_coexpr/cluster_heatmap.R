@@ -28,28 +28,31 @@ mat <- data |>
   as.matrix()
 
 # Shuffle columns-----
-set.seed(42)
+set.seed(123)
 mat <- mat[, sample(ncol(mat))]
 
 # Plot heatmap-----
-col <- colorRamp2(c(-2, 0, 2), c("#27408B", "white", "#CD0000"))
+col <- colorRamp2(c(-1.5, 0, 1.5), c("#27408B", "white", "#CD0000"))
 
 col_split <- groups |> 
   column_to_rownames("sample")
 col_split <- col_split[colnames(mat), ]
 col_split <- factor(col_split, levels = c("HC", "CHB", "LC", "HCC"))
 
-pdf(snakemake@output[[1]], width = 5, height = 8)
+pdf(snakemake@output[[1]], width = 4, height = 5)
 set.seed(42)
 ht <- Heatmap(
   mat,
   name = "Z-score",
   col = col,
   top_annotation = HeatmapAnnotation(group = anno_block(
-    gp = gpar(fill = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A")))
+    gp = gpar(
+      fill = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"),
+      col = NA
+    ))
   ),
-  border = TRUE,
   show_column_names = FALSE,
+  show_row_names = FALSE,
   cluster_columns = FALSE,
   column_split = col_split,
   row_km = 5,
