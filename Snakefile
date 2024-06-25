@@ -25,6 +25,7 @@ rule all:
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
 
         # ===== Differential Analysis Data =====
+        "results/data/diff_analysis/detect_rate_diff.csv",
         "results/data/diff_analysis/glycan_ancova.csv",
         "results/data/diff_analysis/glycan_post_hoc.csv",
         "results/data/diff_analysis/glycan_fold_change.csv",
@@ -283,6 +284,16 @@ rule clinical_heatmap:
 
 
 # ==================== Differential Analysis ====================
+rule detection_rate_diff:
+    # Perform Fisher's exact test to test detection rate difference of glycans.
+    input:
+        RAW_ABUNDANCE,
+        GROUPS
+    output:
+        "results/data/diff_analysis/detect_rate_diff.csv"
+    script:
+        "src/diff_analysis/glycan_detect_rate.R"
+
 rule glycan_ancova:
     # Perform ANCOVA for each glycan.
     input:
