@@ -34,6 +34,7 @@ rule all:
         "results/data/diff_analysis/trait_fold_change.csv",
 
         # ===== Differential Analysis Figures =====
+        "results/figures/diff_analysis/detect_rate_diff.pdf",
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
@@ -290,7 +291,8 @@ rule detection_rate_diff:
         RAW_ABUNDANCE,
         GROUPS
     output:
-        "results/data/diff_analysis/detect_rate_diff.csv"
+        "results/data/diff_analysis/detect_rate_diff.csv",
+        "results/figures/diff_analysis/detect_rate_diff.pdf"
     script:
         "src/diff_analysis/glycan_detect_rate.R"
 
