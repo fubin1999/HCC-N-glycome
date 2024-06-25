@@ -23,6 +23,7 @@ rule all:
         "results/figures/data_quality/batch_effect_pca.pdf",
         "results/figures/data_quality/glycan_count_venn_full.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
+        "results/figures/data_quality/glycan_property_heatmap.pdf",
 
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/detect_rate_diff.csv",
@@ -259,6 +260,17 @@ rule glycan_count_venn:
         "results/figures/data_quality/glycan_count_venn_confident.pdf"
     script:
         "src/data_quality/glycan_count_venn.R"
+
+rule glycan_property_heatmap:
+    # Draw heatmap to show all glycans' properties.
+    input:
+        PROCESSED_ABUNDANCE,
+        RAW_ABUNDANCE,
+        META_PROPERTIES
+    output:
+        "results/figures/data_quality/glycan_property_heatmap.pdf"
+    script:
+        "src/data_quality/glycan_properties.R"
 
 
 # ==================== Clinical Information ====================
