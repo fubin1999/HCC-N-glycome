@@ -1,16 +1,20 @@
 library(VennDiagram)
 library(tidyverse)
 
-# full_raw <- read_csv("results/data/prepared/raw_abundance_full.csv")
-# subset <- read_csv("results/data/prepared/raw_abundance.csv")
+# all_data <- read_csv("results/data/prepared/raw_abundance_full.csv")
+# struc_data <- read_csv("results/data/prepared/raw_abundance.csv")
+# conf_data <- read_csv("results/data/prepared/processed_abundance.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 
-full_raw <- read_csv(snakemake@input[[1]])
-subset <- read_csv(snakemake@input[[2]])
-groups <- read_csv(snakemake@input[[3]])
+all_data <- read_csv(snakemake@input[[1]])
+struc_data <- read_csv(snakemake@input[[2]])
+conf_data <- read_csv(snakemake@input[[3]])
+groups <- read_csv(snakemake@input[[4]])
 
-full_raw <- full_raw %>%
-  semi_join(subset, by = "sample")
+all_data <- all_data %>%
+  semi_join(conf_data, by = "sample")
+struc_data <- struc_data %>%
+  semi_join(conf_data, by = "sample")
 
 prepare_venn_data <- function (data) {
   data %>%
@@ -26,8 +30,9 @@ prepare_venn_data <- function (data) {
     deframe()
 }
 
-full_venn_data <- prepare_venn_data(full_raw)
-subset_venn_data <- prepare_venn_data(subset)
+all_venn_data <- prepare_venn_data(all_data)
+struc_venn_data <- prepare_venn_data(struc_data)
+conf_venn_data <- prepare_venn_data(conf_data)
 
 plot_venn <- function (data) {
   venn.diagram(
@@ -39,11 +44,16 @@ plot_venn <- function (data) {
 }
 
 pdf(snakemake@output[[1]], width = 4, height = 4)
-p1 <- plot_venn(full_venn_data)
+p1 <- plot_venn(all_venn_data)
 grid.draw(p1)
 dev.off()
 
 pdf(snakemake@output[[2]], width = 4, height = 4)
-p2 <- plot_venn(subset_venn_data)
+p2 <- plot_venn(struc_venn_data)
 grid.draw(p2)
+dev.off()
+
+pdf(snakemake@output[[3]], width = 4, height = 4)
+p3 <- plot_venn(conf_venn_data)
+grid.draw(p3)
 dev.off()
