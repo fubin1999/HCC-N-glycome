@@ -1,9 +1,9 @@
 library(tidyverse)
 library(ComplexHeatmap)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# raw_abundance <- read_csv("results/data/prepared/raw_abundance.csv")
-# mp_table <- read_csv("results/data/prepared/meta_properties.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+raw_abundance <- read_csv("results/data/prepared/raw_abundance.csv")
+mp_table <- read_csv("results/data/prepared/meta_properties.csv")
 
 abundance <- read_csv(snakemake@input[[1]])
 raw_abundance <- read_csv(snakemake@input[[2]])
@@ -42,20 +42,30 @@ mat <- data %>%
 mat[mat == FALSE] <- "No"
 mat[mat == TRUE] <- "Yes"
 
+rela_abundance <- abundance %>%
+  pivot_longer(-sample, names_to = "glycan", values_to = "value") %>%
+  group_by(sample) %>%
+  mutate(value = value / sum(value)) %>%
+  pivot_wider(names_from = glycan, values_from = value) %>%
+  column_to_rownames("sample") %>%
+  as.matrix()
+rela_abundance <- rela_abundance[, colnames(mat)]
+
 ha <- HeatmapAnnotation(
-  `Rela. Abund. (%)` = anno_barplot(
-    data$mean_rela_abund * 100,
-    gp = gpar(fill = "#CAE2F5"),
-    border = FALSE
-  ),
   `Detect Rate (%)` = anno_barplot(
     data$detect_rate * 100,
     gp = gpar(fill = "#CAE2F5"),
     border = FALSE
+  ),
+  `log2(Rela. Abund.)` = anno_boxplot(
+    log2(rela_abundance * 100),
+    gp = gpar(fill = "#CAE2F5"),
+    border = TRUE,
+    outline = FALSE
   )
 )
 
-pdf(snakemake@output[[1]], width = 12, height = 3)
+pdf(snakemake@output[[1]], width = 15, height = 3.5)
 Heatmap(
   mat,
   name = "Feature Presence",
