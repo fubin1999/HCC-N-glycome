@@ -34,7 +34,7 @@ plot_venn <- function (data) {
     data,
     filename = NULL,
     disable.logging = TRUE,
-    fill = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"),
+    col = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A"),
   )
 }
 
