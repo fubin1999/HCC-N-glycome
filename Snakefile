@@ -24,6 +24,7 @@ rule all:
         "results/figures/data_quality/glycan_count_venn_full.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
         "results/figures/data_quality/glycan_property_heatmap.pdf",
+        "results/figures/data_quality/glycan_property_barplots.pdf",
 
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/detect_rate_diff.csv",
@@ -270,7 +271,16 @@ rule glycan_property_heatmap:
     output:
         "results/figures/data_quality/glycan_property_heatmap.pdf"
     script:
-        "src/data_quality/glycan_properties.R"
+        "src/data_quality/glycan_property_heatmap.R"
+
+rule glycan_property_barplots:
+    # Draw barplots for more detailed properties.
+    input:
+        META_PROPERTIES
+    output:
+        "results/figures/data_quality/glycan_property_barplots.pdf"
+    script:
+        "src/data_quality/glycan_property_barplots.R"
 
 
 # ==================== Clinical Information ====================
