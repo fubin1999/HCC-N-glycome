@@ -41,7 +41,7 @@ survival_data <- HCC_sample_info %>%
     days_to_last_follow_up
   )) %>%
   select(barcode, os, vital_status, gender) %>%
-  filter(!is.na(os)) %>%
+  filter(!is.na(os), os <= 365 * 5) %>%
   left_join(tidy_expr_data, by = "barcode")
 
 survival_results <- survival_data %>%

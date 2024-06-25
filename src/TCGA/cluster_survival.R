@@ -23,10 +23,11 @@ survival_data <- HCC_sample_info %>%
   )) %>%
   select(barcode, os, vital_status) %>%
   filter(!is.na(os)) %>%
-  left_join(cc_result, by = "barcode")
+  left_join(cc_result, by = "barcode") %>%
+  filter(os <= 365 * 5)
 
 survival_result <- survfit(Surv(os, vital_status) ~ class, data = survival_data)
-p_value <- surv_pvalue(survival_result, data = survival_data, method = "sqrtN")
+p_value <- surv_pvalue(survival_result, data = survival_data)
 
 cox_model <- coxph(Surv(os, vital_status) ~ class, data = survival_data)
 
@@ -39,9 +40,8 @@ plots <- ggsurvplot(
   surv.median.line = "hv",
   pval = TRUE,
   pval.method = TRUE,
-  log.rank.weights = "sqrtN",
-  pval.coord = c(2100, 0.85),
-  pval.method.coord = c(2100, 0.95),
+  pval.coord = c(1200, 0.85),
+  pval.method.coord = c(1200, 0.95),
 )
 
 final_p <- plots$plot / plots$table + plot_layout(heights = c(4, 1))
