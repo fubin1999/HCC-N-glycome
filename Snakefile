@@ -42,6 +42,7 @@ rule all:
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
         "results/figures/diff_analysis/glycan_diff_upset.pdf",
+        "results/figures/diff_analysis/glycan_compare_FC.pdf",
         "results/figures/diff_analysis/glycan_confounders.pdf",
         "results/figures/diff_analysis/glycan_pca.pdf",
         "results/figures/diff_analysis/trait_confounders.pdf",
@@ -396,6 +397,15 @@ rule glycan_diff_upset:
         "results/figures/diff_analysis/glycan_diff_upset.pdf"
     script:
         "src/diff_analysis/glycan_diff_upset.R"
+
+rule compare_glycan_FC:
+    # Compare the fold changes of glycans between each group pair.
+    input:
+        "results/data/diff_analysis/glycan_fold_change.csv"
+    output:
+        "results/figures/diff_analysis/glycan_compare_FC.pdf"
+    script:
+        "src/diff_analysis/compare_FC.R"
 
 rule glycan_confounders:
     # Plot dot plot for confounders' p-values.
