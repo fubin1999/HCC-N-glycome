@@ -78,19 +78,6 @@ rule all:
         "results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
         "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
 
-        # ===== Molecular Subtype Data =====
-        "results/data/subtype/cc_result.csv",
-        "results/data/subtype/subtype_clinical_diff.csv",
-        "results/data/subtype/subtype_glycan_diff.csv",
-        "results/data/subtype/subtype_trait_diff.csv",
-        "results/data/subtype/subtype_ancova_with_HC.csv",
-
-        # ===== Molecular Subtype Figures =====
-        "results/figures/subtype/cc_result/",
-        "results/figures/subtype/clinical_boxplots.pdf",
-        "results/figures/subtype/trait_heatmap.pdf",
-        "results/figures/subtype/subtype_compare_p.pdf",
-
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
         # "results/data/motifs/motifs.csv",
@@ -602,92 +589,6 @@ rule trait_corrplot_with_clinical:
         HCC="results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf"
     script:
         "src/cor_with_clinical/trait_corrplot_with_clinical.R"
-
-
-# ==================== Molecular Subtype ====================
-rule HCC_consensus_clustering:
-    # Consensus clustering for HCC samples.
-    input:
-        PROCESSED_ABUNDANCE,
-        GROUPS
-    output:
-        directory("results/figures/subtype/cc_result/"),
-        "results/data/subtype/cc_result.csv"
-    script:
-        "src/subtype/subtype.R"
-
-rule subtype_clinical_diff:
-    # Perform wilcox test on clinical data between two subtypes.
-    input:
-        "results/data/subtype/cc_result.csv",
-        CLINICAL
-    output:
-        "results/data/subtype/subtype_clinical_diff.csv"
-    script:
-        "src/subtype/subtype_with_clinical.R"
-
-rule subtype_clinical_boxplots:
-    # Draw boxplots for different clinical variables between subtypes.
-    input:
-        CLINICAL,
-        "results/data/subtype/cc_result.csv",
-        "results/data/subtype/subtype_clinical_diff.csv"
-    output:
-        "results/figures/subtype/clinical_boxplots.pdf"
-    script:
-        "src/subtype/subtype_clinical_boxplots.R"
-
-rule subtype_trait_diff:
-    # Perform t-test on derived traits between subtypes.
-    input:
-        FILTERED_DERIVED_TRAITS,
-        "results/data/subtype/cc_result.csv"
-    output:
-        "results/data/subtype/subtype_trait_diff.csv"
-    script:
-        "src/subtype/subtype_with_traits.R"
-
-rule subtype_glycan_diff:
-    # Perform t-test on glycan abundance between subtypes.
-    input:
-        PROCESSED_ABUNDANCE,
-        "results/data/subtype/cc_result.csv"
-    output:
-        "results/data/subtype/subtype_glycan_diff.csv"
-    script:
-        "src/subtype/subtype_with_glycans.R"
-
-rule subtype_trait_heatmap:
-    # Plot heatmap for different derived traits between subtypes.
-    input:
-        FILTERED_DERIVED_TRAITS,
-        "results/data/subtype/cc_result.csv",
-        "results/data/subtype/subtype_trait_diff.csv"
-    output:
-        "results/figures/subtype/trait_heatmap.pdf"
-    script:
-        "src/subtype/subtype_heatmap.R"
-
-rule subtype_glycan_ancova_with_HC:
-    # Perform ANCOVA for glycans in HC and two HCC subtypes.
-    input:
-        abundance=PROCESSED_ABUNDANCE,
-        groups=GROUPS,
-        clinical=CLINICAL,
-        subtypes="results/data/subtype/cc_result.csv"
-    output:
-        "results/data/subtype/subtype_ancova_with_HC.csv"
-    script:
-        "src/subtype/subtype_ancova_with_HC.R"
-
-rule subtype_compare_glycan_p_values:
-    # Compare the p values for difference between two subtypes with HC.
-    input:
-        "results/data/subtype/subtype_ancova_with_HC.csv"
-    output:
-        "results/figures/subtype/subtype_compare_p.pdf"
-    script:
-        "src/subtype/subtype_compare_p.R"
 
 
 # ==================== GlyCompare ====================
