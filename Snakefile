@@ -277,14 +277,18 @@ rule glycan_property_heatmap:
     script:
         "src/data_quality/glycan_property_heatmap.R"
 
-rule glycan_property_barplots:
-    # Draw barplots for more detailed properties.
+rule glycan_property_detailed:
+    # Draw barplots and boxplots for more detailed properties.
+    # Barplots: for number of glycans in each category.
+    # Boxplots: for relative abundance of glycans in each category.
     input:
+        PROCESSED_ABUNDANCE,
         META_PROPERTIES
     output:
-        "results/figures/data_quality/glycan_property_barplots.pdf"
+        "results/figures/data_quality/glycan_property_barplots.pdf",
+        "results/figures/data_quality/glycan_property_boxplots.pdf"
     script:
-        "src/data_quality/glycan_property_barplots.R"
+        "src/data_quality/glycan_property_detailed.R"
 
 
 # ==================== Clinical Information ====================
