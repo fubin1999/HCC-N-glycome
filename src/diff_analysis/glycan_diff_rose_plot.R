@@ -1,8 +1,17 @@
 library(tidyverse)
 
-post_hoc_result <- read_csv(snakemake@input[[1]])
+ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
+post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
+
+ancova_result <- read_csv(snakemake@input[[1]])
+post_hoc_result <- read_csv(snakemake@input[[2]])
+
+diff_glycans <- ancova_result %>%
+  filter(Effect == "group", p.adj < 0.05) %>%
+  pull(glycan)
 
 plot_data <- post_hoc_result %>%
+  filter(glycan %in% diff_glycans) %>%
   mutate(
     comparison = str_glue("{group1} / {group2}"),
     signif = p.adj < 0.05,

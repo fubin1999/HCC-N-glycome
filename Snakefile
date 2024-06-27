@@ -42,7 +42,6 @@ rule all:
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
-        "results/figures/diff_analysis/glycan_diff_upset.pdf",
         "results/figures/diff_analysis/glycan_compare_FC.pdf",
         "results/figures/diff_analysis/glycan_confounders.pdf",
         "results/figures/diff_analysis/glycan_pca.pdf",
@@ -339,6 +338,7 @@ rule glycan_fold_change:
 rule glycan_diff_rose_plot:
     # Draw rose plot for differential glycans between each group pair.
     input:
+        "results/data/diff_analysis/glycan_ancova.csv",
         "results/data/diff_analysis/glycan_post_hoc.csv"
     output:
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf"
@@ -361,9 +361,9 @@ rule glycan_heatmap:
 rule glycan_diff_bubble:
     # Draw bubble plot for p-values and fold changes of glycans.
     input:
-        post_hoc="results/data/diff_analysis/glycan_post_hoc.csv",
-        fold_change="results/data/diff_analysis/glycan_fold_change.csv",
-        row_order="results/data/glycan_coexpr/glycan_clusters.csv"
+        "results/data/diff_analysis/glycan_ancova.csv",
+        "results/data/diff_analysis/glycan_post_hoc.csv",
+        "results/data/diff_analysis/glycan_fold_change.csv",
     output:
         "results/figures/diff_analysis/glycan_diff_bubble.pdf"
     script:
@@ -379,16 +379,6 @@ rule glycan_violin_plots:
         "results/figures/diff_analysis/glycan_violin_plots.pdf"
     script:
         "src/diff_analysis/glycan_violin_plots.R"
-
-rule glycan_diff_upset:
-    # Plot upset plot for the number of significant glycans
-    # between each group paires.
-    input:
-        "results/data/diff_analysis/glycan_post_hoc.csv"
-    output:
-        "results/figures/diff_analysis/glycan_diff_upset.pdf"
-    script:
-        "src/diff_analysis/glycan_diff_upset.R"
 
 rule compare_glycan_FC:
     # Compare the fold changes of glycans between each group pair.

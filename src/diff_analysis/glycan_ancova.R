@@ -28,12 +28,7 @@ ancova_result <- data |>
   as_tibble()
 
 # Post-hoc-----
-diff_glycans <- ancova_result |> 
-  filter(p.adj < 0.05, Effect == "group") |>
-  pull(glycan)
-
 posthoc_result <- data %>%
-  filter(glycan %in% diff_glycans) %>%
   post_hoc(log_value ~ age * sex + group, group, glycan) %>%
   add_significance(p.col = "p.adj")
 
