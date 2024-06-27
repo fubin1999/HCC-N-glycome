@@ -1,8 +1,8 @@
 library(tidyverse)
 library(patchwork)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# mp_table <- read_csv("results/data/prepared/meta_properties.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+mp_table <- read_csv("results/data/prepared/meta_properties.csv")
 
 abundance <- read_csv(snakemake@input[[1]])
 mp_table <- read_csv(snakemake@input[[2]])
@@ -124,7 +124,7 @@ final_abund_p <- (sia_abund_p | fuc_abund_p | ant_abund_p | type_abund_p | bisec
 ) &
   scale_y_continuous(
     name = "Relative Abundance",
-    limits = c(0, 0.5),
+    limits = c(0, 1),
     expand = expansion(mult = c(0.05, 0.05)),
     labels = scales::percent_format(accuracy = 1)
   ) &

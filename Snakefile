@@ -26,6 +26,7 @@ rule all:
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
         "results/figures/data_quality/glycan_property_heatmap.pdf",
         "results/figures/data_quality/glycan_property_barplots.pdf",
+        "results/figures/data_quality/glycan_property_boxplots.pdf",
 
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/detect_rate_diff.csv",
