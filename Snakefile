@@ -42,6 +42,7 @@ rule all:
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
+        "results/figures/diff_analysis/glycan_volcanos.pdf",
         "results/figures/diff_analysis/glycan_compare_FC.pdf",
         "results/figures/diff_analysis/glycan_confounders.pdf",
         "results/figures/diff_analysis/glycan_pca.pdf",
@@ -368,6 +369,17 @@ rule glycan_diff_bubble:
         "results/figures/diff_analysis/glycan_diff_bubble.pdf"
     script:
         "src/diff_analysis/glycan_diff_bubble.R"
+
+rule glycan_volcano:
+    # Draw glycan volcano plots.
+    input:
+        "results/data/diff_analysis/glycan_ancova.csv",
+        "results/data/diff_analysis/glycan_post_hoc.csv",
+        "results/data/diff_analysis/glycan_fold_change.csv"
+    output:
+        "results/figures/diff_analysis/glycan_volcanos.pdf"
+    script:
+        "src/diff_analysis/glycan_volcano.R"
 
 rule glycan_violin_plots:
     # Plot violin plots for all significant glycans.
