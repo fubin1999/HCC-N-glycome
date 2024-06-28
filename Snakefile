@@ -346,19 +346,6 @@ rule glycan_diff_rose_plot:
     script:
         "src/diff_analysis/glycan_diff_rose_plot.R"
 
-rule glycan_heatmap:
-    # Draw heatmap for differential glycans.
-    input:
-        abundance=PROCESSED_ABUNDANCE,
-        groups=GROUPS,
-        ancova_result="results/data/diff_analysis/glycan_ancova.csv",
-        mp_table=META_PROPERTIES
-    output:
-        "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf",
-        "results/data/glycan_coexpr/glycan_clusters.csv"
-    script:
-        "src/glycan_coexpr/cluster_heatmap.R"
-
 rule glycan_diff_bubble:
     # Draw bubble plot for p-values and fold changes of glycans.
     input:
@@ -484,6 +471,19 @@ rule trait_heatmap:
     
 
 # ==================== Glycan Coexpression Module ====================
+rule glycan_cluster_heatmap:
+    # Draw heatmap for differential glycans.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        ancova_result="results/data/diff_analysis/glycan_ancova.csv",
+        mp_table=META_PROPERTIES
+    output:
+        "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf",
+        "results/data/glycan_coexpr/glycan_clusters.csv"
+    script:
+        "src/glycan_coexpr/cluster_heatmap.R"
+
 rule eigen_glycans:
     # Calculate the eigen value for each glycan cluster.
     input:
