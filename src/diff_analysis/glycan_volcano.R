@@ -3,9 +3,9 @@ library(ggrepel)
 library(patchwork)
 
 
-# ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
-# post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
-# fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
+ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
+post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
+fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
 
 ancova_result <- read_csv(snakemake@input[[1]])
 post_hoc_result <- read_csv(snakemake@input[[2]])
@@ -40,12 +40,9 @@ ylim <- c(0, max(plot_data$logp))
 plot_volcano <- function (data, .title) {
   ggplot(data, aes(logFC, logp)) +
     geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "grey") +
-    geom_point(aes(color = regulate), size = 4, alpha = 0.5) +
-    scale_color_manual(
-      values = c("up" = "#CD0000", "down" = "steelblue", "no" = "grey"),
-    ) +
-    labs(x = "log2FC", y = "-log10p", title = .title, color = "") +
-    theme_classic()
+    geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
+    geom_point(aes(color = regulate, size = abs(logFC)), alpha = 0.5) +
+    ggtitle(.title)
 }
 
 plot_df <- plot_data %>%
@@ -55,7 +52,13 @@ plot_df <- plot_data %>%
 
 p <- reduce(plot_df$plot, `+`) +
   plot_layout(nrow = 1, guides = "collect") &
-  ylim(ylim)
+  lims(x = c(-0.8, 1.4), y = ylim) &
+  scale_color_manual(
+    values = c("up" = "#CD0000", "down" = "steelblue", "no" = "grey"),
+  ) &
+  scale_size_continuous(range = c(1, 5), limits = c(0, 1.5)) &
+  labs(x = "log2FC", y = "-log10p", color = "Regulate", size = "|log2FC|") &
+  theme_classic()
 # tgutil::ggpreview(plot = p, width = 10, height = 3)
 
 ggsave(snakemake@output[[1]], plot = p, width = 10, height = 3)
