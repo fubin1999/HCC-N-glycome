@@ -41,6 +41,7 @@ rule all:
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
+        "results/figures/diff_analysis/glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_volcanos.pdf",
         "results/figures/diff_analysis/glycan_compare_FC.pdf",
         "results/figures/diff_analysis/glycan_compare_p.pdf",
@@ -365,6 +366,17 @@ rule glycan_diff_bubble:
         "results/figures/diff_analysis/glycan_diff_bubble.pdf"
     script:
         "src/diff_analysis/glycan_diff_bubble.R"
+
+rule glycan_heatmap:
+    # Draw mean heatmap for differential glycans.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS,
+        "results/data/diff_analysis/glycan_ancova.csv"
+    output:
+        "results/figures/diff_analysis/glycan_heatmap.pdf"
+    script:
+        "src/diff_analysis/glycan_heatmap.R"
 
 rule glycan_volcano:
     # Draw glycan volcano plots.
