@@ -22,7 +22,6 @@ rule all:
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
         "results/figures/data_quality/glycan_count_venn_all.pdf",
-        "results/figures/data_quality/glycan_count_venn_with_structures.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
         "results/figures/data_quality/glycan_property_heatmap.pdf",
         "results/figures/data_quality/glycan_property_barplots.pdf",
@@ -195,22 +194,12 @@ rule combine_data_per_plate_full:
     script:
         "src/prepare_data/combine_data_per_plate.R"
 
-rule preprocess:
-    # Filter glycan, impute missing values, and normalize.
-    input:
-        RAW_ABUNDANCE
-    output:
-        PROCESSED_ABUNDANCE
-    script:
-        "src/prepare_data/preprocess.R"
-
 rule prepare_groups:
     # Prepare the groups.
     input:
-        plates="data/plates.csv",
-        abundance=PROCESSED_ABUNDANCE
+        plates="data/plates.csv"
     output:
-        GROUPS
+        PREPARED_DIR + "unfiltered_groups.csv"
     script:
         "src/prepare_data/prepare_groups.R"
 
@@ -218,12 +207,24 @@ rule prepare_clinical:
     # Prepare the clinical information.
     input:
         clinical="data/clinical.csv",
-        abundance=PROCESSED_ABUNDANCE,
         plates="data/plates.csv"
     output:
-        CLINICAL
+        PREPARED_DIR + "unfiltered_clinical.csv"
     script:
         "src/prepare_data/prepare_clinical.R"
+
+rule preprocess:
+    # Filter glycan, impute missing values, and normalize.
+    input:
+        RAW_ABUNDANCE,
+        PREPARED_DIR + "unfiltered_groups.csv",
+        PREPARED_DIR + "unfiltered_clinical.csv"
+    output:
+        PROCESSED_ABUNDANCE,
+        GROUPS,
+        CLINICAL
+    script:
+        "src/prepare_data/preprocess.R"
 
 rule calculate_derived_traits:
     # Calculate derived traits using GlyTrait
@@ -254,12 +255,10 @@ rule glycan_count_venn:
     # Draw venn diagrams for glycan count per group.
     input:
         "results/data/prepared/raw_abundance_full.csv",
-        "results/data/prepared/raw_abundance.csv",
         "results/data/prepared/processed_abundance.csv",
         "results/data/prepared/groups.csv"
     output:
         "results/figures/data_quality/glycan_count_venn_all.pdf",
-        "results/figures/data_quality/glycan_count_venn_with_structures.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf"
     script:
         "src/data_quality/glycan_count_venn.R"

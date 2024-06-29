@@ -1,6 +1,9 @@
 library(tidyverse)
 
 raw_data <- read_csv(snakemake@input[[1]])
+groups <- read_csv(snakemake@input[[2]])
+clinical <- read_csv(snakemake@input[[3]])
+
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
 
 # 1. Convert to long-----
@@ -21,12 +24,16 @@ filtered_1 <- long_data |>
 
 # 3. Filter glycans-----
 # Remove glycans with missing values in more than 50% of samples.
-filtered_2 <- filtered_1 |> 
-  group_by(glycan) |> 
-  mutate(missing_prop = mean(is.na(value))) |> 
-  filter(missing_prop < 0.5) |> 
-  ungroup() |> 
-  select(-missing_prop)
+glycans_to_keep <- filtered_1 %>%
+  left_join(groups, by = "sample") %>%
+  filter(group != "QC") %>%
+  group_by(glycan, group) %>%
+  summarise(detect_rate = mean(!is.na(value)), .groups = "drop") %>%
+  distinct(glycan) %>%
+  pull(glycan)
+
+filtered_2 <- filtered_1 %>%
+  filter(glycan %in% glycans_to_keep)
 
 # Before filtering: 72 glycans
 # After filtering: 62 glycans
@@ -51,5 +58,13 @@ normalized <- imputed |>
 final_data <- normalized |>
   pivot_wider(names_from = glycan, values_from = value)
 
+# Filter groups and clinical-----
+filtered_groups <- groups %>%
+  semi_join(final_data, by = "sample")
+filtered_clinical <- clinical %>%
+  semi_join(filtered_groups %>% filter(group != "QC"), by = "sample")
+
 # Save result-----
 write_csv(final_data, snakemake@output[[1]])
+write_csv(filtered_groups, snakemake@output[[2]])
+write_csv(filtered_clinical, snakemake@output[[3]])
