@@ -44,6 +44,7 @@ rule all:
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
         "results/figures/diff_analysis/glycan_volcanos.pdf",
         "results/figures/diff_analysis/glycan_compare_FC.pdf",
+        "results/figures/diff_analysis/glycan_compare_p.pdf",
         "results/figures/diff_analysis/glycan_confounders.pdf",
         "results/figures/diff_analysis/glycan_pca.pdf",
         "results/figures/diff_analysis/trait_confounders.pdf",
@@ -396,6 +397,15 @@ rule compare_glycan_FC:
         "results/figures/diff_analysis/glycan_compare_FC.pdf"
     script:
         "src/diff_analysis/compare_FC.R"
+
+rule compare_glycan_p:
+    # Compare the p-values of glycans between each group pair.
+    input:
+        "results/data/diff_analysis/glycan_post_hoc.csv"
+    output:
+        "results/figures/diff_analysis/glycan_compare_p.pdf"
+    script:
+        "src/diff_analysis/compare_p.R"
 
 rule glycan_confounders:
     # Plot dot plot for confounders' p-values.
