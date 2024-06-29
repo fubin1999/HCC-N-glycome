@@ -15,7 +15,7 @@ glyhunter_long <- glyhunter_df |>
 
 result <- glyhunter_long |>
   separate_wider_regex(sample, c(".*_", position = ".*", "_1")) |>
-  left_join(pos_df, by = "position") |>
+  right_join(pos_df, by = "position") |>
   select(sample, glycan, value)
 
 write_csv(result, snakemake@output[[1]])

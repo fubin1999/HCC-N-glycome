@@ -9,7 +9,8 @@ groups <- read_csv(snakemake@input[[2]]) %>%
 post_hoc_result <- read_csv(snakemake@input[[3]])
 
 data <- eigen_glycans %>%
-  left_join(groups, by = "sample")
+  left_join(groups, by = "sample") %>%
+  filter(group != "QC")
 
 plot_data <- data %>%
   summarise(

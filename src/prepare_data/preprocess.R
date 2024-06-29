@@ -1,7 +1,6 @@
 library(tidyverse)
 
 raw_data <- read_csv(snakemake@input[[1]])
-chosen_samples <- read_csv(snakemake@input[[2]])$sample
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
 
 # 1. Convert to long-----
@@ -18,8 +17,7 @@ to_delete_2 <- long_data |>
 to_delete <- c(to_delete_1, to_delete_2)
 
 filtered_1 <- long_data |>
-  filter(!sample %in% to_delete) %>%
-  filter(sample %in% chosen_samples)
+  filter(!sample %in% to_delete)
 
 # 3. Filter glycans-----
 # Remove glycans with missing values in more than 50% of samples.

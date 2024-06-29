@@ -160,9 +160,19 @@ rule assign_maldi_pos:
     # Match the MALDI positions of GlyHunter results to samples.
     input:
         "data/MALDI_positions.csv",
-        "results/data/glyhunter_results{sub}/plate{no}/"
+        "results/data/glyhunter_results/plate{no}/"
     output:
-        "results/data/data_per_plate{sub}/plate{no}.csv"
+        "results/data/data_per_plate/plate{no}.csv"
+    script:
+        "src/prepare_data/assign_maldi_pos.R"
+
+rule assign_maldi_pos_full:
+    # Match the MALDI positions of GlyHunter results to samples.
+    input:
+        "data/MALDI_positions.csv",
+        "results/data/glyhunter_results_full/plate{no}/"
+    output:
+        "results/data/data_per_plate_full/plate{no}.csv"
     script:
         "src/prepare_data/assign_maldi_pos.R"
 
@@ -187,8 +197,7 @@ rule combine_data_per_plate_full:
 rule preprocess:
     # Filter glycan, impute missing values, and normalize.
     input:
-        RAW_ABUNDANCE,
-        "data/chosen_samples.csv"
+        RAW_ABUNDANCE
     output:
         PROCESSED_ABUNDANCE
     script:
