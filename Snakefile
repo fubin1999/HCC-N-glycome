@@ -65,6 +65,7 @@ rule all:
         "results/figures/glycan_coexpr/glycan_property_heatmap.pdf",
         "results/figures/glycan_coexpr/cluster_corrplot.pdf",
         "results/figures/glycan_coexpr/cluster_cor_with_clinical.pdf",
+        "results/figures/glycan_coexpr/cor_inter_intra_GCM.pdf",
 
         # ===== Correlation with Clinical Data =====
         "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
@@ -514,6 +515,16 @@ rule glycan_cluster_heatmap:
         "results/data/glycan_coexpr/glycan_clusters.csv"
     script:
         "src/glycan_coexpr/cluster_heatmap.R"
+
+rule glycan_cor_within_cluster:
+    # Correlation analysis for glycans within the same GCM or with different GCMs.
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/glycan_coexpr/glycan_clusters.csv"
+    output:
+        "results/figures/glycan_coexpr/cor_inter_intra_GCM.pdf"
+    script:
+        "src/glycan_coexpr/glycan_cor_within_cluster.R"
 
 rule eigen_glycans:
     # Calculate the eigen value for each glycan cluster.
