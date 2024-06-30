@@ -28,8 +28,8 @@ plot_data <- cor_result %>%
 p <- ggplot(plot_data, aes(clinical, reorder(cluster_name, desc(cluster)))) +
   geom_tile(aes(fill = cor), color = "white", linewidth = 1) +
   geom_text(aes(label = sig_label)) +
-  scale_fill_gradient2(low = "#27408B", mid = "white", high = "#CD0000") +
-  labs(y = "Glycan Cluster", size = "|Spearman's rho|", color = "Relation") +
+  scale_fill_gradient2(high = "#D26F32", mid = "white", low = "#275D87") +
+  labs(fill = "Spearman's rho") +
   coord_equal() +
   theme_void() +
   theme(
