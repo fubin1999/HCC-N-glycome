@@ -3,8 +3,8 @@ library(rstatix)
 library(ggprism)
 library(patchwork)
 
-raw_abundance <- read_csv("results/data/prepared/raw_abundance.csv")
-groups <- read_csv("results/data/prepared/groups.csv")
+# raw_abundance <- read_csv("results/data/prepared/raw_abundance.csv")
+# groups <- read_csv("results/data/prepared/groups.csv")
 raw_abundance <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 
@@ -113,5 +113,5 @@ final_p <- reduce(plot_df$plot, `+`) +
   theme(
     legend.position = "right"
   )
-tgutil::ggpreview(plot = final_p, width = 14, height = 7)
+# tgutil::ggpreview(plot = final_p, width = 14, height = 7)
 ggsave(snakemake@output[[2]], plot = final_p, width = 14, height = 7)
