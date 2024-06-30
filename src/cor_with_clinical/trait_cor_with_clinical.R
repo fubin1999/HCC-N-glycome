@@ -5,7 +5,8 @@ library(patchwork)
 trait_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clinical <- read_csv(snakemake@input[[3]]) %>%
-  select(-age, -sex)
+  select(-age, -sex) %>%
+  mutate(AAR = AST / ALT)
 
 data <- trait_data %>%
   pivot_longer(-sample, names_to = "trait", values_to = "value") %>%

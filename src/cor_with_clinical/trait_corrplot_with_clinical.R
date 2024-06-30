@@ -22,6 +22,7 @@ clinical_type <- tribble(
   "TBIL", "Liver Function",
   "AST", "Liver Function",
   "ALT", "Liver Function",
+  "AAR", "Liver Function",
   "GGT", "Liver Function",
   "ALB", "Liver Function",
   "AFP", "Tumor Markers",
