@@ -79,6 +79,7 @@ rule all:
         "results/figures/cor_with_clinical/trait_cor_with_clinical_CHB.pdf",
         "results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
         "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
+        "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -622,6 +623,17 @@ rule trait_corrplot_with_clinical:
         HCC="results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf"
     script:
         "src/cor_with_clinical/trait_corrplot_with_clinical.R"
+
+rule clinical_subtype_boxplots:
+    # Draw boxplots for differential traits in clinical subtypes.
+    input:
+        FILTERED_DERIVED_TRAITS,
+        GROUPS,
+        CLINICAL
+    output:
+        "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf"
+    script:
+        "src/cor_with_clinical/clinical_subtype_boxplots.R"
 
 
 # ==================== GlyCompare ====================
