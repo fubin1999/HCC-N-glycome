@@ -70,6 +70,8 @@ rule all:
 
         # ===== Correlation with Clinical Data =====
         "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
+        "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
+        "results/data/cor_with_clinical/glycan_cor_with_clinical_per_group.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv",
 
@@ -612,17 +614,20 @@ rule glycan_cor_with_AFP:
     script:
         "src/cor_with_clinical/glycan_cor_with_AFP.R"
 
-rule trait_cor_with_clinical:
-    # Correlation of derived traits with clinical information.
+rule calcu_cor_with_clinical:
+    # Correlation of glycan abundance and derived traits with clinical information.
     input:
-        FILTERED_DERIVED_TRAITS,
-        GROUPS,
-        CLINICAL
+        glycans=PROCESSED_ABUNDANCE,
+        traits=FILTERED_DERIVED_TRAITS,
+        groups=GROUPS,
+        clinical=CLINICAL
     output:
+        "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
+        "results/data/cor_with_clinical/glycan_cor_with_clinical_per_group.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv"
     script:
-        "src/cor_with_clinical/trait_cor_with_clinical.R"
+        "src/cor_with_clinical/cor_with_clinical.R"
 
 rule trait_corrplot_with_clinical:
     # Draw corrplot for derived traits with clinical information.
