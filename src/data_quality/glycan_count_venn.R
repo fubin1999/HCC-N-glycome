@@ -2,12 +2,14 @@ library(VennDiagram)
 library(tidyverse)
 
 # all_data <- read_csv("results/data/prepared/raw_abundance_full.csv")
+# struc_data <- read_csv("results/data/prepared/raw_abundance.csv")
 # conf_data <- read_csv("results/data/prepared/processed_abundance.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 
 all_data <- read_csv(snakemake@input[[1]])
-conf_data <- read_csv(snakemake@input[[2]])
-groups <- read_csv(snakemake@input[[3]])
+struc_data <- read_csv(snakemake@input[[2]])
+conf_data <- read_csv(snakemake@input[[3]])
+groups <- read_csv(snakemake@input[[4]])
 
 prepare_venn_data <- function (data) {
   data %>%
@@ -24,6 +26,7 @@ prepare_venn_data <- function (data) {
 }
 
 all_venn_data <- prepare_venn_data(all_data)
+struc_venn_data <- prepare_venn_data(struc_data)
 conf_venn_data <- prepare_venn_data(conf_data)
 
 plot_venn <- function (data) {
@@ -35,12 +38,13 @@ plot_venn <- function (data) {
   )
 }
 
-pdf(snakemake@output[[1]], width = 4, height = 4)
-p1 <- plot_venn(all_venn_data)
-grid.draw(p1)
-dev.off()
+output_files <- snakemake@output
+venn_data <- list(all_venn_data, struc_venn_data, conf_venn_data)
 
-pdf(snakemake@output[[2]], width = 4, height = 4)
-p3 <- plot_venn(conf_venn_data)
-grid.draw(p3)
-dev.off()
+# 循环生成 PDF 文件
+for (i in seq_along(output_files)) {
+  pdf(output_files[[i]], width = 4, height = 4)
+  p <- plot_venn(venn_data[[i]])
+  grid.draw(p)
+  dev.off()
+}

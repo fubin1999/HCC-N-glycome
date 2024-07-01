@@ -22,6 +22,7 @@ rule all:
         # ===== Data Quality Figures =====
         "results/figures/data_quality/batch_effect_pca.pdf",
         "results/figures/data_quality/glycan_count_venn_all.pdf",
+        "results/figures/data_quality/glycan_count_venn_with_structures.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf",
         "results/figures/data_quality/glycan_property_heatmap.pdf",
         "results/figures/data_quality/glycan_property_barplots.pdf",
@@ -258,10 +259,12 @@ rule glycan_count_venn:
     # Draw venn diagrams for glycan count per group.
     input:
         "results/data/prepared/raw_abundance_full.csv",
+        "results/data/prepared/raw_abundance.csv",
         "results/data/prepared/processed_abundance.csv",
         "results/data/prepared/groups.csv"
     output:
         "results/figures/data_quality/glycan_count_venn_all.pdf",
+        "results/figures/data_quality/glycan_count_venn_with_structures.pdf",
         "results/figures/data_quality/glycan_count_venn_confident.pdf"
     script:
         "src/data_quality/glycan_count_venn.R"
