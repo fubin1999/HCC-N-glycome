@@ -84,6 +84,7 @@ rule all:
         "results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
         "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
         "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf",
+        "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -653,6 +654,15 @@ rule clinical_subtype_boxplots:
         "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf"
     script:
         "src/cor_with_clinical/clinical_subtype_boxplots.R"
+
+rule glycan_corrplot_with_clinical:
+    # Draw corrplot for glycan abundance with clinical information.
+    input:
+        "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
+    output:
+        "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf"
+    script:
+        "src/cor_with_clinical/glycan_corrplot_with_clinical.R"
 
 
 # ==================== GlyCompare ====================
