@@ -29,6 +29,7 @@ glycans_to_keep <- filtered_1 %>%
   filter(group != "QC") %>%
   group_by(glycan, group) %>%
   summarise(detect_rate = mean(!is.na(value)), .groups = "drop") %>%
+  filter(detect_rate > 0.5) %>%
   distinct(glycan) %>%
   pull(glycan)
 

@@ -1,8 +1,8 @@
 library(tidyverse)
 library(patchwork)
 
-abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-mp_table <- read_csv("results/data/prepared/meta_properties.csv")
+# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+# mp_table <- read_csv("results/data/prepared/meta_properties.csv")
 
 abundance <- read_csv(snakemake@input[[1]])
 mp_table <- read_csv(snakemake@input[[2]])
@@ -61,7 +61,7 @@ final_count_p <- (sia_count_p | fuc_count_p | ant_count_p | type_count_p | bisec
     axes = "collect_y"
 ) &
   scale_y_continuous(
-    limits = c(0, 55),
+    limits = c(0, 60),
     expand = expansion(mult = c(0, 0.1))
   ) &
   guides(fill = "none") &
