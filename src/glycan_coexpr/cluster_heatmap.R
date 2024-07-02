@@ -39,7 +39,7 @@ col_split <- groups |>
 col_split <- col_split[colnames(mat), ]
 col_split <- factor(col_split, levels = c("HC", "CHB", "LC", "HCC"))
 
-pdf(snakemake@output[[1]], width = 4, height = 5)
+pdf(snakemake@output[[1]], width = 4, height = 6.5)
 set.seed(42)
 ht <- Heatmap(
   mat,

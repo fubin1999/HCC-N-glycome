@@ -42,4 +42,4 @@ p <- post_hoc %>%
   theme_classic()
 # tgutil::ggpreview(plot = p, width = 6.5, height = 5)
 
-ggsave(snakemake@output[[1]], plot = p, width = 6.5, height = 5)
+ggsave(snakemake@output[[1]], plot = p, width = 6.5, height = 6.5)

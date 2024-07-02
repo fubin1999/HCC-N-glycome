@@ -28,11 +28,12 @@ bubble_p <- ggplot(bubble_data, aes(trait, comparison)) +
   theme(
     axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5),
     axis.text.y = element_text(hjust = 1),
-    legend.box = "horizontal"
+    legend.box = "horizontal",
+    legend.position = "top"
   ) +
   scale_alpha_manual(values = c(0, 1)) +
-  scale_size_continuous(range = c(1, 5)) +
+  scale_size_continuous(range = c(1, 4)) +
   scale_fill_gradient2(high = "#D26F32", low = "#275D87", mid = "white")
 
 # tgutil::ggpreview(width = 10, height = 4)
-ggsave(snakemake@output[[1]], plot = bubble_p, width = 10, height = 4)
+ggsave(snakemake@output[[1]], plot = bubble_p, width = 7, height = 4)
