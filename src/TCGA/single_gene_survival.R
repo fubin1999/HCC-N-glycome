@@ -53,7 +53,45 @@ survival_results <- survival_data %>%
   select(gene_name, fit_stats) %>%
   unnest(fit_stats) %>%
   filter(term == "expr") %>%
-  select(-term) %>%
-  adjust_pvalue(p.col = "p.value", method = "BH")
+  select(-term)
 
 write_csv(survival_results, snakemake@output[[1]])
+
+km_plot_df <- survival_data %>%
+  nest_by(gene_name) %>%
+  mutate(
+    cut_res = list(surv_cutpoint(data, "os", "vital_status", "expr")),
+    cat_res = list(surv_categorize(cut_res)),
+    cat_res = list(as_tibble(cat_res)),
+  ) %>%
+  select(gene_name, cat_res) %>%
+  unnest(cat_res) %>%
+  nest_by() %>%
+  mutate(
+    surv_res = list(survfit(Surv(os, vital_status) ~ expr, data = data)),
+    km_plot = list(ggsurvplot(
+      surv_res,
+      data = data,
+      palette = "npg",
+      surv.median.line = "hv",
+      legend.title = gene_name,
+      legend.labs = c("High", "Low"),
+      pval = TRUE,
+      pval.method = TRUE,
+      pval.coord = c(1200, 0.85),
+      pval.method.coord = c(1200, 0.95),
+    )$plot)
+  ) %>%
+  select(gene_name, km_plot)
+
+walk2(
+  km_plot_df$gene_name,
+  km_plot_df$km_plot,
+  ~ ggsave(
+    file = file.path(snakemake@output[[2]], paste0(.x, ".pdf")),
+    plot = .y,
+    width = 3,
+    height = 3.5,
+    create.dir = TRUE
+  )
+)
