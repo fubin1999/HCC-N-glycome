@@ -31,5 +31,8 @@ p <- dea_result %>%
   ) +
   guides(color = "none") +
   scale_color_manual(values = c(up = "#CD0000", down = "#27408B", no = "grey")) +
-  theme_classic()
+  theme_bw() +
+  theme(
+    panel.grid = element_blank()
+  )
 ggsave(snakemake@output[[1]], plot = p, width = 5, height = 5)
