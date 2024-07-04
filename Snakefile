@@ -109,8 +109,8 @@ rule all:
         "results/figures/TCGA/consensus_cluster/",
         "results/figures/TCGA/cluster_dea_heatmap.pdf",
         "results/figures/TCGA/clinical_heatmap.pdf",
-        "results/figures/TCGA/cox_forest_plot.pdf",
         "results/figures/TCGA/cluster_KM.pdf",
+        "results/figures/TCGA/single_gene_KM/",
 
         # ===== Machine Learning Data =====
         "results/data/ml/model_comparison.csv",
@@ -843,18 +843,10 @@ rule TCGA_single_gene_survival:
         "results/data/TCGA/prepared_data.rda",
         "data/glycogenes.csv"
     output:
-        "results/data/TCGA/cox.csv"
+        "results/data/TCGA/cox.csv",
+        directory("results/figures/TCGA/single_gene_KM/")
     script:
         "src/TCGA/single_gene_survival.R"
-
-rule TCGA_gene_cox_forest_plot:
-    # Draw forest plot for significant genes in cox.
-    input:
-        "results/data/TCGA/cox.csv"
-    output:
-        "results/figures/TCGA/cox_forest_plot.pdf"
-    script:
-        "src/TCGA/cox_forest.R"
 
 rule TCGA_cluster_KM:
     # Draw KM Curve for two clusters.
