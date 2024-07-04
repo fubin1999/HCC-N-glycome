@@ -32,7 +32,7 @@ set.seed(123)
 mat <- mat[, sample(ncol(mat))]
 
 # Plot heatmap-----
-col <- colorRamp2(c(-1.5, 0, 1.5), c("#27408B", "white", "#CD0000"))
+col <- colorRamp2(c(-1.5, 0, 1.5), c("#275D87", "white", "#D26F32"))
 
 col_split <- groups |> 
   column_to_rownames("sample")
