@@ -46,4 +46,4 @@ plots <- ggsurvplot(
 
 final_p <- plots$plot / plots$table + plot_layout(heights = c(4, 1))
 # tgutil::ggpreview(plot = final_p, width = 5, height = 7)
-ggsave(snakemake@output[[1]], plot = final_p, width = 5, height = 7)
+ggsave(snakemake@output[[1]], plot = final_p, width = 5, height = 6)
