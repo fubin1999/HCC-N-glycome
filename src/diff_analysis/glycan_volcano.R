@@ -3,9 +3,9 @@ library(ggrepel)
 library(patchwork)
 
 
-ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
-post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
-fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
+# ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
+# post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
+# fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
 
 ancova_result <- read_csv(snakemake@input[[1]])
 post_hoc_result <- read_csv(snakemake@input[[2]])
