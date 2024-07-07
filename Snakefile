@@ -27,6 +27,7 @@ rule all:
         "results/figures/data_quality/glycan_property_heatmap.pdf",
         "results/figures/data_quality/glycan_property_barplots.pdf",
         "results/figures/data_quality/glycan_property_boxplots.pdf",
+        "results/figures/data_quality/QC_corrplot.pdf",
 
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/detect_rate_diff.csv",
@@ -295,6 +296,16 @@ rule glycan_property_detailed:
         "results/figures/data_quality/glycan_property_boxplots.pdf"
     script:
         "src/data_quality/glycan_property_detailed.R"
+
+rule QC_corrplot:
+    # Draw correlation plot for QC samples.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS
+    output:
+        "results/figures/data_quality/QC_corrplot.pdf"
+    script:
+        "src/data_quality/QC_corrplot.R"
 
 
 # ==================== Clinical Information ====================
