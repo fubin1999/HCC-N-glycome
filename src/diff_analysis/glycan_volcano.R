@@ -42,6 +42,7 @@ plot_volcano <- function (data, .title) {
     geom_hline(yintercept = -log10(0.05), linetype = "dashed", color = "grey") +
     geom_vline(xintercept = 0, linetype = "dashed", color = "grey") +
     geom_point(aes(color = regulate, size = abs(logFC)), alpha = 0.5) +
+    guides(color = "none") +
     ggtitle(.title)
 }
 
