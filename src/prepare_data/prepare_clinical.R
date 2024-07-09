@@ -1,5 +1,8 @@
 library(tidyverse)
 
+# raw_clinical <- read_csv("data/clinical.csv")
+# plates <- read_csv("data/plates.csv")
+
 raw_clinical <- read_csv(snakemake@input[["clinical"]])
 plates <- read_csv(snakemake@input[["plates"]])
 
@@ -13,9 +16,13 @@ clinical <- raw_clinical |>
   select(-sample_no)
 
 # Clean up clinical data
-clean_clinical <- clinical |> 
-  mutate(across(-c(sample, sex), ~ parse_number(as.character(.x)))) |> 
-  mutate(across(-c(sample, sex), ~ replace_na(.x, 0))) |> 
+clean_clinical <- clinical |>
+  mutate(across(-c(sample, sex), ~ parse_number(as.character(.x)))) %>%
   distinct(sample, .keep_all = TRUE)
 
-write_csv(clean_clinical, snakemake@output[[1]])
+# Impute missing values using mice
+imputed_clinical <- clean_clinical %>%
+  mutate(across(c(HBSAG, HBEAG, HBEAB, HBCAB, AFP, HCV, CEA, CA199), ~ replace_na(.x, 0))) %>%
+  VIM::kNN(imp_var = FALSE)
+
+write_csv(imputed_clinical, snakemake@output[[1]])
