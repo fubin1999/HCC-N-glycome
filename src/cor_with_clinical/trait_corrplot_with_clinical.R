@@ -34,6 +34,11 @@ clinical_type <- tribble(
 plot_corrplot <- function (cor_result) {
   plot_data <- cor_result %>%
     mutate(
+      cor = case_when(
+        cor > 0.5 ~ 0.5,
+        cor < -0.5 ~ -0.5,
+        .default = cor,
+      ),
       signif = p.adj < 0.05,
       cor_direction = case_when(
         p.adj < 0.05 & cor > 0 ~ "Positive",
