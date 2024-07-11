@@ -75,6 +75,8 @@ rule all:
         "results/data/cor_with_clinical/glycan_cor_with_clinical_per_group.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
         "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv",
+        "results/data/cor_with_clinical/liver_function_model_r2.csv",
+        "results/data/cor_with_clinical/liver_function_model_pred.csv",
 
         # ===== Correlation with Clinical Figures =====
         "results/figures/cor_with_clinical/glycan_cor_with_AFP_1.pdf",
@@ -674,6 +676,18 @@ rule glycan_corrplot_with_clinical:
         "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf"
     script:
         "src/cor_with_clinical/glycan_corrplot_with_clinical.R"
+
+rule liver_function_model:
+    # Build models to predict liver function.
+    input:
+        FILTERED_DERIVED_TRAITS,
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/cor_with_clinical/liver_function_model_r2.csv",
+        "results/data/cor_with_clinical/liver_function_model_pred.csv"
+    notebook:
+        "src/cor_with_clinical/liver_function_model.ipynb"
 
 
 # ==================== GlyCompare ====================
