@@ -89,6 +89,7 @@ rule all:
         "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf",
         "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf",
         "results/figures/cor_with_clinical/liver_function_model_r2_venns.pdf",
+        "results/figures/cor_with_clinical/pred_boxplots.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -698,6 +699,16 @@ rule liver_function_model_r2_venns:
         "results/figures/cor_with_clinical/liver_function_model_r2_venns.pdf"
     script:
         "src/cor_with_clinical/r2_venn.R"
+
+rule liver_function_model_pred_boxplots:
+    # Draw boxplots for predicted liver function values.
+    input:
+        "results/data/cor_with_clinical/liver_function_model_pred.csv",
+        GROUPS
+    output:
+        "results/figures/cor_with_clinical/pred_boxplots.pdf"
+    script:
+        "src/cor_with_clinical/pred_boxplots.R"
 
 
 # ==================== GlyCompare ====================
