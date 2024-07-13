@@ -88,6 +88,7 @@ rule all:
         "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
         "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf",
         "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf",
+        "results/figures/cor_with_clinical/liver_function_model_r2_venns.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -688,6 +689,15 @@ rule liver_function_model:
         "results/data/cor_with_clinical/liver_function_model_pred.csv"
     notebook:
         "src/cor_with_clinical/liver_function_model.ipynb"
+
+rule liver_function_model_r2_venns:
+    # Draw venn diagrams for R2 values of liver function models.
+    input:
+        "results/data/cor_with_clinical/liver_function_model_r2.csv"
+    output:
+        "results/figures/cor_with_clinical/liver_function_model_r2_venns.pdf"
+    script:
+        "src/cor_with_clinical/r2_venn.R"
 
 
 # ==================== GlyCompare ====================
