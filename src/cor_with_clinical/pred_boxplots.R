@@ -12,8 +12,8 @@ data <- pred %>%
   left_join(groups, by = "sample") %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
-plot_boxplots <- function (data, .target) {
-  ggplot(data, aes(group, pred)) +
+plot_boxplots <- function (data, .value, .target) {
+  ggplot(data, aes(group, {{ .value }})) +
     geom_boxplot(aes(color = group)) +
     geom_jitter(aes(color = group), width = 0.25, alpha = 0.5) +
     scale_color_manual(values = c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A")) +
@@ -23,7 +23,6 @@ plot_boxplots <- function (data, .target) {
       step_increase = 0.1, vjust = 0
     ) +
     guides(color = FALSE) +
-    labs(y = "Predicted value", title = str_glue("Predicted {.target}")) +
     theme_bw() +
     theme(
       panel.grid = element_blank(),
@@ -33,12 +32,28 @@ plot_boxplots <- function (data, .target) {
     scale_y_continuous(expand = expansion(mult = c(0.05, 0.1)))
 }
 
+plot_true_boxplots <- function (data, .target) {
+  data %>%
+    plot_boxplots(true, .target) +
+    labs(y = "True value", title = str_glue("True {.target}"))
+}
+
+plot_pred_boxplots <- function (data, .target) {
+  data %>%
+    plot_boxplots(pred, .target) +
+    labs(y = "Predicted value", title = str_glue("Predicted {.target}"))
+}
+
 plot_df <- data %>%
   nest_by(target) %>%
-  mutate(plot = list(plot_boxplots(data, target))) %>%
-  select(target, plot)
+  mutate(
+    pred_plots = list(plot_pred_boxplots(data, target)),
+    true_plots = list(plot_true_boxplots(data, target))
+  ) %>%
+  select(-data)
 
-p <- reduce(plot_df$plot, `+`) +
-  plot_layout(nrow = 1)
-# tgutil::ggpreview(width = 12, height = 4)
-ggsave(snakemake@output[[1]], p, width = 10, height = 3.5)
+pred_p <- reduce(plot_df$pred_plots, `+`) + plot_layout(nrow = 1)
+true_p <- reduce(plot_df$true_plots, `+`) + plot_layout(nrow = 1)
+final_p <- pred_p / true_p
+# tgutil::ggpreview(width = 10, height = 6.5)
+ggsave(snakemake@output[[1]], final_p, width = 10, height = 6.5)
