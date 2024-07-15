@@ -1,8 +1,8 @@
 library(tidyverse)
 library(ggrepel)
 
-dea_result <- read_csv("results/data/TCGA/dea_results.csv")
-glycogenes <- read_csv("data/glycogenes.csv")$gene_name
+# dea_result <- read_csv("results/data/TCGA/dea_results.csv")
+# glycogenes <- read_csv("data/glycogenes.csv")$gene_name
 
 dea_result <- read_csv(snakemake@input[[1]])
 glycogenes <- read_csv(snakemake@input[[2]])$gene_name

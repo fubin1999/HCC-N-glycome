@@ -3,9 +3,9 @@ library(ComplexHeatmap)
 library(circlize)
 library(tidyverse)
 
-load("results/data/TCGA/prepared_data.rda")
-dea_result <- read_csv("results/data/TCGA/dea_results.csv")
-glyco_genes <- read_csv("data/glycogenes.csv") %>% pull(gene_name)
+# load("results/data/TCGA/prepared_data.rda")
+# dea_result <- read_csv("results/data/TCGA/dea_results.csv")
+# glyco_genes <- read_csv("data/glycogenes.csv") %>% pull(gene_name)
 
 load(snakemake@input[[1]])
 dea_result <- read_csv(snakemake@input[[2]])

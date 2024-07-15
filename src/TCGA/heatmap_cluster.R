@@ -3,10 +3,10 @@ library(ComplexHeatmap)
 library(circlize)
 library(tidyverse)
 
-load("results/data/TCGA/prepared_data.rda")
-clusters <- read_csv("results/data/TCGA/consensus_cluster_result.csv") %>%
-  mutate(class = str_glue("Cluster {class}"))
-glycogenes <- read_csv("data/glycogenes.csv")
+# load("results/data/TCGA/prepared_data.rda")
+# clusters <- read_csv("results/data/TCGA/consensus_cluster_result.csv") %>%
+#   mutate(class = str_glue("Cluster {class}"))
+# glycogenes <- read_csv("data/glycogenes.csv")
 
 load(snakemake@input[[1]])
 clusters <- read_csv(snakemake@input[[2]]) %>%
