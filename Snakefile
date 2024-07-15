@@ -883,15 +883,14 @@ rule TCGA_cluster_heatmap:
     script:
         "src/TCGA/heatmap_cluster.R"
 
-rule TCGA_HCC_clinical_heatmap:
-    # Draw clinical heatmap for TCGA HCC samples.
+rule TCGA_clinical_heatmap:
+    # Draw clinical heatmap for TCGA samples.
     input:
-        "results/data/TCGA/prepared_data.rda",
-        "results/data/TCGA/consensus_cluster_result.csv"
+        "results/data/TCGA/prepared_data.rda"
     output:
         "results/figures/TCGA/clinical_heatmap.pdf"
     script:
-        "src/TCGA/clinical_heatmap_cluster.R"
+        "src/TCGA/clinical_heatmap.R"
 
 rule TCGA_single_gene_survival:
     # Perform Cox PH on each glycogenes.
