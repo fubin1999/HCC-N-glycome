@@ -6,15 +6,13 @@ library(patchwork)
 # trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 # clinical <- read_csv("results/data/prepared/clinical.csv") %>%
-#   select(-age, -sex) %>%
-#   mutate(AAR = AST / ALT)
+#   select(-age, -sex)
 
 glycan_data <- read_csv(snakemake@input[["glycans"]])
 trait_data <- read_csv(snakemake@input[["traits"]])
 groups <- read_csv(snakemake@input[["groups"]])
 clinical <- read_csv(snakemake@input[["clinical"]]) %>%
-  select(-age, -sex) %>%
-  mutate(AAR = AST / ALT)
+  select(-age, -sex)
 
 prepare_data <- function (data) {
   data %>%

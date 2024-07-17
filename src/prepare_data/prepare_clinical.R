@@ -25,4 +25,8 @@ imputed_clinical <- clean_clinical %>%
   mutate(across(c(HBSAG, HBEAG, HBEAB, HBCAB, AFP, HCV, CEA, CA199), ~ replace_na(.x, 0))) %>%
   VIM::kNN(imp_var = FALSE)
 
-write_csv(imputed_clinical, snakemake@output[[1]])
+# Calculate AAR
+final_clinical <- imputed_clinical |>
+  mutate(AAR = AST / ALT)
+
+write_csv(final_clinical, snakemake@output[[1]])
