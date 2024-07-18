@@ -37,7 +37,7 @@ plot_r2_venn <- function (r2_data, .title) {
   # Update the data with the actual data
   venn_data_feature_table <- extract_feature_table(region_label_data, name, "/")
   set_label_data <- set_label_data %>%
-    sjmisc::rec(name, rec = "CA3+CA4=Branching; CG=Galactosylation; TB=Bisecting; TF=Fucosylation", suffix = "")
+    sjmisc::rec(name, rec = "CA3+CA4=Bra; CG=Gal; TB=Bis; TF=Fuc", suffix = "")
   region_label_data <- region_label_data %>%
     left_join(venn_data_feature_table, by = c("name" = "features")) %>%
     left_join(r2_data, by = setdiff(colnames(r2_feature_table), "features"))
@@ -57,7 +57,9 @@ plot_r2_venn <- function (r2_data, .title) {
     geom_text(aes(X, Y, label = name),
               data = set_label_data) +
     geom_text(aes(X, Y, label = scales::percent(r2, accuracy = 1)),
-              data = region_label_data) +
+              data = region_label_data,
+              size = 3
+    ) +
     guides(fill = "none") +
     labs(caption = .title) +
     theme_void() +
@@ -78,4 +80,4 @@ p <- reduce(plot_df$plot, `+`) +
   plot_layout(nrow = 1)
 
 # tgutil::ggpreview(width = 15, height = 3.5)
-ggsave(snakemake@output[[1]], p, width = 15, height = 3.5)
+ggsave(snakemake@output[[1]], p, width = 15, height = 3)

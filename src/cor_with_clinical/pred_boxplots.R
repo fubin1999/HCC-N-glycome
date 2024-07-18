@@ -52,8 +52,8 @@ plot_df <- data %>%
   ) %>%
   select(-data)
 
-pred_p <- reduce(plot_df$pred_plots, `+`) + plot_layout(nrow = 1)
-true_p <- reduce(plot_df$true_plots, `+`) + plot_layout(nrow = 1)
+pred_p <- reduce(plot_df$pred_plots, `+`) + plot_layout(nrow = 1, axes = "collect_y")
+true_p <- reduce(plot_df$true_plots, `+`) + plot_layout(nrow = 1, axes = "collect_y")
 final_p <- pred_p / true_p
 # tgutil::ggpreview(width = 10, height = 6.5)
 ggsave(snakemake@output[[1]], final_p, width = 10, height = 6.5)
