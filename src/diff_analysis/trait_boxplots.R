@@ -1,5 +1,10 @@
 library(tidyverse)
 library(ggprism)
+library(patchwork)
+
+trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+post_hoc_result <- read_csv("results/data/diff_analysis/trait_post_hoc.csv")
 
 trait_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
@@ -19,7 +24,6 @@ trait_df <- tribble(
   "CA3", "Proportion of tri-antennary glycans\nwithin complex glycans", TRUE,
   "CA4", "Proportion of tetra-antennary glycans\nwithin complex glycans", TRUE,
   "CGS", "Average number of sialic acids per galactose\non complex glycans", FALSE,
-  "TS", "Proportion of sialylated glycans", TRUE,
   "CG", "Average number of galactoses per antenna\non complex glycans", FALSE,
   "TF", "Proportion of core-fucosylated glycans", TRUE,
   "TB", "Proportion of bisecting glycans", TRUE
@@ -34,13 +38,13 @@ plot_boxplot <- function (data, .trait, .descr, .perc) {
     filter(trait == .trait)
   HC_CHB_p_val <- sub_post_hoc_result %>%
     filter(group1 == "HC", group2 == "CHB") %>%
-    pull(p.adj)
+    pull(p.adj.signif)
   HC_LC_p_val <- sub_post_hoc_result %>%
     filter(group1 == "HC", group2 == "LC") %>%
-    pull(p.adj)
+    pull(p.adj.signif)
   HC_HCC_p_val <- sub_post_hoc_result %>%
     filter(group1 == "HC", group2 == "HCC") %>%
-    pull(p.adj)
+    pull(p.adj.signif)
   .max <- max(data$value)
   .min <- min(data$value)
   .range <- .max - .min
@@ -49,12 +53,7 @@ plot_boxplot <- function (data, .trait, .descr, .perc) {
     "HC", "CHB", HC_CHB_p_val, .max + 0.1 * .range,
     "HC", "LC", HC_LC_p_val, .max + 0.2 * .range,
     "HC", "HCC", HC_HCC_p_val, .max + 0.3 * .range,
-  ) %>%
-    mutate(label = if_else(
-      label < 0.05,
-      str_c("p = ", scales::scientific(label, digits = 3)),
-      "ns"
-    ))
+  )
   p <- ggplot(data, aes(group, value)) +
     geom_boxplot(aes(color = group), outlier.alpha = 0) +
     geom_jitter(aes(color = group), alpha = 0.5, width = 0.3, shape = 16, size = 1) +
@@ -63,7 +62,6 @@ plot_boxplot <- function (data, .trait, .descr, .perc) {
     guides(color = "none") +
     labs(
       title = .trait,
-      subtitle = .descr,
       y = "Trait Value"
     ) +
     theme_classic() +
@@ -81,9 +79,6 @@ plot_boxplot <- function (data, .trait, .descr, .perc) {
 
 plots <- plot_data %>%
   mutate(plot = list(plot_boxplot(data, trait, description, percent)))
-# tgutil::ggpreview(plot = plots[["plot"]][[1]], width = 3, height = 3.5)
-walk2(
-  plots$trait,
-  plots$plot,
-  ~ ggsave(str_c(snakemake@output[[1]], "/", .x, ".pdf"), plot = .y, width = 3, height = 3.5, create.dir = TRUE)
-)
+p <- reduce(plots$plot, `+`) + plot_layout(nrow = 1, axes = "collect_y")
+# tgutil::ggpreview(p, width = 12, height = 2.5)
+ggsave(snakemake@output[[1]], p, width = 12, height = 2.5)

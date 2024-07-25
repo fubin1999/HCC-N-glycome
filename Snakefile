@@ -50,7 +50,7 @@ rule all:
         "results/figures/diff_analysis/glycan_confounders.pdf",
         "results/figures/diff_analysis/glycan_pca.pdf",
         "results/figures/diff_analysis/trait_confounders.pdf",
-        "results/figures/diff_analysis/trait_boxplots/",
+        "results/figures/diff_analysis/trait_boxplots.pdf",
         "results/figures/diff_analysis/trait_diff_bubble.pdf",
         "results/figures/diff_analysis/trait_heatmap.pdf",
 
@@ -499,7 +499,7 @@ rule trait_boxplots:
         GROUPS,
         "results/data/diff_analysis/trait_post_hoc.csv"
     output:
-        directory("results/figures/diff_analysis/trait_boxplots/")
+       "results/figures/diff_analysis/trait_boxplots.pdf"
     script:
         "src/diff_analysis/trait_boxplots.R"
 
