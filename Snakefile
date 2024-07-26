@@ -675,6 +675,7 @@ rule glycan_corrplot_with_clinical:
     # Draw corrplot for glycan abundance with clinical information.
     input:
         "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
+        META_PROPERTIES
     output:
         "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf"
     script:
