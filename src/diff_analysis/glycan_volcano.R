@@ -2,10 +2,9 @@ library(tidyverse)
 library(ggrepel)
 library(patchwork)
 
-
-ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
-post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
-fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
+# ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
+# post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
+# fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
 
 ancova_result <- read_csv(snakemake@input[[1]])
 post_hoc_result <- read_csv(snakemake@input[[2]])
@@ -31,8 +30,8 @@ plot_data <- data %>%
   filter(group1 == "HC") %>%
   mutate(
     label = case_when(
-      regulate == "up" ~ if_else(logFC > log(1.5), glycan, NA),
-      regulate == "down" ~ if_else(logFC < -log(1.5), glycan, NA),
+      regulate == "up" ~ if_else(logFC > log2(1.5), glycan, NA),
+      regulate == "down" ~ if_else(logFC < -log2(1.5), glycan, NA),
       .default = NA
     ),
     comparison = str_c(group2, " vs ", group1),
