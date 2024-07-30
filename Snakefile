@@ -94,6 +94,8 @@ rule all:
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
+        "results/data/subtypes/anova.csv",
+        "results/data/subtypes/post_hoc.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -821,6 +823,17 @@ rule consensus_clustering:
         "results/data/subtypes/consensus_cluster_result.csv"
     script:
         "src/subtypes/consensus_clustering.R"
+
+rule subtype_glycan_diff:
+    # Perform differential analysis on glycans between subtypes.
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/subtypes/consensus_cluster_result.csv"
+    output:
+        "results/data/subtypes/anova.csv",
+        "results/data/subtypes/post_hoc.csv"
+    script:
+        "src/subtypes/subtype_glycan_diff.R"
 
 
 # ==================== TCGA Gene Expression ====================
