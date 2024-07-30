@@ -96,6 +96,7 @@ rule all:
         "results/data/subtypes/consensus_cluster_result.csv",
         "results/data/subtypes/anova.csv",
         "results/data/subtypes/post_hoc.csv",
+        "results/data/subtypes/batched_corrected.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -820,14 +821,15 @@ rule consensus_clustering:
         "data/plates.csv"
     output:
         directory("results/figures/subtypes/cc_result/"),
-        "results/data/subtypes/consensus_cluster_result.csv"
+        "results/data/subtypes/consensus_cluster_result.csv",
+        "results/data/subtypes/batched_corrected.csv"
     script:
         "src/subtypes/consensus_clustering.R"
 
 rule subtype_glycan_diff:
     # Perform differential analysis on glycans between subtypes.
     input:
-        PROCESSED_ABUNDANCE,
+        "results/data/subtypes/batched_corrected.csv",
         "results/data/subtypes/consensus_cluster_result.csv"
     output:
         "results/data/subtypes/anova.csv",

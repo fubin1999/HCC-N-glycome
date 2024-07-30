@@ -63,3 +63,11 @@ cc_result <- ConsensusClusterPlus(
 cluster_classes <- cc_result[[3]][["consensusClass"]]
 cluster_classes <- data.frame(sample = names(cluster_classes), class = as.integer(cluster_classes))
 write.csv(cluster_classes, snakemake@output[[2]], row.names = FALSE)
+
+# 4. Save the corrected data
+combat_data <- combat_data %>%
+  t() %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "sample") %>%
+  as_tibble()
+write_csv(combat_data, snakemake@output[[3]])
