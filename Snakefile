@@ -100,6 +100,7 @@ rule all:
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
+        "results/figures/subtypes/subtype_heatmap.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -836,6 +837,19 @@ rule subtype_glycan_diff:
         "results/data/subtypes/post_hoc.csv"
     script:
         "src/subtypes/subtype_glycan_diff.R"
+
+rule subtype_heatmap:
+    # Draw heatmap for glycans in different subtypes.
+    input:
+        abundance="results/data/subtypes/batched_corrected.csv",
+        clusters="results/data/subtypes/consensus_cluster_result.csv",
+        anova_result="results/data/subtypes/anova.csv",
+        coexp_modules="results/data/glycan_coexpr/glycan_clusters.csv",
+        clinical=CLINICAL
+    output:
+        "results/figures/subtypes/subtype_heatmap.pdf"
+    script:
+        "src/subtypes/subtype_heatmap.R"
 
 
 # ==================== TCGA Gene Expression ====================
