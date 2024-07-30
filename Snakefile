@@ -92,6 +92,12 @@ rule all:
         "results/figures/cor_with_clinical/pred_boxplots.pdf",
         "results/figures/cor_with_clinical/pred_parallel_coord_plot.pdf",
 
+        # ===== Molecular Subtypes Data =====
+        "results/data/subtypes/consensus_cluster_result.csv",
+
+        # ===== Molecular Subtypes Figures =====
+        "results/figures/subtypes/cc_result/",
+
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
         # "results/data/motifs/motifs.csv",
@@ -802,6 +808,21 @@ rule pred_parallel_coord_plot:
 #         "src/motif/ancova.R"
 
 
+# ==================== Molecular Subtypes ====================
+rule consensus_clustering:
+    # Perform consensus clustering on glycans.
+    input:
+        RAW_ABUNDANCE,
+        PROCESSED_ABUNDANCE,
+        GROUPS,
+        "data/plates.csv"
+    output:
+        directory("results/figures/subtypes/cc_result/"),
+        "results/data/subtypes/consensus_cluster_result.csv"
+    script:
+        "src/subtypes/consensus_clustering.R"
+
+
 # ==================== TCGA Gene Expression ====================
 rule download_TCGA:
     # Download TCGA gene expression data.
@@ -852,7 +873,7 @@ rule heatmap_TCGA:
     script:
         "src/TCGA/heatmap.R"
 
-rule consensus_cluster:
+rule TCGA_consensus_cluster:
     # Perform consensus clustering using glycogenes on tumor samples.
     input:
         "results/data/TCGA/prepared_data.rda",
