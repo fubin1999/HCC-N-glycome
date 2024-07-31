@@ -103,6 +103,7 @@ rule all:
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
         "results/figures/subtypes/subtype_heatmap.pdf",
+        "results/figures/subtypes/subtype_clinical_boxplots.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -863,6 +864,18 @@ rule subtype_clinical_diff:
         "results/data/subtypes/clinical_diff_post_hoc.csv"
     script:
         "src/subtypes/subtype_clinical_diff.R"
+
+rule subtype_clinical_boxplots:
+    # Draw boxplots for derived traits in different subtypes.
+    input:
+        CLINICAL,
+        "results/data/subtypes/consensus_cluster_result.csv",
+        "results/data/subtypes/clinical_diff_kw.csv",
+        "results/data/subtypes/clinical_diff_post_hoc.csv"
+    output:
+        "results/figures/subtypes/subtype_clinical_boxplots.pdf"
+    script:
+        "src/subtypes/subtype_clinical_boxplots.R"
 
 
 # ==================== TCGA Gene Expression ====================
