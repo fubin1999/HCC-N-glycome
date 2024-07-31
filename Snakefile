@@ -97,6 +97,8 @@ rule all:
         "results/data/subtypes/anova.csv",
         "results/data/subtypes/post_hoc.csv",
         "results/data/subtypes/batched_corrected.csv",
+        "results/data/subtypes/clinical_diff_kw.csv",
+        "results/data/subtypes/clinical_diff_post_hoc.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -850,6 +852,17 @@ rule subtype_heatmap:
         "results/figures/subtypes/subtype_heatmap.pdf"
     script:
         "src/subtypes/subtype_heatmap.R"
+
+rule subtype_clinical_diff:
+    # Perform differential analysis on derived traits between subtypes.
+    input:
+        CLINICAL,
+        "results/data/subtypes/consensus_cluster_result.csv"
+    output:
+        "results/data/subtypes/clinical_diff_kw.csv",
+        "results/data/subtypes/clinical_diff_post_hoc.csv"
+    script:
+        "src/subtypes/subtype_clinical_diff.R"
 
 
 # ==================== TCGA Gene Expression ====================
