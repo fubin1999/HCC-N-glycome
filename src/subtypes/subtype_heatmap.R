@@ -1,11 +1,12 @@
 library(tidyverse)
 library(ComplexHeatmap)
+library(circlize)
 
-# abundance <- read_csv("results/data/subtypes/batched_corrected.csv")
-# clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-# anova_result <- read_csv("results/data/subtypes/anova.csv")
-# coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
+abundance <- read_csv("results/data/subtypes/batched_corrected.csv")
+clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+anova_result <- read_csv("results/data/subtypes/anova.csv")
+coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv")
 
 abundance <- read_csv(snakemake@input[["abundance"]])
 clusters <- read_csv(snakemake@input[["clusters"]])
@@ -35,15 +36,17 @@ mat <- data %>%
   as.matrix() %>%
   t()
 
-selected_clinical <- c("sample", "sex", "age", "AST", "ALT", "GGT", "ALB", "TBIL", "TP", "AFP", "AAR")
 col_anno_df <- data %>%
   mutate(subtype = str_glue("Subtype{class}"), subtype = as.factor(subtype)) %>%
   select(sample, subtype) %>%
-  left_join(clinical %>% select(all_of(selected_clinical)), by = "sample") %>%
+  left_join(clinical %>% select(sample, sex, age), by = "sample") %>%
   column_to_rownames("sample") %>%
   .[colnames(mat),]
 set.seed(3)
-col_anno <- HeatmapAnnotation(df = col_anno_df)
+col_anno <- HeatmapAnnotation(
+  df = col_anno_df,
+  annotation_height = unit(0.5, "cm")
+)
 
 col_split <- as.factor(col_anno_df$subtype)
 
@@ -56,22 +59,28 @@ gcm <- tibble(glycan = diff_glycans) %>%
   ) %>%
   column_to_rownames("glycan") %>%
   .[rownames(mat),]
-set.seed(3)
+set.seed(15)
 row_anno <- rowAnnotation(
   `Glycan\nCo-expression\nModule` = gcm,
   show_annotation_name = FALSE
 )
 
-pdf(snakemake@output[[1]], width = 10, height = 10)
+col <- colorRamp2(c(-2, 0, 2), c("#275D87", "white", "#D26F32"))
+
+pdf(snakemake@output[[1]], width = 8, height = 8)
+set.seed(43)
 Heatmap(
   mat,
   name = "Z-score",
+  col = col,
   cluster_columns = FALSE,
   show_column_names = FALSE,
   column_split = col_split,
-  row_split = gcm,
+  row_km = 4,
+  row_km_repeats = 100,
+  row_title = "GSCM%s",
   left_annotation = row_anno,
   top_annotation = col_anno,
-  cluster_row_slices = FALSE,
+  cluster_row_slices = FALSE
 )
 dev.off()
