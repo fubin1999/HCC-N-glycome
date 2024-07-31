@@ -2,11 +2,11 @@ library(tidyverse)
 library(ComplexHeatmap)
 library(circlize)
 
-abundance <- read_csv("results/data/subtypes/batched_corrected.csv")
-clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-anova_result <- read_csv("results/data/subtypes/anova.csv")
-coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
-clinical <- read_csv("results/data/prepared/clinical.csv")
+# abundance <- read_csv("results/data/subtypes/batched_corrected.csv")
+# clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+# anova_result <- read_csv("results/data/subtypes/anova.csv")
+# coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+# clinical <- read_csv("results/data/prepared/clinical.csv")
 
 abundance <- read_csv(snakemake@input[["abundance"]])
 clusters <- read_csv(snakemake@input[["clusters"]])
@@ -45,6 +45,7 @@ col_anno_df <- data %>%
 set.seed(3)
 col_anno <- HeatmapAnnotation(
   df = col_anno_df,
+  col = list(subtype = c(Subtype1 = "#1b9e77", Subtype2 = "#d95f02", Subtype3 = "#7570b3")),
   annotation_height = unit(0.5, "cm")
 )
 
