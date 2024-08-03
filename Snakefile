@@ -244,7 +244,8 @@ rule preprocess:
     input:
         RAW_ABUNDANCE,
         PREPARED_DIR + "unfiltered_groups.csv",
-        PREPARED_DIR + "unfiltered_clinical.csv"
+        PREPARED_DIR + "unfiltered_clinical.csv",
+        "data/plates.csv"
     output:
         PROCESSED_ABUNDANCE,
         GROUPS,

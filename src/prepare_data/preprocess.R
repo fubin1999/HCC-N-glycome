@@ -3,8 +3,12 @@ library(tidyverse)
 raw_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clinical <- read_csv(snakemake@input[[3]])
+plates <- read_csv(snakemake@input[[4]])
 
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
+# groups <- read_csv("results/data/prepared/unfiltered_groups.csv")
+# clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
+# plates <- read_csv("data/plates.csv")
 
 # 1. Convert to long-----
 long_data <- raw_data |>
@@ -55,9 +59,24 @@ normalized <- imputed |>
   glycanr::medianquotientnorm() |> 
   rename(sample = gid)  # Rename back to sample
 
-# 6. Convert back to wide-----
-final_data <- normalized |>
-  pivot_wider(names_from = glycan, values_from = value)
+# 6. Batch effect correction-----
+library(sva)
+
+to_be_combated <- normalized |>
+  pivot_wider(names_from = sample, values_from = value) %>%
+  column_to_rownames(var = "glycan") %>%
+  as.matrix() %>%
+  log()
+batches <- plates %>%
+  column_to_rownames("sample") %>%
+  .[colnames(to_be_combated), "plate"] %>%
+  as.factor()
+mod_combat <- model.matrix(~1, data = data.frame(plate = batches))
+combat_data <- ComBat(dat = to_be_combated, batch = batches, mod = mod_combat, ref.batch = 1)
+final_data <- combat_data %>%
+  exp() %>%
+  t() %>% as.data.frame() %>% rownames_to_column("sample") %>%
+  as_tibble()
 
 # Filter groups and clinical-----
 filtered_groups <- groups %>%
