@@ -55,6 +55,7 @@ rule all:
         "results/figures/diff_analysis/trait_heatmap.pdf",
 
         # ===== Glycan Coexpression Module Data =====
+        "results/figures/glycan_coexpr/cc_result/",
         "results/data/glycan_coexpr/glycan_clusters.csv",
         "results/data/glycan_coexpr/eigen_glycans.csv",
         "results/data/glycan_coexpr/cluster_ancova.csv",
@@ -539,16 +540,26 @@ rule trait_heatmap:
     
 
 # ==================== Glycan Coexpression Module ====================
+rule glycan_coexpression_clustering:
+    # Perform clustering to get glycan coexpression modules.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS,
+        "results/data/diff_analysis/glycan_ancova.csv"
+    output:
+        directory("results/figures/glycan_coexpr/cc_result/"),
+        "results/data/glycan_coexpr/glycan_clusters.csv"
+    script:
+        "src/glycan_coexpr/cluster_glycans.R"
+
 rule glycan_cluster_heatmap:
     # Draw heatmap for differential glycans.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        ancova_result="results/data/diff_analysis/glycan_ancova.csv",
-        mp_table=META_PROPERTIES
+        clusters="results/data/glycan_coexpr/glycan_clusters.csv"
     output:
-        "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf",
-        "results/data/glycan_coexpr/glycan_clusters.csv"
+        "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf"
     script:
         "src/glycan_coexpr/cluster_heatmap.R"
 

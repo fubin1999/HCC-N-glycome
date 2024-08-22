@@ -3,9 +3,13 @@ library(ComplexHeatmap)
 library(circlize)
 
 # Read data-----
+# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+# groups <- read_csv("results/data/prepared/groups.csv")
+# clusters <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+
 abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
-anova_result <- read_csv(snakemake@input[["ancova_result"]])
+clusters <- read_csv(snakemake@input[["clusters"]])
 
 groups <- groups |> 
   filter(group != "QC")
@@ -14,12 +18,8 @@ data <- abundance |>
   semi_join(groups, by = "sample")
 
 # Prepare for heatmap-----
-diff_glycans <- anova_result |> 
-  filter(p.adj < 0.05, Effect == "group") |>
-  pull(glycan)
-
 mat <- data |> 
-  filter(glycan %in% diff_glycans) |> 
+  filter(glycan %in% clusters$glycan) |>
   mutate(value = log(value)) |> 
   group_by(glycan) |> 
   mutate(value = (value - mean(value)) / sd(value)) |> 
@@ -39,6 +39,10 @@ col_split <- groups |>
 col_split <- col_split[colnames(mat), ]
 col_split <- factor(col_split, levels = c("HC", "CHB", "LC", "HCC"))
 
+row_split <- clusters %>%
+  column_to_rownames("glycan")
+row_split <- row_split[rownames(mat), ]
+
 pdf(snakemake@output[[1]], width = 4, height = 6.5)
 set.seed(42)
 ht <- Heatmap(
@@ -55,16 +59,10 @@ ht <- Heatmap(
   show_row_names = FALSE,
   cluster_columns = FALSE,
   column_split = col_split,
-  row_km = 5,
-  row_km_repeats = 100,
+  row_split = row_split,
   row_title = "GCM%s",
   cluster_row_slices = FALSE,
   heatmap_legend_param = list(direction = "horizontal")
 )
 ht <- draw(ht, heatmap_legend_side = "bottom")
 dev.off()
-
-glycan_cluster <- map(row_order(ht), ~ rownames(mat)[.]) |> 
-  map(~ tibble(glycan = .x)) |> 
-  list_rbind(names_to = "cluster")
-write_csv(glycan_cluster, snakemake@output[[2]])
