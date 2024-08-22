@@ -79,7 +79,7 @@ Heatmap(
   column_split = col_split,
   row_km = 4,
   row_km_repeats = 100,
-  row_title = "GSCM%s",
+  row_title = NULL,
   left_annotation = row_anno,
   top_annotation = col_anno,
   cluster_row_slices = FALSE
