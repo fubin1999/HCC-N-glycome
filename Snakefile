@@ -105,6 +105,7 @@ rule all:
         "results/figures/subtypes/cc_result/",
         "results/figures/subtypes/subtype_heatmap.pdf",
         "results/figures/subtypes/subtype_clinical_boxplots.pdf",
+        "results/figures/subtypes/subtype_pca.pdf",
 
         # ===== Motif Data =====
         # "results/data/GlyCompare_results/",
@@ -841,6 +842,16 @@ rule consensus_clustering:
         "results/data/subtypes/batched_corrected.csv"
     script:
         "src/subtypes/consensus_clustering.R"
+
+rule subtype_pca:
+    # Draw PCA plot for subtypes.
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/subtypes/consensus_cluster_result.csv"
+    output:
+        "results/figures/subtypes/subtype_pca.pdf"
+    script:
+        "src/subtypes/subtype_pca.R"
 
 rule subtype_glycan_diff:
     # Perform differential analysis on glycans between subtypes.
