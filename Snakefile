@@ -235,7 +235,8 @@ rule prepare_clinical:
     # Prepare the clinical information.
     input:
         clinical="data/clinical.csv",
-        plates="data/plates.csv"
+        plates="data/plates.csv",
+        groups=PREPARED_DIR + "unfiltered_groups.csv"
     output:
         PREPARED_DIR + "unfiltered_clinical.csv"
     script:
