@@ -22,6 +22,34 @@ clinical <- raw_clinical |>
 clean_clinical <- clinical %>%
   distinct(sample, .keep_all = TRUE) %>%
   mutate(across(-c(sample, sex, `Child-Puge`, TNM), ~ parse_number(as.character(.x)))) %>%
+  # Convert some clinical variables from numeric to postive/negative factors
+  mutate(
+    HBSAG = case_when(
+      is.na(HBSAG) ~ "-",
+      HBSAG < 0.5 ~ "-",
+      .default = "+"
+    ),
+    HBEAG = case_when(
+      is.na(HBEAG) ~ "-",
+      HBEAG < 0.5 ~ "-",
+      .default = "+"
+    ),
+    HBEAB = case_when(
+      is.na(HBEAB) ~ "-",
+      HBEAB < 0.2 ~ "-",
+      .default = "+"
+    ),
+    HBCAB = case_when(
+      is.na(HBCAB) ~ "-",
+      HBCAB < 0.9 ~ "-",
+      .default = "+"
+    ),
+    HCV = case_when(
+      is.na(HCV) ~ "-",
+      HCV < 1000 ~ "-",
+      .default = "+"
+    ),
+  ) %>%
   # Extract TNM stage
   mutate(
     T_stage = str_extract(TNM, "T([0-4X])", group = 1),
@@ -40,11 +68,14 @@ clean_clinical <- clinical %>%
       .default = NA_character_
     )
   ) %>%
-  select(-c(TNM, T_stage, N_stage, M_stage))
+  # Here we remove some variables that are not useful for our analysis.
+  # TNM, T_stage, N_stage, M_stage are used to calculate TNM_stage, so no longer needed.
+  # CEA, CA199, and HCV are not related to the research question.
+  select(-c(TNM, T_stage, N_stage, M_stage, CEA, CA199, HCV))
 
 # Impute missing values using KNN
 imputed_clinical <- clean_clinical %>%
-  mutate(across(c(HBSAG, HBEAG, HBEAB, HBCAB, AFP, HCV, CEA, CA199), ~ replace_na(.x, 0))) %>%
+  mutate(AFP = replace_na(AFP, 0)) %>%
   VIM::kNN(imp_var = FALSE, variable = c("sex", "age", "AST", "ALT", "GGT", "ALB", "TBIL", "TP", "Child-Puge")) %>%
   as_tibble()
 
