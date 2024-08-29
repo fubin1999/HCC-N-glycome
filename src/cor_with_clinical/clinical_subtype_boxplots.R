@@ -28,9 +28,11 @@ trait_definitions <- tribble(
 subtypes <- clinical %>%
   mutate(
     sample = sample,
-    AAR_subtype = if_else(AST / ALT > 1, "AAR+", "AAR-"),
+    AAR_subtype = if_else(AAR > 1, "AAR+", "AAR-"),
     TBIL_subtype = if_else(TBIL > 23, "TBIL+", "TBIL-"),
     ALB_subtype = if_else(ALB < 40, "ALB-", "ALB+"),
+    child_pugh_subtype = if_else(child_pugh == "A", "CP A", "CP B/C"),
+    ALBI_stage_subtype = if_else(ALBI_stage == "I", "ALBI I", "ALBI II/III"),
     .keep = "none"
   ) %>%
   pivot_longer(-sample, names_to = "subtype_by", values_to = "subtype", names_pattern = "(.*)_subtype") %>%
@@ -80,5 +82,5 @@ plot_width <- n_traits * 2
 plot_height <- n_subtypes * 2.5
 p <- reduce(plot_df$plot, `+`) + plot_layout(nrow = n_subtypes, ncol = n_traits)
 
-# tgutil::ggpreview(plot = p, width = plot_width, height = plot_height)
+tgutil::ggpreview(plot = p, width = plot_width, height = plot_height)
 ggsave(snakemake@output[[1]], plot = p, width = plot_width, height = plot_height)
