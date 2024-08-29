@@ -21,7 +21,7 @@ clinical <- raw_clinical |>
 # Clean up clinical data
 clean_clinical <- clinical %>%
   distinct(sample, .keep_all = TRUE) %>%
-  mutate(across(-c(sample, sex, `Child-Puge`, TNM), ~ parse_number(as.character(.x)))) %>%
+  mutate(across(-c(sample, sex, child_pugh, TNM), ~ parse_number(as.character(.x)))) %>%
   # Convert some clinical variables from numeric to postive/negative factors
   mutate(
     HBSAG = case_when(
@@ -76,7 +76,7 @@ clean_clinical <- clinical %>%
 # Impute missing values using KNN
 imputed_clinical <- clean_clinical %>%
   mutate(AFP = replace_na(AFP, 0)) %>%
-  VIM::kNN(imp_var = FALSE, variable = c("sex", "age", "AST", "ALT", "GGT", "ALB", "TBIL", "TP", "Child-Puge")) %>%
+  VIM::kNN(imp_var = FALSE, variable = c("sex", "age", "AST", "ALT", "GGT", "ALB", "TBIL", "TP", "child_pugh")) %>%
   as_tibble()
 
 # Impute TNM stage for HCC samples
