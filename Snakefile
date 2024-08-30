@@ -71,6 +71,10 @@ rule all:
         "results/figures/glycan_coexpr/cor_inter_intra_GCM.pdf",
 
         # ===== Correlation with Liver Function Data =====
+        "results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/global_ttest_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/grouped_ttest_result_with_liver_functions.csv",
 
         # ===== Correlation with Liver Function Figures =====
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
@@ -634,6 +638,22 @@ rule clinical_subtype_boxplots:
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf"
     script:
         "src/cor_with_liver_function/clinical_subtype_boxplots.R"
+
+rule relation_with_liver_function:
+    # Perform statistical analysis to reveal relations between glycosylation and
+    # liver function-related clinical variables.
+    input:
+        PROCESSED_ABUNDANCE,
+        FILTERED_DERIVED_TRAITS,
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/global_ttest_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/grouped_ttest_result_with_liver_functions.csv"
+    script:
+        "src/cor_with_liver_function/relation_with_liver_function.R"
 
 
 # ==================== GlyCompare ====================
