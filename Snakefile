@@ -70,28 +70,10 @@ rule all:
         "results/figures/glycan_coexpr/cluster_cor_with_clinical.pdf",
         "results/figures/glycan_coexpr/cor_inter_intra_GCM.pdf",
 
-        # ===== Correlation with Clinical Data =====
-        "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
-        "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/glycan_cor_with_clinical_per_group.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv",
-        "results/data/cor_with_clinical/liver_function_model_r2.csv",
-        "results/data/cor_with_clinical/liver_function_model_pred.csv",
+        # ===== Correlation with Liver Function Data =====
 
-        # ===== Correlation with Clinical Figures =====
-        "results/figures/cor_with_clinical/glycan_cor_with_AFP_1.pdf",
-        "results/figures/cor_with_clinical/glycan_cor_with_AFP_2.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical_all.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical_HC.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical_CHB.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
-        "results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf",
-        "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf",
-        "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf",
-        "results/figures/cor_with_clinical/liver_function_model_r2_venns.pdf",
-        "results/figures/cor_with_clinical/pred_boxplots.pdf",
-        "results/figures/cor_with_clinical/pred_parallel_coord_plot.pdf",
+        # ===== Correlation with Liver Function Figures =====
+        "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -641,52 +623,7 @@ rule cluster_cor_with_clinical:
         "src/glycan_coexpr/cluster_cor_with_clinical.R"
 
 
-# ==================== Correlation with Clinical Data ====================
-rule glycan_cor_with_AFP:
-    # Draw corrplot for glycans and AFP.
-    input:
-        PROCESSED_ABUNDANCE,
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/cor_with_clinical/glycan_cor_with_AFP.csv",
-        # There are too many glycans to display in a row,
-        # and corrplot object could not be jointed by cowplot,
-        # so the plot is splited into two.
-        "results/figures/cor_with_clinical/glycan_cor_with_AFP_1.pdf",
-        "results/figures/cor_with_clinical/glycan_cor_with_AFP_2.pdf"
-    script:
-        "src/cor_with_clinical/glycan_cor_with_AFP.R"
-
-rule calcu_cor_with_clinical:
-    # Correlation of glycan abundance and derived traits with clinical information.
-    input:
-        glycans=PROCESSED_ABUNDANCE,
-        traits=FILTERED_DERIVED_TRAITS,
-        groups=GROUPS,
-        clinical=CLINICAL
-    output:
-        "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/glycan_cor_with_clinical_per_group.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv"
-    script:
-        "src/cor_with_clinical/cor_with_clinical.R"
-
-rule trait_corrplot_with_clinical:
-    # Draw corrplot for derived traits with clinical information.
-    input:
-        "results/data/cor_with_clinical/trait_cor_with_clinical.csv",
-        "results/data/cor_with_clinical/trait_cor_with_clinical_per_group.csv"
-    output:
-        all="results/figures/cor_with_clinical/trait_cor_with_clinical_all.pdf",
-        HC="results/figures/cor_with_clinical/trait_cor_with_clinical_HC.pdf",
-        CHB="results/figures/cor_with_clinical/trait_cor_with_clinical_CHB.pdf",
-        LC="results/figures/cor_with_clinical/trait_cor_with_clinical_LC.pdf",
-        HCC="results/figures/cor_with_clinical/trait_cor_with_clinical_HCC.pdf"
-    script:
-        "src/cor_with_clinical/trait_corrplot_with_clinical.R"
-
+# ==================== Correlation with Liver Function ====================
 rule clinical_subtype_boxplots:
     # Draw boxplots for differential traits in clinical subtypes.
     input:
@@ -694,59 +631,9 @@ rule clinical_subtype_boxplots:
         GROUPS,
         CLINICAL
     output:
-        "results/figures/cor_with_clinical/trait_clinical_subtype_boxplots.pdf"
+        "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf"
     script:
-        "src/cor_with_clinical/clinical_subtype_boxplots.R"
-
-rule glycan_corrplot_with_clinical:
-    # Draw corrplot for glycan abundance with clinical information.
-    input:
-        "results/data/cor_with_clinical/glycan_cor_with_clinical.csv",
-        META_PROPERTIES
-    output:
-        "results/figures/cor_with_clinical/glycan_cor_with_clinical.pdf"
-    script:
-        "src/cor_with_clinical/glycan_corrplot_with_clinical.R"
-
-rule liver_function_model:
-    # Build models to predict liver function.
-    input:
-        FILTERED_DERIVED_TRAITS,
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/cor_with_clinical/liver_function_model_r2.csv",
-        "results/data/cor_with_clinical/liver_function_model_pred.csv"
-    notebook:
-        "src/cor_with_clinical/liver_function_model.ipynb"
-
-rule liver_function_model_r2_venns:
-    # Draw venn diagrams for R2 values of liver function models.
-    input:
-        "results/data/cor_with_clinical/liver_function_model_r2.csv"
-    output:
-        "results/figures/cor_with_clinical/liver_function_model_r2_venns.pdf"
-    script:
-        "src/cor_with_clinical/r2_venn.R"
-
-rule liver_function_model_pred_boxplots:
-    # Draw boxplots for predicted liver function values.
-    input:
-        "results/data/cor_with_clinical/liver_function_model_pred.csv",
-        GROUPS
-    output:
-        "results/figures/cor_with_clinical/pred_boxplots.pdf"
-    script:
-        "src/cor_with_clinical/pred_boxplots.R"
-
-rule pred_parallel_coord_plot:
-    # Draw parallel coordinate plot for predicted liver function values.
-    input:
-        "results/data/cor_with_clinical/liver_function_model_pred.csv"
-    output:
-        "results/figures/cor_with_clinical/pred_parallel_coord_plot.pdf"
-    script:
-        "src/cor_with_clinical/pred_parallel_coord_plot.R"
+        "src/cor_with_liver_function/clinical_subtype_boxplots.R"
 
 
 # ==================== GlyCompare ====================
