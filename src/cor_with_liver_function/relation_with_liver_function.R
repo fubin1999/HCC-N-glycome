@@ -80,6 +80,7 @@ ttest_with_effsize <- function (data, .formula) {
   effsize_result <- data %>%
     cohens_d(value ~ clinical_value) %>%
     as_tibble() %>%
+    mutate(effsize = -effsize) %>%
     select(-c(.y., n1, n2))
 
   ttest_result %>%
