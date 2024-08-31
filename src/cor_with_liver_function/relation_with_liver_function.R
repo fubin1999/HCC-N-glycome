@@ -10,10 +10,10 @@ library(tidyverse)
 library(rstatix)
 
 # Load and prepare data-----
-glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
-trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
-groups <- read_csv("results/data/prepared/groups.csv")
-clinical <- read_csv("results/data/prepared/clinical.csv")
+# glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
+# trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
+# groups <- read_csv("results/data/prepared/groups.csv")
+# clinical <- read_csv("results/data/prepared/clinical.csv")
 
 glycan_data <- read_csv(snakemake@input[[1]])
 trait_data <- read_csv(snakemake@input[[2]])
