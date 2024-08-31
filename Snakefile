@@ -78,6 +78,7 @@ rule all:
 
         # ===== Correlation with Liver Function Figures =====
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
+        "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -654,6 +655,17 @@ rule relation_with_liver_function:
         "results/data/cor_with_liver_function/grouped_ttest_result_with_liver_functions.csv"
     script:
         "src/cor_with_liver_function/relation_with_liver_function.R"
+
+rule liver_function_heatmap:
+    # Draw the heatmap showing the relationship between glycans and
+    # liver function clinical variables.
+    input:
+        "results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/global_ttest_result_with_liver_functions.csv"
+    output:
+        "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf"
+    script:
+        "src/cor_with_liver_function/glycan_with_clinical_heatmap.R"
 
 
 # ==================== GlyCompare ====================
