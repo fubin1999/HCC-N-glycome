@@ -60,7 +60,7 @@ categoric_p <- glycan_ttest_result %>%
   labs(y = "Categoric", size = "| Cohen's d |", color = "Regulate") +
   theme_bw() +
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.text.x = element_text(angle = -90, hjust = 0, vjust = 0.5),
     axis.title.x = element_blank(),
     legend.position = "top"
   ) +
