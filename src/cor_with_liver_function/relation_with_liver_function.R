@@ -10,10 +10,10 @@ library(tidyverse)
 library(rstatix)
 
 # Load and prepare data-----
-# glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
-# trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
+glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
+trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv")
 
 glycan_data <- read_csv(snakemake@input[[1]])
 trait_data <- read_csv(snakemake@input[[2]])
@@ -70,12 +70,25 @@ data_with_categoric_clinical <- data %>%
     by = "sample", relationship = "many-to-many"
   )
 
+ttest_with_effsize <- function (data, .formula) {
+  ttest_result <- data %>%
+    t_test(.formula) %>%
+    adjust_pvalue(method = "BH") %>%
+    as_tibble() %>%
+    select(-c(.y., n1, n2, df, p, p.adj.signif))
+
+  effsize_result <- data %>%
+    cohens_d(value ~ clinical_value) %>%
+    as_tibble() %>%
+    select(-c(.y., n1, n2))
+
+  ttest_result %>%
+    left_join(effsize_result, by = c(group_vars(data), "group1", "group2"))
+}
+
 global_ttest_result <- data_with_categoric_clinical %>%
   group_by(feature_type, feature, clinical_variable) %>%
-  t_test(value ~ clinical_value) %>%
-  adjust_pvalue(method = "BH") %>%
-  as_tibble() %>%
-  select(feature_type, feature, clinical_variable, group1, group2, statistic, p.adj)
+  ttest_with_effsize(value ~ clinical_value)
 
 grouped_ttest_result <- data_with_categoric_clinical %>%
   left_join(groups, by = "sample") %>%
@@ -87,10 +100,7 @@ grouped_ttest_result <- data_with_categoric_clinical %>%
     t_test_result = list(
       data %>%
         group_by(feature_type, feature, clinical_variable) %>%
-        t_test(value ~ clinical_value) %>%
-        adjust_pvalue(method = "BH") %>%
-        as_tibble() %>%
-        select(feature_type, feature, clinical_variable, group1, group2, statistic, p.adj)
+        ttest_with_effsize(value ~ clinical_value)
     )
   ) %>%
   select(-data) %>%
