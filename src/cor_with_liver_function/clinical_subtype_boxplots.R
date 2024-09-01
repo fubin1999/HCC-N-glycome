@@ -17,20 +17,18 @@ traits <- traits %>%
 selected_traits <- c("TF", "CG", "CGS", "TB", "CA3+CA4")
 
 trait_definitions <- tribble(
-  ~trait, ~trait_definition,
-  "TF", "Prop. of Fucosylated Glycans",
-  "CG", "Average No. of\nGalactoses per Antenna",
-  "CGS", "Average No. of\nSia. per Gal.",
-  "TB", "Prop. of Bisecting Glycans",
-  "CA3+CA4", "Prop. of\nHigh-branching Glycans"
+  ~trait, ~trait_definition, ~trait_field,
+  "TF", "Prop. of Fucosylated Glycans", "Fucosylation",
+  "CG", "Average No. of\nGalactoses per Antenna", "Galactosylation",
+  "CGS", "Average No. of\nSia. per Gal.", "Sialylation",
+  "TB", "Prop. of Bisecting Glycans", "Bisecting",
+  "CA3+CA4", "Prop. of\nHigh-branching Glycans", "Branching"
 )
+
 
 subtypes <- clinical %>%
   mutate(
     sample = sample,
-    AAR_subtype = if_else(AAR > 1, "AAR+", "AAR-"),
-    TBIL_subtype = if_else(TBIL > 23, "TBIL+", "TBIL-"),
-    ALB_subtype = if_else(ALB < 40, "ALB-", "ALB+"),
     child_pugh_subtype = if_else(child_pugh == "A", "CP A", "CP B/C"),
     ALBI_stage_subtype = if_else(ALBI_stage == "I", "ALBI I", "ALBI II/III"),
     .keep = "none"
@@ -72,7 +70,7 @@ draw_boxplot <- function (data, .ylab, .title) {
 plot_df <- plot_data %>%
   nest_by(trait, subtype_by) %>%
   left_join(trait_definitions, by = "trait") %>%
-  mutate(plot = list(draw_boxplot(data, trait_definition, trait))) %>%
+  mutate(plot = list(draw_boxplot(data, trait_definition, trait_field))) %>%
   select(trait, subtype_by, plot) %>%
   arrange(subtype_by)
 
@@ -82,5 +80,5 @@ plot_width <- n_traits * 2
 plot_height <- n_subtypes * 2.5
 p <- reduce(plot_df$plot, `+`) + plot_layout(nrow = n_subtypes, ncol = n_traits)
 
-tgutil::ggpreview(plot = p, width = plot_width, height = plot_height)
+# tgutil::ggpreview(plot = p, width = plot_width, height = plot_height)
 ggsave(snakemake@output[[1]], plot = p, width = plot_width, height = plot_height)
