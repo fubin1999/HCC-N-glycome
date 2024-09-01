@@ -79,6 +79,7 @@ rule all:
         # ===== Correlation with Liver Function Figures =====
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
         "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf",
+        "results/figures/cor_with_liver_function/cor_coef_per_group.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -666,6 +667,15 @@ rule liver_function_heatmap:
         "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf"
     script:
         "src/cor_with_liver_function/glycan_with_clinical_heatmap.R"
+
+rule glycan_liver_function_cor_coef_per_group_boxplot:
+    # Draw boxplots to show Corr Coef difference for four groups.
+    input:
+        "results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv"
+    output:
+        "results/figures/cor_with_liver_function/cor_coef_per_group.pdf"
+    script:
+        "src/cor_with_liver_function/cor_coef_per_group_boxplot.R"
 
 
 # ==================== GlyCompare ====================
