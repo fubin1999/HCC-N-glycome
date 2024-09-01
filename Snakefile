@@ -637,6 +637,7 @@ rule relation_with_liver_function:
     input:
         PROCESSED_ABUNDANCE,
         FILTERED_DERIVED_TRAITS,
+        "results/data/glycan_coexpr/eigen_glycans.csv",
         GROUPS,
         CLINICAL
     output:

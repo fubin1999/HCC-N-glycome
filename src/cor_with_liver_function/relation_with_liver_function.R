@@ -12,13 +12,15 @@ library(rstatix)
 # Load and prepare data-----
 # glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
 # trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
+# eigen_data <- read_csv("results/data/glycan_coexpr/eigen_glycans.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 # clinical <- read_csv("results/data/prepared/clinical.csv")
 
 glycan_data <- read_csv(snakemake@input[[1]])
 trait_data <- read_csv(snakemake@input[[2]])
-groups <- read_csv(snakemake@input[[3]])
-clinical <- read_csv(snakemake@input[[4]])
+eigen_data <- read_csv(snakemake@input[[3]])
+groups <- read_csv(snakemake@input[[4]])
+clinical <- read_csv(snakemake@input[[5]])
 
 glycan_long <- glycan_data %>%
   pivot_longer(-sample, names_to = "feature", values_to = "value") %>%
@@ -27,11 +29,17 @@ glycan_long <- glycan_data %>%
 trait_long <- trait_data %>%
   pivot_longer(-sample, names_to = "feature", values_to = "value")
 
+eigen_long <- eigen_data %>%
+  mutate(feature = str_c("GCM", cluster), value = eigen_glycan, .keep = "unused")
+
 numeric_lf_variables <- c("AST", "ALT", "GGT", "ALB", "TBIL", "TP", "AAR")
 categorical_lf_variables <- c("child_pugh", "ALBI_stage")
 liver_function_variables <- c(numeric_lf_variables, categorical_lf_variables)
 
-data <- bind_rows(list(glycan = glycan_long, trait = trait_long), .id = "feature_type")
+data <- bind_rows(
+  list(glycan = glycan_long, trait = trait_long, gcm = eigen_long),
+  .id = "feature_type"
+)
 
 # Correlation Analysis-----
 data_with_numeric_clinical <- data %>%
