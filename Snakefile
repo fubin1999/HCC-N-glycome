@@ -95,16 +95,6 @@ rule all:
         "results/figures/subtypes/subtype_clinical_boxplots.pdf",
         "results/figures/subtypes/subtype_pca.pdf",
 
-        # ===== Motif Data =====
-        # "results/data/GlyCompare_results/",
-        # "results/data/motifs/motifs.csv",
-        # "results/data/motifs/motif_structures.csv",
-        # "results/data/motifs/ancova_result.csv",
-        # "results/data/motifs/post_hoc_result.csv",
-
-        # ===== Motif Figures =====
-        # "results/figures/SNFG/glycomotifs/",
-
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
@@ -676,86 +666,6 @@ rule glycan_liver_function_cor_coef_per_group_boxplot:
         "results/figures/cor_with_liver_function/cor_coef_per_group.pdf"
     script:
         "src/cor_with_liver_function/cor_coef_per_group_boxplot.R"
-
-
-# ==================== GlyCompare ====================
-# GLYCOMPARE_CLI = "/Users/fubin/Python/glyCompareCT/glyCompareCT"
-#
-# rule prepare_for_glycompare:
-#     # Prepare data format for GlyCompareCT.
-#     input:
-#         "data/glycan_structure_guess_linkage.csv"
-#     output:
-#         temp("results/data/glycompare_structures.csv")
-#     run:
-#         import pandas as pd
-#         df = pd.read_csv(input[0])
-#         df = df.rename(columns={"composition": "Name", "structure": "Glycan Structure"})
-#         df.to_csv(output[0], index=False)
-#
-# rule run_glycompare:
-#     # Run GlyCompareCT.
-#     input:
-#         PROCESSED_ABUNDANCE,
-#         "results/data/glycompare_structures.csv"
-#     output:
-#         directory("results/data/GlyCompare_results/")
-#     shell:
-#         "{GLYCOMPARE_CLI} structure -a {input[0]} -v {input[1]} -o {output[0]} -p glycoCT -r N -c 8"
-#
-# rule plot_motif_SNFG:
-#     # Draw SNFG cartoons for GlyCompare motifs.
-#     input:
-#         "results/data/GlyCompare/GlyCompare_output_data/GlyCompare_motif_annotation.csv"
-#     output:
-#         directory("results/figures/SNFG/glycomotifs/")
-#     run:
-#         import csv
-#         from pathlib import Path
-#         from glycowork.motif.draw import GlycoDraw
-#
-#         output_dir = output[0]
-#         Path(output_dir).mkdir(exist_ok=True, parents=True)
-#         with open(input[0], encoding='utf-8-sig') as fp:
-#             reader = csv.reader(fp)
-#             next(reader)
-#             for motif, _, _, structure in reader:
-#                 path = Path(output_dir) / f"{motif}.svg"
-#                 GlycoDraw(structure, filepath=str(path), compact=True)
-#
-# rule tidy_glycompare_results:
-#     # Convert the results of GlyCompare into tidy formats.
-#     input:
-#         "results/data/GlyCompare_results/GlyCompare_output_data/GlyCompare_motif_abd_table.csv",
-#         "results/data/GlyCompare_results/GlyCompare_output_data/GlyCompare_motif_annotation.csv",
-#     output:
-#         "results/data/motifs/motifs.csv",
-#         "results/data/motifs/motif_structures.csv"
-#     run:
-#         import pandas as pd
-#
-#         abund = pd.read_csv(input[0], index_col=0)
-#         abund = abund.T
-#         abund.index.name = "sample"
-#         abund.to_csv(output[0])
-#
-#         struc = pd.read_csv(input[1], index_col=0)
-#         struc = struc[["glycoCT"]]
-#         struc = struc.rename(columns={"glycoCT": "structure"})
-#         struc.index.name = "motif"
-#         struc.to_csv(output[1])
-#
-# rule motif_ANCOVA:
-#     # Perform ANCOVA on glycomotifs.
-#     input:
-#         "results/data/motifs/motifs.csv",
-#         "results/data/prepared/groups.csv",
-#         "results/data/prepared/clinical.csv",
-#     output:
-#         "results/data/motifs/ancova_result.csv",
-#         "results/data/motifs/post_hoc_result.csv"
-#     script:
-#         "src/motif/ancova.R"
 
 
 # ==================== Molecular Subtypes ====================
