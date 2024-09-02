@@ -75,6 +75,8 @@ rule all:
         "results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv",
         "results/data/cor_with_liver_function/global_ttest_result_with_liver_functions.csv",
         "results/data/cor_with_liver_function/grouped_ttest_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/ALBI_model_scores.csv",
+        "results/data/cor_with_liver_function/ALBI_model_preds.csv",
 
         # ===== Correlation with Liver Function Figures =====
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
@@ -667,6 +669,18 @@ rule glycan_liver_function_cor_coef_per_group_boxplot:
         "results/figures/cor_with_liver_function/cor_coef_per_group.pdf"
     script:
         "src/cor_with_liver_function/cor_coef_per_group_boxplot.R"
+        
+rule ALBI_model:
+    # Train a model using glycans to predict ALBI stages.
+    input:
+        PROCESSED_ABUNDANCE,
+        CLINICAL,
+        GROUPS
+    output:
+        "results/data/cor_with_liver_function/ALBI_model_scores.csv",
+        "results/data/cor_with_liver_function/ALBI_model_preds.csv"
+    script:
+        "src/cor_with_liver_function/ALBI_model.R"
 
 
 # ==================== Molecular Subtypes ====================
