@@ -82,6 +82,7 @@ rule all:
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
         "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf",
         "results/figures/cor_with_liver_function/cor_coef_per_group.pdf",
+        "results/figures/cor_with_liver_function/ALBI_model_ROC.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -681,6 +682,16 @@ rule ALBI_model:
         "results/data/cor_with_liver_function/ALBI_model_preds.csv"
     script:
         "src/cor_with_liver_function/ALBI_model.R"
+
+rule ALBI_model_ROC:
+    # Draw ROC curve for ALBI model.
+    input:
+        "results/data/cor_with_liver_function/ALBI_model_preds.csv",
+        "results/data/cor_with_liver_function/ALBI_model_scores.csv"
+    output:
+        "results/figures/cor_with_liver_function/ALBI_model_ROC.pdf"
+    script:
+        "src/cor_with_liver_function/ALBI_model_ROC.R"
 
 
 # ==================== Molecular Subtypes ====================
