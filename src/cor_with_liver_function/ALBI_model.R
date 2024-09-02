@@ -2,9 +2,9 @@ library(tidyverse)
 library(mlr3verse)
 library(data.table)
 
-# glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
+glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
 
 glycan_data <- read_csv(snakemake@input[[1]])
 clinical <- read_csv(snakemake@input[[2]])
@@ -13,11 +13,11 @@ groups <- read_csv(snakemake@input[[3]])
 data <- glycan_data %>%
   right_join(clinical %>% select(sample, ALBI_stage), by = "sample") %>%
   mutate(ALBI_stage = if_else(ALBI_stage == "I", "I", "II/III")) %>%
-  left_join(groups, by = "sample") %>%
-  column_to_rownames("sample")
+  left_join(groups, by = "sample")
 
 tsk <- as_task_classif(data, target = "ALBI_stage", id = "liver_function")
 tsk$set_col_roles("group", "stratum")
+tsk$set_col_roles("sample", "name")
 rf <- lrn("classif.ranger", predict_type = "prob")
 cv10 <- rsmp("cv", folds = 10)
 
@@ -46,7 +46,9 @@ scores_df <- bind_rows(list(
   ))
 
 preds <- rr$predictions()
-preds_df <- bind_rows(map(preds, ~as.data.table(.x)), .id = "fold")
+preds_df <- bind_rows(map(preds, ~as.data.table(.x)), .id = "fold") %>%
+  left_join(tsk$row_names, by = c("row_ids" = "row_id")) %>%
+  select(row_id = row_ids, row_name, everything())
 
 write_csv(scores_df, snakemake@output[[1]])
 write_csv(preds_df, snakemake@output[[2]])
