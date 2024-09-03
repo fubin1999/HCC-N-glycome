@@ -85,6 +85,7 @@ rule all:
         "results/figures/cor_with_liver_function/ALBI_model_ROC.pdf",
         "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix.pdf",
         "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix_grouped.pdf",
+        "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -705,6 +706,16 @@ rule ALBI_model_confusion_matrix:
         "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix_grouped.pdf"
     script:
         "src/cor_with_liver_function/ALBI_model_confusion_matrix.R"
+
+rule ALBI_model_prob_ridge_plot:
+    # Draw probability ridge plot for ALBI model.
+    input:
+        "results/data/cor_with_liver_function/ALBI_model_preds.csv",
+        GROUPS
+    output:
+        "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf"
+    script:
+        "src/cor_with_liver_function/ALBI_model_prob_ridge_plot.R"
 
 
 # ==================== Molecular Subtypes ====================
