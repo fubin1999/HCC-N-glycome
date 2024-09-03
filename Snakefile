@@ -661,7 +661,8 @@ rule liver_function_heatmap:
         "results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv",
         "results/data/cor_with_liver_function/global_ttest_result_with_liver_functions.csv"
     output:
-        "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf"
+        "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf",
+        "results/figures/cor_with_liver_function/trait_liver_function_heatmap.pdf"
     script:
         "src/cor_with_liver_function/glycan_with_clinical_heatmap.R"
 
