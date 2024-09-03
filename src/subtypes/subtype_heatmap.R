@@ -2,11 +2,11 @@ library(tidyverse)
 library(ComplexHeatmap)
 library(circlize)
 
-abundance <- read_csv("results/data/subtypes/batched_corrected.csv")
-clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-anova_result <- read_csv("results/data/subtypes/anova.csv")
-coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
-clinical <- read_csv("results/data/prepared/clinical.csv")
+# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+# clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+# anova_result <- read_csv("results/data/subtypes/anova.csv")
+# coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+# clinical <- read_csv("results/data/prepared/clinical.csv")
 
 abundance <- read_csv(snakemake@input[["abundance"]])
 clusters <- read_csv(snakemake@input[["clusters"]])
@@ -36,21 +36,26 @@ mat <- data %>%
   as.matrix() %>%
   t()
 
-col_anno_vec <- data %>%
-  mutate(subtype = str_glue("Subtype{class}"), subtype = as.factor(subtype)) %>%
+col_anno_df <- data %>%
+  mutate(subtype = str_glue("Subtype {class}"), subtype = as.factor(subtype)) %>%
   select(sample, subtype) %>%
+  left_join(clinical %>% select(sample, child_pugh, ALBI_stage, TNM_stage), by = "sample") %>%
+  rename(
+    `Glycan Subtype` = subtype,
+    `Child-Pugh Class` = child_pugh,
+    `ALBI Stage` = ALBI_stage,
+    `TNM Stage` = TNM_stage,
+  ) %>%
   column_to_rownames("sample") %>%
   .[colnames(mat),]
-set.seed(3)
+set.seed(2)
 col_anno <- HeatmapAnnotation(
-  subtype = col_anno_vec,
-  col = list(subtype = c(Subtype1 = "#1b9e77", Subtype2 = "#d95f02", Subtype3 = "#7570b3")),
-  annotation_height = unit(0.5, "cm"),
-  show_legend = FALSE,
-  show_annotation_name = FALSE
+  df = col_anno_df,
+  col = list(`Glycan Subtype` = c(`Subtype 1` = "#1b9e77", `Subtype 2` = "#d95f02", `Subtype 3` = "#7570b3")),
+  annotation_height = unit(0.5, "cm")
 )
 
-col_split <- as.factor(col_anno_vec)
+col_split <- as.factor(col_anno_df[["Glycan Subtype"]])
 
 gcm <- tibble(glycan = diff_glycans) %>%
   left_join(coexp_modules, by = "glycan") %>%
@@ -69,8 +74,8 @@ row_anno <- rowAnnotation(
 
 col <- colorRamp2(c(-2, 0, 2), c("#275D87", "white", "#D26F32"))
 
-pdf(snakemake@output[[1]], width = 5, height = 5)
-set.seed(43)
+pdf(snakemake@output[[1]], width = 6, height = 5)
+set.seed(1)
 Heatmap(
   mat,
   name = "Z-score",

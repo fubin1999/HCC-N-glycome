@@ -1,11 +1,8 @@
 # Perform consensus clustering to identify molecular subtypes.
-# 1. To avoid the influence of missing values, we will only
+# To avoid the influence of missing values, we will only
 # use glycans that are present in at least 80% of the samples.
-# 2. Furthermore, to prevent the influence of batch effects, we will
-# use the ComBat algorithm to correct for batch effects.
 
 library(tidyverse)
-library(sva)
 library(ConsensusClusterPlus)
 
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
@@ -40,19 +37,8 @@ data_for_cc <- processed_data %>%
 data_for_cc <- log(data_for_cc)
 data_for_cc <- as.matrix(data_for_cc)
 
-# 2. Correct for batch effects
-plates <- plates %>%
-  select(sample, plate) %>%
-  filter(sample %in% colnames(data_for_cc))
-batches <- plates %>%
-  column_to_rownames(var = "sample") %>%
-  .[colnames(data_for_cc),]
-
-modcombat <- model.matrix(~1, data = plates)
-combat_data <- ComBat(dat = data_for_cc, batch = batches, mod = modcombat)
-
-# 3. Perform consensus clustering
-normed <- sweep(combat_data, 1, apply(combat_data, 1, median, na.rm = T))
+# 2. Perform consensus clustering
+normed <- sweep(data_for_cc, 1, apply(data_for_cc, 1, median, na.rm = T))
 cc_result <- ConsensusClusterPlus(
   normed, maxK = 8, reps = 1000, pItem = 0.8, pFeature = 1,
   # title = "results/figures/subtypes/cc_result",
@@ -63,11 +49,3 @@ cc_result <- ConsensusClusterPlus(
 cluster_classes <- cc_result[[3]][["consensusClass"]]
 cluster_classes <- data.frame(sample = names(cluster_classes), class = as.integer(cluster_classes))
 write.csv(cluster_classes, snakemake@output[[2]], row.names = FALSE)
-
-# 4. Save the corrected data
-combat_data <- combat_data %>%
-  t() %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "sample") %>%
-  as_tibble()
-write_csv(combat_data, snakemake@output[[3]])

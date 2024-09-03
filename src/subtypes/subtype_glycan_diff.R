@@ -1,7 +1,7 @@
 library(tidyverse)
 library(rstatix)
 
-# abundance <- read_csv("results/data/subtypes/batched_corrected.csv")
+# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 # clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
 
 abundance <- read_csv(snakemake@input[[1]])
