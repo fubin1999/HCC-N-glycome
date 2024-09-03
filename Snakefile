@@ -75,6 +75,7 @@ rule all:
         "results/data/cor_with_liver_function/grouped_ttest_result_with_liver_functions.csv",
         "results/data/cor_with_liver_function/ALBI_model_scores.csv",
         "results/data/cor_with_liver_function/ALBI_model_preds.csv",
+        "results/data/cor_with_liver_function/ALBI_score_model_metrics.csv",
 
         # ===== Correlation with Liver Function Figures =====
         "results/figures/cor_with_liver_function/trait_clinical_subtype_boxplots.pdf",
@@ -84,6 +85,7 @@ rule all:
         "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix.pdf",
         "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix_grouped.pdf",
         "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf",
+        "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -677,6 +679,18 @@ rule ALBI_model_prob_ridge_plot:
         "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf"
     script:
         "src/cor_with_liver_function/ALBI_model_prob_ridge_plot.R"
+
+rule ALBI_score_model:
+    # Train a regression model to predict the ALBI score.
+    input:
+        PROCESSED_ABUNDANCE,
+        CLINICAL,
+        GROUPS
+    output:
+        "results/data/cor_with_liver_function/ALBI_score_model_metrics.csv",
+        "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf"
+    script:
+        "src/cor_with_liver_function/ALBI_score_model.R"
 
 
 # ==================== Molecular Subtypes ====================
