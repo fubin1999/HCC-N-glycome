@@ -100,13 +100,12 @@ imputed_clinical_final <- bind_rows(HCC_imputed_clinical_final, non_HCC_imputed_
 final_clinical <- imputed_clinical_final |>
   mutate(AAR = AST / ALT) %>%
   mutate(
-    ALBI = log10(TBIL) * 0.66 - ALB * 0.085,
+    ALBI_score = log10(TBIL) * 0.66 - ALB * 0.085,
     ALBI_stage = case_when(
-      ALBI <= -2.60 ~ "I",
-      ALBI > -2.60 & ALBI <= -1.39 ~ "II",
-      ALBI > -1.39 ~ "III",
+      ALBI_score <= -2.60 ~ "I",
+      ALBI_score > -2.60 & ALBI_score <= -1.39 ~ "II",
+      ALBI_score > -1.39 ~ "III",
     )
-  ) %>%
-  select(-ALBI)
+  )
 
 write_csv(final_clinical, snakemake@output[[1]])

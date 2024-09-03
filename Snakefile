@@ -60,14 +60,12 @@ rule all:
         "results/data/glycan_coexpr/eigen_glycans.csv",
         "results/data/glycan_coexpr/cluster_ancova.csv",
         "results/data/glycan_coexpr/cluster_post_hoc.csv",
-        "results/data/glycan_coexpr/cluster_cor_with_clinical.csv",
 
         # ===== Glycan Coexpression Module Figures =====
         "results/figures/glycan_coexpr/cluster_glycan_heatmap.pdf",
         "results/figures/glycan_coexpr/glycan_cluster_trends.pdf",
         "results/figures/glycan_coexpr/glycan_property_heatmap.pdf",
         "results/figures/glycan_coexpr/cluster_corrplot.pdf",
-        "results/figures/glycan_coexpr/cluster_cor_with_clinical.pdf",
         "results/figures/glycan_coexpr/cor_inter_intra_GCM.pdf",
 
         # ===== Correlation with Liver Function Data =====
@@ -92,13 +90,10 @@ rule all:
         "results/data/subtypes/anova.csv",
         "results/data/subtypes/post_hoc.csv",
         "results/data/subtypes/batched_corrected.csv",
-        "results/data/subtypes/clinical_diff_kw.csv",
-        "results/data/subtypes/clinical_diff_post_hoc.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
         "results/figures/subtypes/subtype_heatmap.pdf",
-        "results/figures/subtypes/subtype_clinical_boxplots.pdf",
         "results/figures/subtypes/subtype_pca.pdf",
 
         # ===== TCGA Data =====
@@ -116,28 +111,6 @@ rule all:
         "results/figures/TCGA/clinical_heatmap.pdf",
         "results/figures/TCGA/cluster_KM.pdf",
         "results/figures/TCGA/single_gene_KM/",
-
-        # ===== Machine Learning Data =====
-        "results/data/ml/model_comparison.csv",
-        "results/data/ml/mrmr_result.csv",
-        "results/data/ml/predictions.csv",
-        "results/data/ml/model_performance.csv",
-
-        # ===== Machine Learning Figures =====
-        "results/figures/ml/model_comparison_heatmap.pdf",
-        "results/figures/ml/mrmr_auc.pdf",
-        "results/figures/ml/roc_curves.pdf",
-        "results/figures/ml/pr_curves.pdf",
-        "results/figures/ml/calibration_curve.pdf",
-        "results/figures/ml/confusion_matrix.pdf",
-        "results/figures/ml/probability_boxplots.pdf",
-        "results/figures/ml/complex_model_metrics_table.pdf",
-        "results/figures/ml/simple_model_metrics_table.pdf",
-        "results/figures/ml/forest_plot.pdf",
-        "results/figures/ml/shap_summary.pdf",
-        "results/figures/ml/shap_waterfall/",
-        "results/figures/ml/decision_tree.svg"
-
 
 # ==================== Prepare Data ====================
 rule build_db:
@@ -612,19 +585,6 @@ rule cluster_corrplot:
     script:
         "src/glycan_coexpr/cluster_cor.R"
 
-rule cluster_cor_with_clinical:
-    # Calculate and plot correlation of glycan clusters with clinical data.
-    input:
-        "results/data/glycan_coexpr/eigen_glycans.csv",
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/glycan_coexpr/cluster_cor_with_clinical.csv",
-        "results/figures/glycan_coexpr/cluster_cor_with_clinical.pdf"
-    script:
-        "src/glycan_coexpr/cluster_cor_with_clinical.R"
-
-
 # ==================== Correlation with Liver Function ====================
 rule clinical_subtype_boxplots:
     # Draw boxplots for differential traits in clinical subtypes.
@@ -768,30 +728,6 @@ rule subtype_heatmap:
     script:
         "src/subtypes/subtype_heatmap.R"
 
-rule subtype_clinical_diff:
-    # Perform differential analysis on derived traits between subtypes.
-    input:
-        CLINICAL,
-        "results/data/subtypes/consensus_cluster_result.csv"
-    output:
-        "results/data/subtypes/clinical_diff_kw.csv",
-        "results/data/subtypes/clinical_diff_post_hoc.csv"
-    script:
-        "src/subtypes/subtype_clinical_diff.R"
-
-rule subtype_clinical_boxplots:
-    # Draw boxplots for derived traits in different subtypes.
-    input:
-        CLINICAL,
-        "results/data/subtypes/consensus_cluster_result.csv",
-        "results/data/subtypes/clinical_diff_kw.csv",
-        "results/data/subtypes/clinical_diff_post_hoc.csv"
-    output:
-        "results/figures/subtypes/subtype_clinical_boxplots.pdf"
-    script:
-        "src/subtypes/subtype_clinical_boxplots.R"
-
-
 # ==================== TCGA Gene Expression ====================
 rule download_TCGA:
     # Download TCGA gene expression data.
@@ -906,159 +842,6 @@ rule TCGA_cluster_KM:
 
 
 # ==================== Machine Learning ====================
-rule prepare_data_for_ml:
-    # Prepare data for ML and split the dataset.
-    input:
-        abundance=PROCESSED_ABUNDANCE,
-        clinical=CLINICAL,
-        groups=GROUPS
-    output:
-        train_data="results/data/ml/train_data.csv",
-        test_data="results/data/ml/test_data.csv",
-        feature_types="results/data/ml/feature_types.json"
-    script:
-        "src/ml/prepare_data.py"
-
-rule compare_models:
-    # Compare different machine learning models (including the HCC Fusion Classifier)
-    # using 10-fold cross-validation.
-    input:
-        train_data="results/data/ml/train_data.csv",
-        feature_types="results/data/ml/feature_types.json"
-    output:
-        "results/data/ml/model_comparison.csv"
-    script:
-        "src/ml/compare_models.py"
-
-rule plot_compare_model_heatmap:
-    # Draw the heatmap for model comparison
-    input:
-        "results/data/ml/model_comparison.csv"
-    output:
-        "results/figures/ml/model_comparison_heatmap.pdf"
-    script:
-        "src/ml/model_compare_heatmap.R"
-
-rule mrmr_feature_selection:
-    # Perform mRMR to select glycans.
-    input:
-        "results/data/ml/train_data.csv",
-        "results/data/ml/feature_types.json"
-    output:
-        "results/data/ml/mrmr_result.csv"
-    script:
-        "src/ml/mrmr.py"
-
-rule plot_mrmr:
-    # Plot number of features vs. AUC for mRMR.
-    input:
-        "results/data/ml/mrmr_result.csv"
-    output:
-        "results/figures/ml/mrmr_auc.pdf"
-    script:
-        "src/ml/plot_mrmr.R"
-
-rule make_predictions:
-    # Predict on the test data and evalute the model.
-    input:
-        train_data="results/data/ml/train_data.csv",
-        test_data="results/data/ml/test_data.csv",
-        feature_types="results/data/ml/feature_types.json"
-    output:
-        "results/data/ml/predictions.csv"
-    script:
-        "src/ml/make_predictions.py"
-
-rule model_roc_and_pr_curves:
-    # Plot ROC curves and PR curves for two models and AFP.
-    input:
-        predictions="results/data/ml/predictions.csv",
-        groups=GROUPS,
-        clinical=CLINICAL
-    output:
-        "results/figures/ml/roc_curves.pdf",
-        "results/figures/ml/pr_curves.pdf"
-    script:
-        "src/ml/pr_roc.R"
-
-rule confusion_matrix:
-    # Draw confusion matrix for the model.
-    input:
-        "results/data/ml/predictions.csv",
-        "results/data/prepared/groups.csv"
-    output:
-        "results/figures/ml/confusion_matrix.pdf"
-    script:
-        "src/ml/confusion_matrix.R"
-
-rule calibration_curve:
-    # Draw the calibration curve of the model.
-    input:
-        "results/data/ml/predictions.csv"
-    output:
-        "results/figures/ml/calibration_curve.pdf"
-    script:
-        "src/ml/calibration_curve.R"
-
-rule probability_boxplots:
-    # Draw boxplots displaying probability distributions for each group.
-    input:
-        "results/data/ml/predictions.csv",
-        "results/data/prepared/groups.csv"
-    output:
-        "results/figures/ml/probability_boxplots.pdf"
-    script:
-        "src/ml/score_boxplots.R"
-
-rule evaluate_model:
-    # Calculate the performance metrics of the model.
-    input:
-        "results/data/ml/predictions.csv",
-        "results/data/prepared/groups.csv"
-    output:
-        "results/data/ml/model_performance.csv"
-    script:
-        "src/ml/metrics.R"
-
-rule model_metrics_table:
-    # Draw a table of model metrics.
-    input:
-        "results/data/ml/model_performance.csv"
-    output:
-        "results/figures/ml/complex_model_metrics_table.pdf",
-        "results/figures/ml/simple_model_metrics_table.pdf"
-    script:
-        "src/ml/metrics_table.R"
-
-rule forest_plot:
-    # Draw a forest plot for the HCC Slim model.
-    input:
-        "results/data/ml/train_data.csv"
-    output:
-        "results/figures/ml/forest_plot.pdf"
-    script:
-        "src/ml/forest_plot.R"
-
-rule shap:
-    # SHAP on HCC Slim.
-    input:
-        "results/data/ml/train_data.csv",
-        "results/data/ml/test_data.csv"
-    output:
-        "results/figures/ml/shap_summary.pdf",
-        directory("results/figures/ml/shap_waterfall/")
-    script:
-        "src/ml/shap.py"
-
-rule decision_tree:
-    # Visualize a decision tree classifier.
-    input:
-        "results/data/ml/train_data.csv",
-        "results/data/ml/test_data.csv"
-    output:
-        "results/figures/ml/decision_tree.svg"
-    notebook:
-        "src/ml/decision_tree.ipynb"
 
 
 # ==================== Others ====================
