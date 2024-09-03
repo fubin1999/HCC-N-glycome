@@ -83,6 +83,8 @@ rule all:
         "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf",
         "results/figures/cor_with_liver_function/cor_coef_per_group.pdf",
         "results/figures/cor_with_liver_function/ALBI_model_ROC.pdf",
+        "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix.pdf",
+        "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix_grouped.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -692,6 +694,17 @@ rule ALBI_model_ROC:
         "results/figures/cor_with_liver_function/ALBI_model_ROC.pdf"
     script:
         "src/cor_with_liver_function/ALBI_model_ROC.R"
+
+rule ALBI_model_confusion_matrix:
+    # Draw confusion matrices for ALBI model.
+    input:
+        "results/data/cor_with_liver_function/ALBI_model_preds.csv",
+        GROUPS
+    output:
+        "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix.pdf",
+        "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix_grouped.pdf"
+    script:
+        "src/cor_with_liver_function/ALBI_model_confusion_matrix.R"
 
 
 # ==================== Molecular Subtypes ====================
