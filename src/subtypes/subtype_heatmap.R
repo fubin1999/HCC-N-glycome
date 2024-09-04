@@ -51,7 +51,12 @@ col_anno_df <- data %>%
 set.seed(2)
 col_anno <- HeatmapAnnotation(
   df = col_anno_df,
-  col = list(`Glycan Subtype` = c(`Subtype 1` = "#1b9e77", `Subtype 2` = "#d95f02", `Subtype 3` = "#7570b3")),
+  col = list(
+    `Glycan Subtype` = c(`Subtype 1` = "#1b9e77", `Subtype 2` = "#d95f02", `Subtype 3` = "#7570b3"),
+    `Child-Pugh Class` = c(A = "#ffd299", B = "#FF7F50", C = "#8f1e00"),
+    `ALBI Stage` = c(I = "#ffc7ff", II = "#a364ff", III = "#342a45"),
+    `TNM Stage` = c(I = "#c6ffe6", II = "#61bc84", III = "#2E8B57", IV = "#345e37")
+  ),
   annotation_height = unit(0.5, "cm")
 )
 
@@ -69,10 +74,14 @@ gcm <- tibble(glycan = diff_glycans) %>%
 set.seed(15)
 row_anno <- rowAnnotation(
   `Glycan\nCo-expression\nModule` = gcm,
-  show_annotation_name = FALSE
+  show_annotation_name = FALSE,
+  col = list(`Glycan\nCo-expression\nModule` = c(
+    GCM0 = "#bcbcbc", GCM1 = "#FF6F61", GCM2 = "#530009", GCM3 = "#FFB347",
+    GCM4 = "#925700", GCM5 = "#8a579e"
+  ))
 )
 
-col <- colorRamp2(c(-2, 0, 2), c("#275D87", "white", "#D26F32"))
+col <- colorRamp2(c(-2, 0, 2), c("#3d5a80", "white", "#ee6c4d"))
 
 pdf(snakemake@output[[1]], width = 6, height = 5)
 set.seed(1)
