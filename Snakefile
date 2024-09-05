@@ -91,6 +91,10 @@ rule all:
         "results/data/subtypes/consensus_cluster_result.csv",
         "results/data/subtypes/anova.csv",
         "results/data/subtypes/post_hoc.csv",
+        "results/data/subtypes/subtype_with_continous_clinical_kruskal_result.csv",
+        "results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv",
+        "results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv",
+        "results/data/subtypes/subtype_with_categoric_clinical_post_hoc_result.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -739,6 +743,21 @@ rule subtype_heatmap:
         "results/figures/subtypes/subtype_heatmap.pdf"
     script:
         "src/subtypes/subtype_heatmap.R"
+
+rule subtype_with_clinical:
+    # Inquire the relationship between glycan molecular subtypes with
+    # clinical variables including liver function markers and
+    # clinical stagings.
+    input:
+        "results/data/subtypes/consensus_cluster_result.csv",
+        CLINICAL
+    output:
+        "results/data/subtypes/subtype_with_continous_clinical_kruskal_result.csv",
+        "results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv",
+        "results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv",
+        "results/data/subtypes/subtype_with_categoric_clinical_post_hoc_result.csv"
+    script:
+        "src/subtypes/subtype_with_clinical.R"
 
 # ==================== TCGA Gene Expression ====================
 rule download_TCGA:
