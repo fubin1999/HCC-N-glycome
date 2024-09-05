@@ -89,8 +89,8 @@ rule all:
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
-        "results/data/subtypes/anova.csv",
-        "results/data/subtypes/post_hoc.csv",
+        "results/data/subtypes/subtype_glycan_anova.csv",
+        "results/data/subtypes/subtype_glycan_post_hoc.csv",
         "results/data/subtypes/subtype_with_continous_clinical_kruskal_result.csv",
         "results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv",
         "results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv",
@@ -726,8 +726,8 @@ rule subtype_glycan_diff:
         PROCESSED_ABUNDANCE,
         "results/data/subtypes/consensus_cluster_result.csv"
     output:
-        "results/data/subtypes/anova.csv",
-        "results/data/subtypes/post_hoc.csv"
+        "results/data/subtypes/subtype_glycan_anova.csv",
+        "results/data/subtypes/subtype_glycan_post_hoc.csv"
     script:
         "src/subtypes/subtype_glycan_diff.R"
 
@@ -736,7 +736,7 @@ rule subtype_heatmap:
     input:
         abundance=PROCESSED_ABUNDANCE,
         clusters="results/data/subtypes/consensus_cluster_result.csv",
-        anova_result="results/data/subtypes/anova.csv",
+        anova_result="results/data/subtypes/subtype_glycan_anova.csv",
         coexp_modules="results/data/glycan_coexpr/glycan_clusters.csv",
         clinical=CLINICAL
     output:
