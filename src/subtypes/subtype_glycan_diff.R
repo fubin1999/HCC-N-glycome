@@ -9,6 +9,7 @@ clusters <- read_csv(snakemake@input[[2]])
 
 data <- abundance %>%
   pivot_longer(-sample, names_to = "glycan", values_to = "value") %>%
+  mutate(value = log(value)) %>%
   right_join(clusters, by = "sample") %>%
   mutate(class = as.factor(class))
 
