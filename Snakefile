@@ -95,6 +95,8 @@ rule all:
         "results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv",
         "results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv",
         "results/data/subtypes/subtype_with_categoric_clinical_post_hoc_result.csv",
+        "results/data/subtypes/subtype_coexp_module_anova.csv",
+        "results/data/subtypes/subtype_coexp_module_post_hoc.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -758,6 +760,17 @@ rule subtype_with_clinical:
         "results/data/subtypes/subtype_with_categoric_clinical_post_hoc_result.csv"
     script:
         "src/subtypes/subtype_with_clinical.R"
+
+rule subtype_coexp_module_diff:
+    # Perform differential analysis on glycan coexpression modules between subtypes.
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        "results/data/subtypes/consensus_cluster_result.csv"
+    output:
+        "results/data/subtypes/subtype_coexp_module_anova.csv",
+        "results/data/subtypes/subtype_coexp_module_post_hoc.csv"
+    script:
+        "src/subtypes/subtype_coexp_module_diff.R"
 
 # ==================== TCGA Gene Expression ====================
 rule download_TCGA:
