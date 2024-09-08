@@ -103,6 +103,7 @@ rule all:
         "results/figures/subtypes/subtype_heatmap.pdf",
         "results/figures/subtypes/subtype_pca.pdf",
         "results/figures/subtypes/subtype_coexp_module_heatmap.pdf",
+        "results/figures/subtypes/subtype_continuous_clinical_boxplots.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -782,6 +783,18 @@ rule subtype_coexp_module_heatmap:
         "results/figures/subtypes/subtype_coexp_module_heatmap.pdf"
     script:
         "src/subtypes/subtype_coexp_module_heatmap.R"
+
+rule subtype_continuous_clinical_boxplot:
+    # Draw boxplots for continuous clinical variables in different subtypes.
+    input:
+        CLINICAL,
+        "results/data/subtypes/consensus_cluster_result.csv",
+        "results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv"
+    output:
+        "results/figures/subtypes/subtype_continuous_clinical_boxplots.pdf"
+    script:
+        "src/subtypes/subtype_continuous_clinical_boxplot.R"
+
 
 # ==================== TCGA Gene Expression ====================
 rule download_TCGA:
