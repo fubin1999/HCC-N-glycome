@@ -102,6 +102,7 @@ rule all:
         "results/figures/subtypes/cc_result/",
         "results/figures/subtypes/subtype_heatmap.pdf",
         "results/figures/subtypes/subtype_pca.pdf",
+        "results/figures/subtypes/subtype_coexp_module_heatmap.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -771,6 +772,16 @@ rule subtype_coexp_module_diff:
         "results/data/subtypes/subtype_coexp_module_post_hoc.csv"
     script:
         "src/subtypes/subtype_coexp_module_diff.R"
+
+rule subtype_coexp_module_heatmap:
+    # Draw heatmap for glycan coexpression modules in different subtypes.
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        "results/data/subtypes/consensus_cluster_result.csv",
+    output:
+        "results/figures/subtypes/subtype_coexp_module_heatmap.pdf"
+    script:
+        "src/subtypes/subtype_coexp_module_heatmap.R"
 
 # ==================== TCGA Gene Expression ====================
 rule download_TCGA:
