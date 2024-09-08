@@ -104,6 +104,7 @@ rule all:
         "results/figures/subtypes/subtype_pca.pdf",
         "results/figures/subtypes/subtype_coexp_module_heatmap.pdf",
         "results/figures/subtypes/subtype_continuous_clinical_boxplots.pdf",
+        "results/figures/subtypes/hypergeometric_test_heatmap.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -794,6 +795,16 @@ rule subtype_continuous_clinical_boxplot:
         "results/figures/subtypes/subtype_continuous_clinical_boxplots.pdf"
     script:
         "src/subtypes/subtype_continuous_clinical_boxplot.R"
+
+rule hypergeometric_test_heatmap:
+    # Draw heatmap for hypergeometric test results.
+    input:
+        "results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv",
+        "results/data/subtypes/subtype_with_categoric_clinical_post_hoc_result.csv"
+    output:
+        "results/figures/subtypes/hypergeometric_test_heatmap.pdf"
+    script:
+        "src/subtypes/hypergeometric_test_heatmap.R"
 
 
 # ==================== TCGA Gene Expression ====================
