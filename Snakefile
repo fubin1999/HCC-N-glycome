@@ -105,6 +105,7 @@ rule all:
         "results/figures/subtypes/subtype_coexp_module_heatmap.pdf",
         "results/figures/subtypes/subtype_continuous_clinical_boxplots.pdf",
         "results/figures/subtypes/hypergeometric_test_heatmap.pdf",
+        "results/figures/subtypes/fisher_test_barplot.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -805,6 +806,17 @@ rule hypergeometric_test_heatmap:
         "results/figures/subtypes/hypergeometric_test_heatmap.pdf"
     script:
         "src/subtypes/hypergeometric_test_heatmap.R"
+
+rule fisher_test_barplot:
+    # Draw barplot for Fisher test results.
+    input:
+        clinical=CLINICAL,
+        subtypes="results/data/subtypes/consensus_cluster_result.csv",
+        fisher_result="results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv"
+    output:
+        "results/figures/subtypes/fisher_test_barplot.pdf"
+    script:
+        "src/subtypes/fisher_test_barplot.R"
 
 
 # ==================== TCGA Gene Expression ====================
