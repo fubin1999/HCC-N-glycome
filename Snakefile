@@ -106,6 +106,7 @@ rule all:
         "results/figures/subtypes/subtype_continuous_clinical_boxplots.pdf",
         "results/figures/subtypes/hypergeometric_test_heatmap.pdf",
         "results/figures/subtypes/fisher_test_barplot.pdf",
+        "results/figures/subtypes/compare_with_other_group_heatmap.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -817,6 +818,18 @@ rule fisher_test_barplot:
         "results/figures/subtypes/fisher_test_barplot.pdf"
     script:
         "src/subtypes/fisher_test_barplot.R"
+
+rule compare_with_other_group_heatmap:
+    # Draw heatmap for comparing glycan subtypes with other groups.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        subtypes="results/data/subtypes/consensus_cluster_result.csv",
+        anova_result="results/data/diff_analysis/glycan_ancova.csv"
+    output:
+        "results/figures/subtypes/compare_with_other_group_heatmap.pdf"
+    script:
+        "src/subtypes/compare_with_other_group_heatmap.R"
 
 
 # ==================== TCGA Gene Expression ====================
