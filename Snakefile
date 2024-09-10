@@ -826,8 +826,7 @@ rule compare_with_other_group_heatmap:
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
-        subtypes="results/data/subtypes/consensus_cluster_result.csv",
-        anova_result="results/data/diff_analysis/glycan_ancova.csv"
+        subtypes="results/data/subtypes/consensus_cluster_result.csv"
     output:
         "results/figures/subtypes/compare_with_other_group_heatmap.pdf"
     script:

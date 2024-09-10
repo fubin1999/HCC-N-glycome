@@ -5,20 +5,13 @@ library(circlize)
 # abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 # subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-# anova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
 
 abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
 subtypes <- read_csv(snakemake@input[["subtypes"]])
-anova_result <- read_csv(snakemake@input[["anova_result"]])
-
-diff_glycans <- anova_result %>%
-  filter(Effect == "group", p.adj < 0.05) %>%
-  pull(glycan)
 
 mat <- abundance %>%
   pivot_longer(-sample, names_to = "glycan", values_to = "value") %>%
-  filter(glycan %in% diff_glycans) %>%
   left_join(groups, by = "sample") %>%
   filter(group != "QC") %>%
   left_join(subtypes %>% mutate(subtype = paste0("S", class), .keep = "unused"), by = "sample") %>%
