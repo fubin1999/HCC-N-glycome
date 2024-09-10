@@ -832,28 +832,21 @@ rule compare_with_other_group_heatmap:
     script:
         "src/subtypes/compare_with_other_group_heatmap.R"
 
-rule subtype_with_other_groups_glycan_pairwise_ttest:
+rule pairwise_comparison_of_glycans_between_subtypes_and_other_groups:
     # Perform pairwise t-test between subtypes and other groups
     # to find differential glycans.
+    # Also, draw heatmap for comparing glycan subtypes with other groups.
+    # This heatmap shows the fold changes of each comparison,
+    # as well as the significance of the difference.
     input:
         abundance=PROCESSED_ABUNDANCE,
         groups=GROUPS,
         subtypes="results/data/subtypes/consensus_cluster_result.csv"
     output:
         "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv"
-    script:
-        "src/subtypes/subtype_control_pairwise_ttest.R"
-
-rule compare_with_other_group_FC_heatmap:
-    # Draw heatmap for comparing glycan subtypes with other groups.
-    # This heatmap shows the fold changes of each comparison,
-    # as well as the significance of the difference.
-    input:
-        "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv"
-    output:
         "results/figures/subtypes/compare_with_other_group_FC_heatmap.pdf"
     script:
-        "src/subtypes/pairwise_compare_heatmap.R"
+        "src/subtypes/subtype_control_pairwise_glycan_diff.R"
 
 
 # ==================== TCGA Gene Expression ====================
