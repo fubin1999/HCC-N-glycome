@@ -108,6 +108,7 @@ rule all:
         "results/figures/subtypes/hypergeometric_test_heatmap.pdf",
         "results/figures/subtypes/fisher_test_barplot.pdf",
         "results/figures/subtypes/compare_with_other_group_heatmap.pdf",
+        "results/figures/subtypes/compare_with_other_group_FC_heatmap.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -843,6 +844,17 @@ rule subtype_with_other_groups_glycan_pairwise_ttest:
         "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv"
     script:
         "src/subtypes/subtype_control_pairwise_ttest.R"
+
+rule compare_with_other_group_FC_heatmap:
+    # Draw heatmap for comparing glycan subtypes with other groups.
+    # This heatmap shows the fold changes of each comparison,
+    # as well as the significance of the difference.
+    input:
+        "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv"
+    output:
+        "results/figures/subtypes/compare_with_other_group_FC_heatmap.pdf"
+    script:
+        "src/subtypes/pairwise_compare_heatmap.R"
 
 
 # ==================== TCGA Gene Expression ====================
