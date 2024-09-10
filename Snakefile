@@ -97,6 +97,7 @@ rule all:
         "results/data/subtypes/subtype_with_categoric_clinical_post_hoc_result.csv",
         "results/data/subtypes/subtype_coexp_module_anova.csv",
         "results/data/subtypes/subtype_coexp_module_post_hoc.csv",
+        "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -830,6 +831,18 @@ rule compare_with_other_group_heatmap:
         "results/figures/subtypes/compare_with_other_group_heatmap.pdf"
     script:
         "src/subtypes/compare_with_other_group_heatmap.R"
+
+rule subtype_with_other_groups_glycan_pairwise_ttest:
+    # Perform pairwise t-test between subtypes and other groups
+    # to find differential glycans.
+    input:
+        abundance=PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        subtypes="results/data/subtypes/consensus_cluster_result.csv"
+    output:
+        "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv"
+    script:
+        "src/subtypes/subtype_control_pairwise_ttest.R"
 
 
 # ==================== TCGA Gene Expression ====================
