@@ -98,6 +98,7 @@ rule all:
         "results/data/subtypes/subtype_coexp_module_anova.csv",
         "results/data/subtypes/subtype_coexp_module_post_hoc.csv",
         "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv",
+        "results/data/subtypes/subtype_with_other_groups_clinical_wilcox.csv",
 
         # ===== Molecular Subtypes Figures =====
         "results/figures/subtypes/cc_result/",
@@ -108,7 +109,8 @@ rule all:
         "results/figures/subtypes/hypergeometric_test_heatmap.pdf",
         "results/figures/subtypes/fisher_test_barplot.pdf",
         "results/figures/subtypes/compare_with_other_group_heatmap.pdf",
-        "results/figures/subtypes/compare_with_other_group_FC_heatmap.pdf",
+        "results/figures/subtypes/compare_with_other_group_glycan_diff_heatmap.pdf",
+        "results/figures/subtypes/compare_with_other_group_clinical_diff_heatmap.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -843,10 +845,23 @@ rule pairwise_comparison_of_glycans_between_subtypes_and_other_groups:
         groups=GROUPS,
         subtypes="results/data/subtypes/consensus_cluster_result.csv"
     output:
-        "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv"
-        "results/figures/subtypes/compare_with_other_group_FC_heatmap.pdf"
+        "results/data/subtypes/subtype_with_other_groups_glycan_ttest.csv",
+        "results/figures/subtypes/compare_with_other_group_glycan_diff_heatmap.pdf"
     script:
         "src/subtypes/subtype_control_pairwise_glycan_diff.R"
+
+rule pairwise_comparison_of_clinical_between_subtypes_and_other_groups:
+    # Perform pairwise t-test between subtypes and other groups
+    # to find differential clinical variables.
+    input:
+        clinical=CLINICAL,
+        groups=GROUPS,
+        subtypes="results/data/subtypes/consensus_cluster_result.csv"
+    output:
+        "results/data/subtypes/subtype_with_other_groups_clinical_wilcox.csv",
+        "results/figures/subtypes/compare_with_other_group_clinical_diff_heatmap.pdf"
+    script:
+        "src/subtypes/subtype_control_pairwise_clinical_diff.R"
 
 
 # ==================== TCGA Gene Expression ====================
