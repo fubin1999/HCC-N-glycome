@@ -346,7 +346,9 @@ rule glycan_ancova:
         clinical=CLINICAL
     output:
         ancova="results/data/diff_analysis/glycan_ancova.csv",
-        posthoc="results/data/diff_analysis/glycan_post_hoc.csv"
+        posthoc="results/data/diff_analysis/glycan_post_hoc.csv",
+        ancova_lf_adjusted="results/data/diff_analysis/glycan_ancova_lf_adjusted.csv",
+        posthoc_lf_adjusted="results/data/diff_analysis/glycan_post_hoc_lf_adjusted.csv"
     script:
         "src/diff_analysis/glycan_ancova.R"
 
