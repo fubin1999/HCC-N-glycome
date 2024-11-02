@@ -67,12 +67,13 @@ to_be_combated <- normalized |>
   column_to_rownames(var = "glycan") %>%
   as.matrix() %>%
   log()
-batches <- plates %>%
+batch_data <- plates %>%
+  mutate(group = str_extract(raw_sample, "^[A-Z]+")) %>%
   column_to_rownames("sample") %>%
-  .[colnames(to_be_combated), "plate"] %>%
-  as.factor()
-mod_combat <- model.matrix(~1, data = data.frame(plate = batches))
-combat_data <- ComBat(dat = to_be_combated, batch = batches, mod = mod_combat, ref.batch = 1)
+  .[colnames(to_be_combated), c("plate", "group")] %>%
+  mutate(plate = as.factor(plate), group = as.factor(group))
+mod_combat <- model.matrix(~group, data = batch_data)
+combat_data <- ComBat(dat = to_be_combated, batch = batch_data$plate, mod = mod_combat, ref.batch = 1)
 final_data <- combat_data %>%
   exp() %>%
   t() %>% as.data.frame() %>% rownames_to_column("sample") %>%
