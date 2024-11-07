@@ -42,6 +42,7 @@ rule all:
         "results/figures/diff_analysis/detect_rate_diff.pdf",
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
+        "results/figures/diff_analysis/glycan_volcanos_lf_adjusted.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
         "results/figures/diff_analysis/glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_volcanos.pdf",
@@ -402,6 +403,17 @@ rule glycan_volcano:
         "results/data/diff_analysis/glycan_fold_change.csv"
     output:
         "results/figures/diff_analysis/glycan_volcanos.pdf"
+    script:
+        "src/diff_analysis/glycan_volcano.R"
+
+rule glycan_volcano_lf_adjusted:
+    # Draw glycan volcano plots with liver function adjusted.
+    input:
+        "results/data/diff_analysis/glycan_ancova_lf_adjusted.csv",
+        "results/data/diff_analysis/glycan_post_hoc_lf_adjusted.csv",
+        "results/data/diff_analysis/glycan_fold_change.csv"
+    output:
+        "results/figures/diff_analysis/glycan_volcanos_lf_adjusted.pdf"
     script:
         "src/diff_analysis/glycan_volcano.R"
 
