@@ -89,6 +89,11 @@ rule all:
         "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf",
         "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf",
 
+        # ===== Linear Regression Model =====
+        "results/data/models/model_comparison.csv",
+        "results/data/models/parameters.csv",
+        "results/figures/models/model_check/",
+
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
         "results/data/subtypes/subtype_glycan_anova.csv",
@@ -887,6 +892,25 @@ rule pairwise_comparison_of_clinical_between_subtypes_and_other_groups:
         "results/figures/subtypes/compare_with_other_group_clinical_diff_heatmap.pdf"
     script:
         "src/subtypes/subtype_control_pairwise_clinical_diff.R"
+
+
+# ==================== Linear Regression Models ====================
+rule compare_lm_models:
+    # Compare the four linear regression models for each GCM:
+    # 1. GCM ~ age + sex + group
+    # 2. GCM ~ age + sex + ALBI_score
+    # 3. GCM ~ age + sex + group + ALBI_score
+    # 4. GCM ~ age + sex + group * ALBI_score
+    input:
+        "results/data/glycan_coexpr/eigen_glycans.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/models/model_comparison.csv",
+        "results/data/models/parameters.csv",
+        directory("results/figures/models/model_check/")
+    script:
+        "src/models/model_comparison.R"
 
 
 # ==================== TCGA Gene Expression ====================
