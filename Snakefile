@@ -43,6 +43,7 @@ rule all:
         "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_volcanos_lf_adjusted.pdf",
+        "results/figures/diff_analysis/glycan_p_comparison_lf_adjusted.pdf",
         "results/figures/diff_analysis/glycan_diff_bubble.pdf",
         "results/figures/diff_analysis/glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_volcanos.pdf",
@@ -416,6 +417,16 @@ rule glycan_volcano_lf_adjusted:
         "results/figures/diff_analysis/glycan_volcanos_lf_adjusted.pdf"
     script:
         "src/diff_analysis/glycan_volcano.R"
+
+rule compare_p_values_lf_adjusted:
+    # Compare the p-values of glycans between each group pair with liver function adjusted.
+    input:
+        "results/data/diff_analysis/glycan_ancova.csv",
+        "results/data/diff_analysis/glycan_ancova_lf_adjusted.csv"
+    output:
+        "results/figures/diff_analysis/glycan_p_comparison_lf_adjusted.pdf",
+    script:
+        "src/diff_analysis/compare_p_lf_adjusted.R"
 
 rule glycan_violin_plots:
     # Plot violin plots for all significant glycans.
