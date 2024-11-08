@@ -90,12 +90,14 @@ rule all:
         "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf",
 
         # ===== Linear Regression Model Data =====
-        "results/data/models/model_comparison.csv",
-        "results/data/models/parameters.csv",
+        "results/data/models/gcm_model_comparison.csv",
+        "results/data/models/gcm_parameters.csv",
+        "results/data/models/glycan_model_performances.csv",
+        "results/data/models/glycan_parameters.csv",
 
         # ===== Linear Regression Model Figures =====
-        "results/figures/models/model_check/",
-        "results/figures/models/model_comparison_radars.pdf",
+        "results/figures/models/gcm_model_check/",
+        "results/figures/models/gcm_model_comparison_radars.pdf",
         "results/figures/models/gcm_forest_plot.pdf",
 
         # ===== Molecular Subtypes Data =====
@@ -910,25 +912,38 @@ rule compare_lm_models:
         GROUPS,
         CLINICAL
     output:
-        "results/data/models/model_comparison.csv",
-        "results/data/models/parameters.csv",
-        directory("results/figures/models/model_check/")
+        "results/data/models/gcm_model_comparison.csv",
+        "results/data/models/gcm_parameters.csv",
+        directory("results/figures/models/gcm_model_check/")
     script:
         "src/models/model_comparison.R"
+
+rule fit_glycan_models:
+    # Fit a lm model for each glycan using this formula:
+    # GCM ~ age + sex + group + ALBI_score
+    input:
+        "results/data/prepared/processed_abundance.csv",
+        GROUPS,
+        CLINICAL
+    output:
+        "results/data/models/glycan_model_performances.csv",
+        "results/data/models/glycan_parameters.csv"
+    script:
+        "src/models/glycan_models.R"
 
 rule plot_model_comparison_radars:
     # Draw radar plots for model comparison.
     input:
-        "results/data/models/model_comparison.csv"
+        "results/data/models/gcm_model_comparison.csv"
     output:
-        "results/figures/models/model_comparison_radars.pdf"
+        "results/figures/models/gcm_model_comparison_radars.pdf"
     script:
         "src/models/model_compare_radar.R"
 
 rule plot_gcm_forest_plot:
     # Draw forest plot for each GCM.
     input:
-        "results/data/models/parameters.csv"
+        "results/data/models/gcm_parameters.csv"
     output:
         "results/figures/models/gcm_forest_plot.pdf"
     script:
