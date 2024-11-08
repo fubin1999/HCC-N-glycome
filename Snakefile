@@ -96,6 +96,7 @@ rule all:
         # ===== Linear Regression Model Figures =====
         "results/figures/models/model_check/",
         "results/figures/models/model_comparison_radars.pdf",
+        "results/figures/models/gcm_forest_plot.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -923,6 +924,15 @@ rule plot_model_comparison_radars:
         "results/figures/models/model_comparison_radars.pdf"
     script:
         "src/models/model_compare_radar.R"
+
+rule plot_gcm_forest_plot:
+    # Draw forest plot for each GCM.
+    input:
+        "results/data/models/parameters.csv"
+    output:
+        "results/figures/models/gcm_forest_plot.pdf"
+    script:
+        "src/models/gcm_forest_plot.R"
 
 
 # ==================== TCGA Gene Expression ====================
