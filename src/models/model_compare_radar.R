@@ -8,7 +8,13 @@ compare_data <- read_csv(snakemake@input[[1]])
 
 # Prepare data-----
 plot_data <- compare_data %>%
-  mutate(name = factor(name, levels = c("ALBI", "group", "group + ALBI", "group * ALBI"))) %>%
+  mutate(name = factor(
+    name, levels = c(
+      "sex + age + ALBI",
+      "sex + age + group",
+      "sex + age + group + ALBI",
+      "sex + age + group * ALBI"
+    ))) %>%
   select(gcm, name, AIC_wt, AICc_wt, BIC_wt, RMSE, Sigma, gcm, R2, R2_adjusted) %>%
   rename(AIC = AIC_wt, AICc = AICc_wt, BIC = BIC_wt, `R2(adj)` = R2_adjusted) %>%
   mutate(across(c(Sigma, RMSE), ~ -.))
@@ -36,4 +42,4 @@ suppressWarnings(
 
 suppressWarnings(final_p <- reduce(plot_df$plot, `+`) + plot_layout(guides = "collect"))
 # suppressWarnings(tgutil::ggpreview(final_p, width = 14, height = 8))
-ggsave(snakemake@output[[1]], final_p, width = 14, height = 8)
+ggsave(snakemake@output[[1]], final_p, width = 15, height = 8)

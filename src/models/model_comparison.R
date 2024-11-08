@@ -23,10 +23,10 @@ data <- gcm_data %>%
 
 # Model comparison-----
 formulas <- list(
-  "group" = eigen_glycan ~ sex + age + group,
-  "ALBI" = eigen_glycan ~ sex + age + ALBI_score,
-  "group + ALBI" = eigen_glycan ~ sex + age + group + ALBI_score,
-  "group * ALBI" = eigen_glycan ~ sex + age + group * ALBI_score
+  "sex + age + group" = eigen_glycan ~ sex + age + group,
+  "sex + age + ALBI" = eigen_glycan ~ sex + age + ALBI_score,
+  "sex + age + group + ALBI" = eigen_glycan ~ sex + age + group + ALBI_score,
+  "sex + age + group * ALBI" = eigen_glycan ~ sex + age + group * ALBI_score
 )
 
 data_list <- data %>%
