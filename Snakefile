@@ -89,10 +89,13 @@ rule all:
         "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf",
         "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf",
 
-        # ===== Linear Regression Model =====
+        # ===== Linear Regression Model Data =====
         "results/data/models/model_comparison.csv",
         "results/data/models/parameters.csv",
+
+        # ===== Linear Regression Model Figures =====
         "results/figures/models/model_check/",
+        "results/figures/models/model_comparison_radars.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -911,6 +914,15 @@ rule compare_lm_models:
         directory("results/figures/models/model_check/")
     script:
         "src/models/model_comparison.R"
+
+rule plot_model_comparison_radars:
+    # Draw radar plots for model comparison.
+    input:
+        "results/data/models/model_comparison.csv"
+    output:
+        "results/figures/models/model_comparison_radars.pdf"
+    script:
+        "src/models/model_compare_radar.R"
 
 
 # ==================== TCGA Gene Expression ====================
