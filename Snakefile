@@ -86,6 +86,7 @@ rule all:
         "results/figures/cor_with_liver_function/ALBI_model_confusion_matrix_grouped.pdf",
         "results/figures/cor_with_liver_function/ALBI_model_prob_ridge_plot.pdf",
         "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf",
+        "results/figures/cor_with_liver_function/correlation_comparison.pdf",
 
         # ===== Linear Regression Model Data =====
         "results/data/models/gcm_model_comparison.csv",
@@ -693,6 +694,16 @@ rule ALBI_score_model:
         "results/figures/cor_with_liver_function/ALBI_score_model_prediction.pdf"
     script:
         "src/cor_with_liver_function/ALBI_score_model.R"
+
+rule compare_r_grouped_vs_global:
+    # Compare the correlation results between grouped and global.
+    input:
+        "results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv",
+        "results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv"
+    output:
+        "results/figures/cor_with_liver_function/correlation_comparison.pdf"
+    script:
+        "src/cor_with_liver_function/compare_r_grouped_vs_global.R"
 
 
 # ==================== Molecular Subtypes ====================
