@@ -32,7 +32,7 @@ trait_long <- trait_data %>%
 eigen_long <- eigen_data %>%
   mutate(feature = str_c("GCM", cluster), value = eigen_glycan, .keep = "unused")
 
-numeric_lf_variables <- c("AST", "ALT", "GGT", "ALB", "TBIL", "TP", "AAR")
+numeric_lf_variables <- c("AST", "ALT", "GGT", "ALB", "TBIL", "TP", "AAR", "ALBI_score")
 categorical_lf_variables <- c("child_pugh", "ALBI_stage")
 liver_function_variables <- c(numeric_lf_variables, categorical_lf_variables)
 
