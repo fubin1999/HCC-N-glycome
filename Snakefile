@@ -102,6 +102,7 @@ rule all:
         "results/figures/models/gcm_model_comparison_radars.pdf",
         "results/figures/models/gcm_forest_plot.pdf",
         "results/figures/models/glycan_forest_plot.pdf",
+        "results/figures/models/trait_forest_plot.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -954,14 +955,16 @@ rule plot_gcm_forest_plot:
     script:
         "src/models/gcm_forest_plot.R"
 
-rule plot_glycan_forest_plot:
-    # Draw forest plot for each glycan.
+rule plot_lm_forest_plot:
+    # Draw forest plot for each glycan or derived trait.
     input:
-        "results/data/models/glycan_parameters.csv"
+        "results/data/models/{var_name}_parameters.csv"
+    params:
+        var_name="{var_name}"
     output:
-        "results/figures/models/glycan_forest_plot.pdf"
+        "results/figures/models/{var_name}_forest_plot.pdf"
     script:
-        "src/models/glycan_forest_plot.R"
+        "src/models/lm_forest_plot.R"
 
 
 # ==================== TCGA Gene Expression ====================

@@ -4,10 +4,11 @@ library(patchwork)
 # Load data-----
 # param_data <- read_csv("results/data/models/glycan_parameters.csv")
 param_data <- read_csv(snakemake@input[[1]])
+var_name <- snakemake@params[["var_name"]]
 
 # Plot-----
 plot_forest <- function(data) {
-  ggplot(data, aes(Std_Coefficient, glycan)) +
+  ggplot(data, aes(Std_Coefficient, .data[[var_name]])) +
     geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
     geom_errorbar(aes(xmin = CI_low, xmax = CI_high), width = 0.4) +
     geom_point(aes(fill = Std_Coefficient), color = "black", size = 2.5, shape = 22) +
