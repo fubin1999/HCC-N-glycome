@@ -28,6 +28,6 @@ LC_p <- param_data %>% filter(Parameter == "Group: LC") %>% plot_forest() + ggti
 CHB_p <- param_data %>% filter(Parameter == "Group: CHB") %>% plot_forest() + ggtitle("Group: CHB")
 ALBI_p <- param_data %>% filter(Parameter == "ALBI Score") %>% plot_forest() + ggtitle("ALBI Score")
 
-final_p <- ALBI_p + CHB_p + LC_p + HCC_p + plot_layout(nrow = 1, axes = "collect_y")
+final_p <- ALBI_p + CHB_p + LC_p + HCC_p + plot_layout(nrow = 1, axes = "collect_y") & xlim(-1.5, 1.9)
 # tgutil::ggpreview(final_p, width = 8, height = 8)
 ggsave(snakemake@output[[1]], final_p, width = 8, height = 8)
