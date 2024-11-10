@@ -37,22 +37,35 @@ plot_data <- data %>%
 mat <- plot_data %>%
   select(-trait_type) %>%
   column_to_rownames("trait") %>%
-  as.matrix()
+  as.matrix() %>%
+  t()
 
-row_split <- plot_data %>%
+col_split <- plot_data %>%
   pull(trait_type)
 
 col_fun <- colorRamp2(c(-1, 0, 1), c("#275D87", "white", "#D26F32"))
-pdf(snakemake@output[[1]])
-Heatmap(
+
+ht <- Heatmap(
   mat,
   name = "Z-score",
   col = col_fun,
   width = unit(ncol(mat) / 2.5, "cm"),
   height = unit(nrow(mat) / 2.5, "cm"),
-  cluster_columns = FALSE,
-  row_split = row_split,
-  cluster_row_slices = FALSE,
-  rect_gp = gpar(col = "white", lwd = 1)
+  cluster_rows = FALSE,
+  column_names_rot = 60,
+  column_names_gp = gpar(fontsize = 10),
+  row_names_gp = gpar(fontsize = 10),
+  column_title_gp = gpar(fontsize = 10),
+  column_split = col_split,
+  cluster_column_slices = FALSE,
+  rect_gp = gpar(col = "white", lwd = 1.5)
 )
+ht <- draw(ht)
+w <- ComplexHeatmap:::width(ht)
+w <- convertX(w, "inch", valueOnly = TRUE)
+h <- ComplexHeatmap:::height(ht)
+h <- convertY(h, "inch", valueOnly = TRUE)
+
+pdf(snakemake@output[[1]], width = w, height = h)
+draw(ht)
 dev.off()
