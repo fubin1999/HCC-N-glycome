@@ -103,6 +103,7 @@ rule all:
         "results/figures/models/gcm_forest_plot.pdf",
         "results/figures/models/glycan_forest_plot.pdf",
         "results/figures/models/trait_forest_plot.pdf",
+        "results/figures/models/key_trait_forest_plot.pdf",
 
         # ===== Molecular Subtypes Data =====
         "results/data/subtypes/consensus_cluster_result.csv",
@@ -965,6 +966,15 @@ rule plot_lm_forest_plot:
         "results/figures/models/{var_name}_forest_plot.pdf"
     script:
         "src/models/lm_forest_plot.R"
+
+rule plot_forest_plot_for_key_traits:
+    # Draw forest plot for key traits.
+    input:
+        "results/data/models/trait_parameters.csv"
+    output:
+        "results/figures/models/key_trait_forest_plot.pdf"
+    script:
+        "src/models/key_traits_forest_plot.R"
 
 
 # ==================== TCGA Gene Expression ====================
