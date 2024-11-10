@@ -618,14 +618,15 @@ rule relation_with_liver_function:
         "src/cor_with_liver_function/relation_with_liver_function.R"
 
 rule liver_function_heatmap:
-    # Draw the heatmap showing the relationship between glycans and
+    # Draw the heatmap showing the relationship between glycans/traits and
     # liver function clinical variables.
     input:
         "results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv",
         "results/data/cor_with_liver_function/global_ttest_result_with_liver_functions.csv"
+    params:
+        var_name="{var_name}"
     output:
-        "results/figures/cor_with_liver_function/glycan_liver_function_heatmap.pdf",
-        "results/figures/cor_with_liver_function/trait_liver_function_heatmap.pdf"
+        "results/figures/cor_with_liver_function/{var_name}_liver_function_heatmap.pdf",
     script:
         "src/cor_with_liver_function/glycan_with_clinical_heatmap.R"
 
