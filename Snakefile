@@ -94,6 +94,8 @@ rule all:
         "results/data/models/gcm_parameters.csv",
         "results/data/models/glycan_model_performances.csv",
         "results/data/models/glycan_parameters.csv",
+        "results/data/models/trait_model_performances.csv",
+        "results/data/models/trait_parameters.csv",
 
         # ===== Linear Regression Model Figures =====
         "results/figures/models/gcm_model_check/",
@@ -919,18 +921,20 @@ rule compare_lm_models:
     script:
         "src/models/model_comparison.R"
 
-rule fit_glycan_models:
-    # Fit a lm model for each glycan using this formula:
+rule fit_lm_models:
+    # Fit a lm model for each glycan or trait using this formula:
     # GCM ~ age + sex + group + ALBI_score
     input:
-        "results/data/prepared/processed_abundance.csv",
-        GROUPS,
-        CLINICAL
+        data=lambda wildcards: FILTERED_DERIVED_TRAITS if wildcards.var_name == "trait" else PROCESSED_ABUNDANCE,
+        groups=GROUPS,
+        clinical=CLINICAL
+    params:
+        var_name="{var_name}"
     output:
-        "results/data/models/glycan_model_performances.csv",
-        "results/data/models/glycan_parameters.csv"
+        "results/data/models/{var_name}_model_performances.csv",
+        "results/data/models/{var_name}_parameters.csv"
     script:
-        "src/models/glycan_models.R"
+        "src/models/lm_models.R"
 
 rule plot_model_comparison_radars:
     # Draw radar plots for model comparison.
