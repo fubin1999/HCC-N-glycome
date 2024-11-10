@@ -40,24 +40,18 @@ rule all:
         "results/data/diff_analysis/trait_ancova_lf_adjusted.csv",
         "results/data/diff_analysis/trait_post_hoc.csv",
         "results/data/diff_analysis/trait_post_hoc_lf_adjusted.csv",
-        "results/data/diff_analysis/trait_fold_change.csv",
 
         # ===== Differential Analysis Figures =====
         "results/figures/diff_analysis/detect_rate_diff.pdf",
-        "results/figures/diff_analysis/glycan_diff_rose_plot.pdf",
         "results/figures/diff_analysis/glycan_violin_plots.pdf",
         "results/figures/diff_analysis/glycan_volcanos_lf_adjusted.pdf",
         "results/figures/diff_analysis/glycan_p_comparison_lf_adjusted.pdf",
-        "results/figures/diff_analysis/glycan_diff_bubble.pdf",
         "results/figures/diff_analysis/glycan_heatmap.pdf",
         "results/figures/diff_analysis/glycan_volcanos.pdf",
         "results/figures/diff_analysis/glycan_compare_FC.pdf",
         "results/figures/diff_analysis/glycan_compare_p.pdf",
-        "results/figures/diff_analysis/glycan_confounders.pdf",
         "results/figures/diff_analysis/glycan_pca.pdf",
-        "results/figures/diff_analysis/trait_confounders.pdf",
         "results/figures/diff_analysis/trait_boxplots.pdf",
-        "results/figures/diff_analysis/trait_diff_bubble.pdf",
         "results/figures/diff_analysis/trait_heatmap.pdf",
 
         # ===== Glycan Coexpression Module Data =====
@@ -402,27 +396,6 @@ rule glycan_fold_change:
     script:
         "src/diff_analysis/glycan_fold_change.R"
 
-rule glycan_diff_rose_plot:
-    # Draw rose plot for differential glycans between each group pair.
-    input:
-        "results/data/diff_analysis/glycan_ancova.csv",
-        "results/data/diff_analysis/glycan_post_hoc.csv"
-    output:
-        "results/figures/diff_analysis/glycan_diff_rose_plot.pdf"
-    script:
-        "src/diff_analysis/glycan_diff_rose_plot.R"
-
-rule glycan_diff_bubble:
-    # Draw bubble plot for p-values and fold changes of glycans.
-    input:
-        "results/data/diff_analysis/glycan_ancova.csv",
-        "results/data/diff_analysis/glycan_post_hoc.csv",
-        "results/data/diff_analysis/glycan_fold_change.csv",
-    output:
-        "results/figures/diff_analysis/glycan_diff_bubble.pdf"
-    script:
-        "src/diff_analysis/glycan_diff_bubble.R"
-
 rule glycan_heatmap:
     # Draw mean heatmap for differential glycans.
     input:
@@ -495,15 +468,6 @@ rule compare_glycan_p:
     script:
         "src/diff_analysis/compare_p.R"
 
-rule glycan_confounders:
-    # Plot dot plot for confounders' p-values.
-    input:
-        "results/data/diff_analysis/glycan_ancova.csv"
-    output:
-        "results/figures/diff_analysis/glycan_confounders.pdf"
-    script:
-        "src/diff_analysis/glycan_confounder_dot_plot.R"
-
 rule glycan_pca:
     # Draw PCA plots for glycan abundance.
     input:
@@ -513,25 +477,6 @@ rule glycan_pca:
         "results/figures/diff_analysis/glycan_pca.pdf"
     script:
         "src/diff_analysis/glycan_pca.R"
-
-rule trait_fold_change:
-    # Calculate fold changes for each derived trait.
-    input:
-        FILTERED_DERIVED_TRAITS,
-        GROUPS
-    output:
-        "results/data/diff_analysis/trait_fold_change.csv"
-    script:
-        "src/diff_analysis/trait_fold_change.R"
-
-rule trait_confounders:
-    # Plot dot plot for confounders' p-values.
-    input:
-        "results/data/diff_analysis/trait_ancova.csv"
-    output:
-        "results/figures/diff_analysis/trait_confounders.pdf"
-    script:
-        "src/diff_analysis/trait_confounder_dot_plot.R"
 
 rule trait_boxplots:
     # Draw boxplots for selected derived traits.
@@ -543,15 +488,6 @@ rule trait_boxplots:
        "results/figures/diff_analysis/trait_boxplots.pdf"
     script:
         "src/diff_analysis/trait_boxplots.R"
-
-rule trait_diff_bubble:
-    # Draw bubble plot for differential derived traits.
-    input:
-        "results/data/diff_analysis/trait_post_hoc.csv"
-    output:
-        "results/figures/diff_analysis/trait_diff_bubble.pdf"
-    script:
-        "src/diff_analysis/trait_diff_bubble.R"
 
 rule trait_heatmap:
     # Draw heatmap for derived traits.
