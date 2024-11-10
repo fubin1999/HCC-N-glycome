@@ -35,6 +35,7 @@ plot_list <- plot_data %>%
   mutate(plot = list(plot_forest(data) + ggtitle(Parameter))) %>%
   select(Parameter, plot) %>%
   deframe()
+plot_list <- plot_list[c("ALBI Score", "Group: CHB", "Group: LC", "Group: HCC")]
 
 final_p <- reduce(plot_list, `+`) +
   plot_layout(nrow = 1, axes = "collect_y") &
