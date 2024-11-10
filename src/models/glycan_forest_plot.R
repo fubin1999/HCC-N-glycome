@@ -23,11 +23,20 @@ plot_forest <- function(data) {
     )
 }
 
-HCC_p <- param_data %>% filter(Parameter == "Group: HCC") %>% plot_forest() + ggtitle("Group: HCC")
-LC_p <- param_data %>% filter(Parameter == "Group: LC") %>% plot_forest() + ggtitle("Group: LC")
-CHB_p <- param_data %>% filter(Parameter == "Group: CHB") %>% plot_forest() + ggtitle("Group: CHB")
-ALBI_p <- param_data %>% filter(Parameter == "ALBI Score") %>% plot_forest() + ggtitle("ALBI Score")
+plot_data <- param_data %>%
+  filter(Parameter %in% c("ALBI Score", "Group: CHB", "Group: LC", "Group: HCC"))
 
-final_p <- ALBI_p + CHB_p + LC_p + HCC_p + plot_layout(nrow = 1, axes = "collect_y") & xlim(-1.5, 1.9)
+max_x <- max(plot_data$CI_high)
+min_x <- min(plot_data$CI_low)
+
+plot_list <- plot_data %>%
+  nest_by(Parameter) %>%
+  mutate(plot = list(plot_forest(data) + ggtitle(Parameter))) %>%
+  select(Parameter, plot) %>%
+  deframe()
+
+final_p <- reduce(plot_list, `+`) +
+  plot_layout(nrow = 1, axes = "collect_y") &
+  xlim(min_x, max_x)
 # tgutil::ggpreview(final_p, width = 8, height = 8)
 ggsave(snakemake@output[[1]], final_p, width = 8, height = 8)
