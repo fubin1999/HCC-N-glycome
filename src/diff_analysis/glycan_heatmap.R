@@ -29,15 +29,16 @@ heatmap_data <- abundance %>%
   summarise(mean_z_score = mean(value), .groups = "drop")
 
 heatmap <- ggplot(heatmap_data, aes(glycan, group)) +
-  geom_tile(aes(fill = mean_z_score)) +
+  geom_tile(aes(fill = mean_z_score), color = "white", linewidth = 0.8) +
   scale_fill_gradient2(high = "#D26F32", low = "#275D87", mid = "white") +
   labs(x = "", y = "", fill = "z-score") +
   theme_minimal() +
   theme(
-    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.text.x = element_text(angle = 60, hjust = 1, vjust = 1.1),
     legend.direction = "horizontal",
-    panel.grid = element_blank()
+    panel.grid = element_blank(),
+    legend.position = "bottom"
   )
 
-# tgutil::ggpreview(width = 10, height = 2)
-ggsave(snakemake@output[[1]], plot = heatmap, width = 10, height = 2)
+# tgutil::ggpreview(width = 10, height = 2.6)
+ggsave(snakemake@output[[1]], plot = heatmap, width = 10, height = 2.6)
