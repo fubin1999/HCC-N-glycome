@@ -32,10 +32,14 @@ rule all:
         # ===== Differential Analysis Data =====
         "results/data/diff_analysis/detect_rate_diff.csv",
         "results/data/diff_analysis/glycan_ancova.csv",
+        "results/data/diff_analysis/glycan_ancova_lf_adjusted.csv",
         "results/data/diff_analysis/glycan_post_hoc.csv",
+        "results/data/diff_analysis/glycan_post_hoc_lf_adjusted.csv",
         "results/data/diff_analysis/glycan_fold_change.csv",
         "results/data/diff_analysis/trait_ancova.csv",
+        "results/data/diff_analysis/trait_ancova_lf_adjusted.csv",
         "results/data/diff_analysis/trait_post_hoc.csv",
+        "results/data/diff_analysis/trait_post_hoc_lf_adjusted.csv",
         "results/data/diff_analysis/trait_fold_change.csv",
 
         # ===== Differential Analysis Figures =====
@@ -356,19 +360,37 @@ rule detection_rate_diff:
     script:
         "src/diff_analysis/glycan_detect_rate.R"
 
-rule glycan_ancova:
-    # Perform ANCOVA for each glycan.
+rule group_ancova:
+    # Perform ANCOVA to investigate the relationship between groups and glycans/traits.
+    # Age and sex are considered as covariates.
     input:
-        abundance=PROCESSED_ABUNDANCE,
+        data=lambda wildcards: PROCESSED_ABUNDANCE if wildcards.var_name == "glycan" else FILTERED_DERIVED_TRAITS,
         groups=GROUPS,
         clinical=CLINICAL
+    params:
+        var_name="{var_name}",
+        cov_albi=False
     output:
-        ancova="results/data/diff_analysis/glycan_ancova.csv",
-        posthoc="results/data/diff_analysis/glycan_post_hoc.csv",
-        ancova_lf_adjusted="results/data/diff_analysis/glycan_ancova_lf_adjusted.csv",
-        posthoc_lf_adjusted="results/data/diff_analysis/glycan_post_hoc_lf_adjusted.csv"
+        "results/data/diff_analysis/{var_name}_ancova.csv",
+        "results/data/diff_analysis/{var_name}_post_hoc.csv"
     script:
-        "src/diff_analysis/glycan_ancova.R"
+        "src/diff_analysis/ancova.R"
+
+rule group_ancova_ALBI_cov:
+    # Perform ANCOVA to investigate the relationship between groups and glycans/traits.
+    # Age, sex and ALBI score are considered as covariates.
+    input:
+        data=lambda wildcards: PROCESSED_ABUNDANCE if wildcards.var_name == "glycan" else FILTERED_DERIVED_TRAITS,
+        groups=GROUPS,
+        clinical=CLINICAL
+    params:
+        var_name="{var_name}",
+        cov_albi=True
+    output:
+        "results/data/diff_analysis/{var_name}_ancova_lf_adjusted.csv",
+        "results/data/diff_analysis/{var_name}_post_hoc_lf_adjusted.csv"
+    script:
+        "src/diff_analysis/ancova.R"
 
 rule glycan_fold_change:
     # Calculate fold changes for each glycan.
@@ -491,18 +513,6 @@ rule glycan_pca:
         "results/figures/diff_analysis/glycan_pca.pdf"
     script:
         "src/diff_analysis/glycan_pca.R"
-
-rule trait_ancova:
-    # Perform ANCOVA on derived traits.
-    input:
-        traits=FILTERED_DERIVED_TRAITS,
-        groups=GROUPS,
-        clinical=CLINICAL
-    output:
-        "results/data/diff_analysis/trait_ancova.csv",
-        "results/data/diff_analysis/trait_post_hoc.csv"
-    script:
-        "src/diff_analysis/trait_ancova.R"
 
 rule trait_fold_change:
     # Calculate fold changes for each derived trait.
