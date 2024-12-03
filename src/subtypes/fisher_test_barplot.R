@@ -55,21 +55,13 @@ plot_fisher <- function (data, var) {
     theme(
       panel.grid = element_blank(),
       axis.title.x = element_blank(),
-      plot.title = element_text(hjust = 0.5, size = 9)
+      plot.title = element_text(hjust = 0.5, size = 9),
+      legend.position = "bottom",
     )
 }
 
 plots <- map(names(colors), ~ plot_fisher(plot_data, .x))
-legends <- map(plots, ~ get_legend(.x))
-plots_no_legend <- map(plots, ~ . + theme(legend.position = "none"))
-combined_legend <- plot_grid(plotlist = legends, ncol = 2, align = "hv", axis = "t")
-combined_plot <- plot_grid(plotlist = plots_no_legend, nrow = 1)
-final_plot <- plot_grid(
-  combined_plot,
-  NULL,
-  combined_legend,
-  nrow = 1, rel_widths = c(80, 5, 15)
-)
+combined_plot <- plot_grid(plotlist = plots, nrow = 1)
 
-# tgutil::ggpreview(final_plot, width = 10, height = 3)
-ggsave(snakemake@output[[1]], final_plot, width = 10, height = 3)
+# tgutil::ggpreview(combined_plot, width = 7.5, height = 2.5)
+ggsave(snakemake@output[[1]], combined_plot, width = 7.5, height = 2.5)
