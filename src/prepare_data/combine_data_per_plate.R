@@ -10,7 +10,8 @@ convert <- function(comp) {
 }
 
 files <- unlist(snakemake@input)
-combined <- read_csv(files) |> 
+combined <- read_csv(files) |>
+  filter(!is.na(glycan)) |>
   complete(sample, glycan, fill = list(value = NA)) |>
   mutate(glycan = convert(glycan))
 wide_data <- combined |>
