@@ -92,7 +92,7 @@ rownames(merged_matrix) <- colnames(merged_matrix)
 W <- checking.gram.similarityMatrix(merged_matrix)
 eigen_values <- eigen(W)$values
 k <- compute.kclust2(eigen_values, 20)
-set.seed(123)
+set.seed(43)
 sc_result <- VonLuxburgSC(W, K = 5, flagDiagZero = TRUE, verbose = TRUE)
 clusters_df <- tibble(
   glycan = rownames(merged_matrix),

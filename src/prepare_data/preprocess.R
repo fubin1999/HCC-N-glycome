@@ -4,14 +4,17 @@ raw_data <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
 clinical <- read_csv(snakemake@input[[3]])
 plates <- read_csv(snakemake@input[[4]])
+chosen_samples <- read_csv(snakemake@input[[5]])$sample
 
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
 # groups <- read_csv("results/data/prepared/unfiltered_groups.csv")
 # clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
 # plates <- read_csv("data/plates.csv")
+# chosen_samples <- read_csv("data/chosen_samples.csv")$sample
 
 # 1. Convert to long-----
 long_data <- raw_data |>
+  filter(sample %in% chosen_samples) |>
   pivot_longer(-sample, names_to = "glycan", values_to = "value")
 
 # 2. Filter samples-----
