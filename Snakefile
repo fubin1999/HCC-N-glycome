@@ -158,7 +158,7 @@ rule build_db:
 rule run_glyhunter:
     # Run GlyHunter on each mass list file.
     input:
-        mass_list="data/mass_list/plate{no}.xlsx",
+        mass_list="data/cohort_GD1/mass_list/plate{no}.xlsx",
         db="results/data/glycan_db.byonic"
     output:
         directory("results/data/glyhunter_results/plate{no}/")
@@ -168,7 +168,7 @@ rule run_glyhunter:
 rule run_glyhunter_default_db:
     # Run GlyHunter with default serum N-glycan database.
     input:
-        "data/mass_list/plate{no}.xlsx"
+        "data/cohort_GD1/mass_list/plate{no}.xlsx"
     output:
         directory("results/data/glyhunter_results_full/plate{no}/")
     shell:
@@ -177,7 +177,7 @@ rule run_glyhunter_default_db:
 rule assign_maldi_pos:
     # Match the MALDI positions of GlyHunter results to samples.
     input:
-        "data/MALDI_positions.csv",
+        "data/cohort_GD1/MALDI_positions.csv",
         "results/data/glyhunter_results/plate{no}/"
     output:
         "results/data/data_per_plate/plate{no}.csv"
@@ -187,7 +187,7 @@ rule assign_maldi_pos:
 rule assign_maldi_pos_full:
     # Match the MALDI positions of GlyHunter results to samples.
     input:
-        "data/MALDI_positions.csv",
+        "data/cohort_GD1/MALDI_positions.csv",
         "results/data/glyhunter_results_full/plate{no}/"
     output:
         "results/data/data_per_plate_full/plate{no}.csv"
@@ -215,7 +215,7 @@ rule combine_data_per_plate_full:
 rule prepare_groups:
     # Prepare the groups.
     input:
-        plates="data/plates.csv"
+        plates="data/cohort_GD1/plates.csv"
     output:
         PREPARED_DIR + "unfiltered_groups.csv"
     script:
@@ -224,8 +224,8 @@ rule prepare_groups:
 rule prepare_clinical:
     # Prepare the clinical information.
     input:
-        clinical="data/clinical.csv",
-        plates="data/plates.csv",
+        clinical="data/cohort_GD1/clinical.csv",
+        plates="data/cohort_GD1/plates.csv",
         groups=PREPARED_DIR + "unfiltered_groups.csv"
     output:
         PREPARED_DIR + "unfiltered_clinical.csv"
@@ -238,8 +238,8 @@ rule preprocess:
         RAW_ABUNDANCE,
         PREPARED_DIR + "unfiltered_groups.csv",
         PREPARED_DIR + "unfiltered_clinical.csv",
-        "data/plates.csv",
-        "data/chosen_samples.csv"
+        "data/cohort_GD1/plates.csv",
+        "data/cohort_GD1/chosen_samples.csv"
     output:
         PROCESSED_ABUNDANCE,
         GROUPS,
@@ -266,7 +266,7 @@ rule batch_effect_pca:
     # Draw PCA plot to check batch effect.
     input:
         PROCESSED_ABUNDANCE,
-        "data/plates.csv"
+        "data/cohort_GD1/plates.csv"
     output:
         "results/figures/data_quality/batch_effect_pca.pdf"
     script:
@@ -714,7 +714,7 @@ rule consensus_clustering:
         RAW_ABUNDANCE,
         PROCESSED_ABUNDANCE,
         GROUPS,
-        "data/plates.csv"
+        "data/cohort_GD1/plates.csv"
     output:
         directory("results/figures/subtypes/cc_result/"),
         "results/data/subtypes/consensus_cluster_result.csv",
