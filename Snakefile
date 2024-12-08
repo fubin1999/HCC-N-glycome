@@ -261,6 +261,17 @@ rule calculate_derived_traits:
         "src/prepare_data/derive_traits.py"
 
 
+rule run_glyhunter_sh:
+    # Run GlyHunter on SH cohort mass lists.
+    input:
+        mass_list="data/cohort_SH/mass_list.xlsx",
+        db="results/data/glycan_db.byonic"
+    output:
+        directory("results/data/glyhunter_results_SH/")
+    shell:
+        "glyhunter run {input.mass_list} -d {input.db} -o {output}"
+
+
 # ==================== Data Quality ====================
 rule batch_effect_pca:
     # Draw PCA plot to check batch effect.
