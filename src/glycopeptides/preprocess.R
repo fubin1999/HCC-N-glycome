@@ -1,8 +1,8 @@
 library(tidyverse)
 
 
-# data <- read_tsv("data/glycoproteome.list") %>%
-#   janitor::clean_names()
+data <- read_tsv("data/glycoproteome.list") %>%
+  janitor::clean_names()
 
 data <- read_tsv(snakemake@input[[1]]) %>%
   janitor::clean_names()
@@ -66,6 +66,10 @@ prepared <- data %>%
     genes = str_remove(genes, ";$"),
     glycan_composition = str_remove_all(glycan_composition, "[\\(\\)]"),
     glycan_composition = str_replace(glycan_composition, "A", "S")
-  )
+  ) %>%
+  select(-group) %>%
+  pivot_wider(names_from = sample, values_from = log2_ratio) %>%
+  pivot_longer(starts_with("GPS"), names_to = "sample", values_to = "log2_ratio") %>%
+  left_join(groups %>% select(sample, group), by = "sample")
 
 write_csv(prepared, snakemake@output[[1]])
