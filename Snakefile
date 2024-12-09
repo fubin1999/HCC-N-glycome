@@ -1085,6 +1085,17 @@ rule prepare_SH_data_for_ml:
         "src/ml/prepare_sh_data_for_ml.R"
 
 
+# ==================== Glycoproteomics ====================
+rule prepare_gp_data:
+    # Prepare glycoproteomics data.
+    input:
+        "data/glycoproteome.list",
+    output:
+        "results/data/glycoproteomics/prepared.csv"
+    script:
+        "src/glycopeptides/preprocess.R"
+
+
 # ==================== Others ====================
 rule draw_complete_glycans:
     # Draw glycans with glycowork with linkage information.
