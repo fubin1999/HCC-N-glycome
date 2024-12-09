@@ -1073,6 +1073,18 @@ rule prepare_data_for_ml:
         "src/ml/prepare_data_for_ml.R"
 
 
+rule prepare_SH_data_for_ml:
+    # Prepare data of SH cohort for machine learning.
+    input:
+        "results/data/glyhunter_results_SH/summary_area.csv",
+        "data/cohort_SH/maldi_pos_and_group.csv",
+        "results/data/ml/train_data.csv"
+    output:
+        "results/data/ml/test_data_SH.csv"
+    script:
+        "src/ml/prepare_sh_data_for_ml.R"
+
+
 # ==================== Others ====================
 rule draw_complete_glycans:
     # Draw glycans with glycowork with linkage information.
