@@ -1065,7 +1065,6 @@ rule prepare_data_for_ml:
     # Prepare data for machine learning.
     input:
         RAW_ABUNDANCE,
-        "results/data/prepared/unfiltered_clinical.csv",
         "results/data/prepared/unfiltered_groups.csv"
     output:
         "results/data/ml/train_data.csv",

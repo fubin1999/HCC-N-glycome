@@ -2,21 +2,23 @@ library(tidyverse)
 
 # Load data-----
 abundance <- read_csv(snakemake@input[[1]])
-clinical <- read_csv(snakemake@input[[2]])
-groups <- read_csv(snakemake@input[[3]])
+groups <- read_csv(snakemake@input[[2]])
 
 # Total Abundance Normalization-----
+selected <- abundance %>%
+  pivot_longer(-sample, names_to = "glycan", values_to = "abundance") %>%
+  summarise(missing_prop = mean(is.na(abundance)), .by = glycan) %>%
+  filter(missing_prop < 0.01) %>%
+  pull(glycan)
+
 normed <- abundance %>%
   pivot_longer(-sample, names_to = "glycan", values_to = "abundance") %>%
+  filter(glycan %in% selected) %>%
   mutate(abundance = abundance / sum(abundance, na.rm = TRUE) * 100, .by = sample) %>%
   pivot_wider(names_from = glycan, values_from = abundance)
 
-clinical_selected <- clinical %>%
-  select(sample, AST, ALT, GGT, ALB, TBIL, TP, AFP, child_pugh, AAR, ALBI_score)
-
 prepared <- groups %>%
   inner_join(normed, by = "sample") %>%
-  inner_join(clinical_selected, by = "sample") %>%
   filter(group != "QC")
 
 # Train-Test Split-----
