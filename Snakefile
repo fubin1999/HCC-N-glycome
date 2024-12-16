@@ -129,6 +129,9 @@ rule all:
         "results/figures/subtypes/compare_with_other_group_glycan_diff_heatmap.pdf",
         "results/figures/subtypes/compare_with_other_group_clinical_diff_heatmap.pdf",
 
+        # ===== Biosynthesis Pathway Analysis Data =====
+        "results/data/biosynthesis/GT_activities.csv",
+
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
@@ -951,6 +954,18 @@ rule plot_forest_plot_for_key_traits:
         "results/figures/models/key_trait_forest_plot.pdf"
     script:
         "src/models/key_traits_forest_plot.R"
+
+
+# ==================== Biosynthesis Pathway Analysis ====================
+rule decoupleR:
+    # Use decoupleR to predict the biosynthesis pathways of glycans.
+    input:
+        PROCESSED_ABUNDANCE,
+        "results/data/prepared/meta_properties.csv"
+    output:
+        "results/data/biosynthesis/GT_activities.csv"
+    script:
+        "src/biosynthesis/decouple.R"
 
 
 # ==================== TCGA Gene Expression ====================
