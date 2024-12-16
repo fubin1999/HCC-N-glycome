@@ -131,6 +131,7 @@ rule all:
 
         # ===== Biosynthesis Pathway Analysis Data =====
         "results/data/biosynthesis/GT_activities.csv",
+        "results/data/biosynthesis/biosynthesis_ttest.csv",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -966,6 +967,16 @@ rule decoupleR:
         "results/data/biosynthesis/GT_activities.csv"
     script:
         "src/biosynthesis/decouple.R"
+
+rule biosynthesis_diff_analysis:
+    # Perform differential analysis on biosynthesis pathways.
+    input:
+        "results/data/biosynthesis/GT_activities.csv",
+        GROUPS
+    output:
+        "results/data/biosynthesis/biosynthesis_ttest.csv"
+    script:
+        "src/biosynthesis/gt_activity_diff.R"
 
 
 # ==================== TCGA Gene Expression ====================
