@@ -133,6 +133,9 @@ rule all:
         "results/data/biosynthesis/GT_activities.csv",
         "results/data/biosynthesis/biosynthesis_ttest.csv",
 
+        # ===== Biosynthesis Pathway Analysis Figures =====
+        "results/figures/biosynthesis/biosynthesis_heatmap.pdf",
+
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
         "results/data/TCGA/consensus_cluster_result.csv",
@@ -977,6 +980,16 @@ rule biosynthesis_diff_analysis:
         "results/data/biosynthesis/biosynthesis_ttest.csv"
     script:
         "src/biosynthesis/gt_activity_diff.R"
+
+rule biosynthesis_heatmap:
+    # Draw heatmap for biosynthesis pathways.
+    input:
+        "results/data/biosynthesis/GT_activities.csv",
+        GROUPS
+    output:
+        "results/figures/biosynthesis/biosynthesis_heatmap.pdf"
+    script:
+        "src/biosynthesis/plot_gt_activities.R"
 
 
 # ==================== TCGA Gene Expression ====================
