@@ -9,8 +9,8 @@ chosen_samples <- read_csv(snakemake@input[[5]])$sample
 # raw_data <- read_csv("results/data/prepared/raw_abundance.csv")
 # groups <- read_csv("results/data/prepared/unfiltered_groups.csv")
 # clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
-# plates <- read_csv("data/plates.csv")
-# chosen_samples <- read_csv("data/chosen_samples.csv")$sample
+# plates <- read_csv("data/cohort_GD1/plates.csv")
+# chosen_samples <- read_csv("data/cohort_GD1/chosen_samples.csv")$sample
 
 # 1. Convert to long-----
 long_data <- raw_data |>
