@@ -135,6 +135,7 @@ rule all:
 
         # ===== Biosynthesis Pathway Analysis Figures =====
         "results/figures/biosynthesis/biosynthesis_heatmap.pdf",
+        "results/figures/biosynthesis/EPO_heatmap.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -990,6 +991,15 @@ rule biosynthesis_heatmap:
         "results/figures/biosynthesis/biosynthesis_heatmap.pdf"
     script:
         "src/biosynthesis/plot_gt_activities.R"
+        
+rule NGlyBAI_EPO_heatmap:
+    # Draw heatmap for NGlyBAI and EPO.
+    input:
+        "data/NC_2021_Bokan_Bao_data.xlsx"
+    output:
+        "results/figures/biosynthesis/EPO_heatmap.pdf"
+    script:
+        "src/biosynthesis/EPO_dataset.R"
 
 
 # ==================== TCGA Gene Expression ====================
