@@ -136,6 +136,9 @@ rule all:
         # ===== Biosynthesis Pathway Analysis Figures =====
         "results/figures/biosynthesis/biosynthesis_heatmap.pdf",
         "results/figures/biosynthesis/EPO_heatmap.pdf",
+        
+        # ===== ROC data =====
+        "results/data/roc/glycan_auc.csv",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -1000,6 +1003,18 @@ rule NGlyBAI_EPO_heatmap:
         "results/figures/biosynthesis/EPO_heatmap.pdf"
     script:
         "src/biosynthesis/EPO_dataset.R"
+        
+
+# ==================== ROC ====================
+rule roc_for_glycans:
+  # Perform ROC analysis on each glycan.
+  input:
+      PROCESSED_ABUNDANCE,
+      GROUPS
+  output:
+      "results/data/roc/glycan_auc.csv"
+  script:
+      "src/roc/single_ROC.R"
 
 
 # ==================== TCGA Gene Expression ====================
