@@ -137,8 +137,9 @@ rule all:
         "results/figures/biosynthesis/biosynthesis_heatmap.pdf",
         "results/figures/biosynthesis/EPO_heatmap.pdf",
         
-        # ===== ROC data =====
+        # ===== ROC =====
         "results/data/roc/glycan_auc.csv",
+        "results/figures/roc/glycan_auc.pdf",
 
         # ===== TCGA Data =====
         "results/data/TCGA/dea_results.csv",
@@ -285,6 +286,17 @@ rule run_glyhunter_sh:
         db="results/data/glycan_db.byonic"
     output:
         directory("results/data/glyhunter_results_SH/")
+    shell:
+        "glyhunter run {input.mass_list} -d {input.db} -o {output}"
+        
+      
+rule run_glyhunter_gd2:
+    # Run GlyHunter on GD2 cohort mass lists.
+    input:
+        mass_list="data/cohort_GD2/mass_list.xlsx",
+        db="results/data/glycan_db.byonic"
+    output:
+        directory("results/data/glyhunter_results_GD2/")
     shell:
         "glyhunter run {input.mass_list} -d {input.db} -o {output}"
 
@@ -1007,14 +1019,23 @@ rule NGlyBAI_EPO_heatmap:
 
 # ==================== ROC ====================
 rule roc_for_glycans:
-  # Perform ROC analysis on each glycan.
-  input:
-      PROCESSED_ABUNDANCE,
-      GROUPS
-  output:
-      "results/data/roc/glycan_auc.csv"
-  script:
-      "src/roc/single_ROC.R"
+    # Perform ROC analysis on each glycan.
+    input:
+        PROCESSED_ABUNDANCE,
+        GROUPS
+    output:
+        "results/data/roc/glycan_auc.csv"
+    script:
+        "src/roc/single_ROC.R"
+      
+rule roc_auc_barplot_for_glycans:
+    # Draw barplot for ROC AUC for glycans.
+    input:
+        "results/data/roc/glycan_auc.csv"
+    output:
+        "results/figures/roc/glycan_auc.pdf"
+    script:
+        "src/roc/glycan_AUC_compare.R"
 
 
 # ==================== TCGA Gene Expression ====================
@@ -1140,8 +1161,7 @@ rule prepare_data_for_ml:
         "results/data/ml/train_data.csv",
         "results/data/ml/test_data.csv"
     script:
-        "src/ml/prepare_data_for_ml.R"
-
+        "src/ml/prepare_train_data.R"
 
 rule prepare_SH_data_for_ml:
     # Prepare data of SH cohort for machine learning.
@@ -1152,7 +1172,18 @@ rule prepare_SH_data_for_ml:
     output:
         "results/data/ml/test_data_SH.csv"
     script:
-        "src/ml/prepare_sh_data_for_ml.R"
+        "src/ml/prepare_val_data.R"
+        
+rule prepare_GD2_data_for_ml:
+    # Prepare data of GD2 cohort for machine learning.
+    input:
+        "results/data/glyhunter_results_GD2/summary_area.csv",
+        "data/cohort_GD2/maldi_pos_and_group.csv",
+        "results/data/ml/train_data.csv"
+    output:
+        "results/data/ml/test_data_GD2.csv"
+    script:
+        "src/ml/prepare_val_data.R"
 
 
 # ==================== Glycoproteomics ====================
