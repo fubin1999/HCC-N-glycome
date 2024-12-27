@@ -4,6 +4,7 @@ library(tidyverse)
 preds <- read_csv("results/data/ml/preds.csv")
 clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
 groups <- read_csv("results/data/prepared/unfiltered_groups.csv")
+subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
 
 
 prepared <- clinical %>% 
@@ -18,6 +19,7 @@ prepared <- clinical %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
 
+# Plots in Main Figure-----
 plots <- list()
 
 
@@ -165,3 +167,31 @@ plots[["TNM"]] <- prepared %>%
 all_p <- cowplot::plot_grid(plotlist = plots, nrow = 1)
 tgutil::ggpreview(all_p, width = 12, height = 2.5)
 ggsave("results/figures/ml/probabilities.pdf", all_p, width = 12, height = 2.5)
+
+
+# Plots in Supplementary Information-----
+subtype_p <- prepared %>% 
+  select(sample, true, proba) %>% 
+  inner_join(subtypes, by = "sample") %>% 
+  mutate(subtype = as.character(class)) %>% 
+  ggplot(aes(subtype, proba)) +
+  ggbeeswarm::geom_quasirandom(aes(color = subtype), width = 0.4) +
+  ggsignif::geom_signif(
+    comparisons = list(c("1", "2"), c("1", "3"), c("2", "3")),
+    step_increase = 0.13, vjust = -0.2, textsize = 3, tip_length = 0,
+    map_signif_level = function(p) {
+      sci_num <- scales::label_scientific(digits = 3)
+      paste0("p = ", sci_num(p))
+    }
+  ) +
+  scale_color_manual(values = RColorBrewer::brewer.pal(5, "Blues")[2:5]) +
+  scale_y_continuous(
+    breaks = c(0, 0.25, 0.5, 0.75, 1),
+    labels = scales::percent_format(accuracy = 1),
+    expand = expansion(mult = c(0.05, 0.1)),
+  ) +
+  labs(x = "Subtypes", y = "Predicted Probability") +
+  guides(color = "none") +
+  theme_classic()
+tgutil::ggpreview(subtype_p, width = 2.5, height = 3)
+ggsave("results/figures/ml/subtype_probabilities.pdf", subtype_p, width = 2.5, height = 3)
