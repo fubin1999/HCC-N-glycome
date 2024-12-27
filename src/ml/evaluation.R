@@ -6,6 +6,8 @@ library(gt)
 
 # Read data-----
 preds <- read_csv("results/data/ml/preds.csv")
+clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
+
 preds <- preds %>% 
   mutate(true = factor(true), pred = factor(pred)) %>% 
   mutate(model = case_match(
@@ -136,3 +138,51 @@ combined_pr <- reduce(pr_df$plot, `+`) + plot_layout(nrow = 1)
 
 tgutil::ggpreview(combined_pr, width = 12, height = 3)
 ggsave("results/figures/ml/pr_curves.pdf", combined_pr, width = 12, height = 3)
+
+
+# Plot ROC comparing models and AFP-----
+plot_roc <- function(data) {
+  data %>% 
+    select(sample, true, model = proba, AFP) %>% 
+    pivot_longer(c(model, AFP), names_to = "predictor", values_to = "value") %>% 
+    group_by(predictor) %>% 
+    roc_curve(true, value, event_level = "second") %>% 
+    autoplot() +
+    scale_color_manual(values = c("#3A3D8F", "#ED6A5A")) +
+    guides(color = guide_legend(title = NULL, position = "inside")) +
+    theme(
+      panel.grid = element_blank(),
+      legend.position.inside = c(0.7, 0.25),
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5)
+    )
+}
+
+prepared_for_delong <- preds %>% 
+  filter(dataset == "test") %>%
+  select(-dataset) %>% 
+  left_join(clinical %>% select(sample, AFP), by = "sample")
+
+delong_res <- prepared_for_delong %>% 
+  nest_by(model) %>% 
+  mutate(
+    model_roc = list(roc(data$true, data$proba)),
+    AFP_roc = list(roc(data$true, data$AFP)),
+    roc_test_res = list(roc.test(model_roc, AFP_roc)),
+    delong_p = roc_test_res$p.value
+  ) %>% 
+  select(model, delong_p)
+
+AFP_roc_plot_df <- prepared_for_delong %>% 
+  nest_by(model) %>% 
+  left_join(delong_res, by = "model") %>%
+  arrange(model) %>%
+  mutate(plot = list(
+    plot_roc(data) + 
+      ggtitle(model) +
+      labs(subtitle = paste("DeLong p-value:", round(delong_p, 3)))
+  ))
+
+AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
+tgutil::ggpreview(AFP_ROC_p, width = 12, height = 3)
+ggsave("results/figures/ml/roc_AFP.pdf", AFP_ROC_p, width = 12, height = 3)
