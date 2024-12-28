@@ -141,18 +141,24 @@ ggsave("results/figures/ml/pr_curves.pdf", combined_pr, width = 12, height = 3)
 
 
 # Plot ROC comparing models and AFP-----
-plot_roc <- function(data) {
+plot_roc_compared_with_AFP <- function(data, AFP_auc, model_auc) {
   data %>% 
     select(sample, true, model = proba, AFP) %>% 
     pivot_longer(c(model, AFP), names_to = "predictor", values_to = "value") %>% 
     group_by(predictor) %>% 
     roc_curve(true, value, event_level = "second") %>% 
     autoplot() +
-    scale_color_manual(values = c("#3A3D8F", "#ED6A5A")) +
+    scale_color_manual(
+      values = c(AFP = "#3A3D8F", model = "#ED6A5A"),
+      labels = c(
+        AFP = str_glue("AFP ({sprintf('%.3f', AFP_auc)})"), 
+        model = str_glue("Model ({sprintf('%.3f', model_auc)})")
+      )
+    ) +
     guides(color = guide_legend(title = NULL, position = "inside")) +
     theme(
       panel.grid = element_blank(),
-      legend.position.inside = c(0.7, 0.25),
+      legend.position.inside = c(0.65, 0.2),
       plot.title = element_text(hjust = 0.5),
       plot.subtitle = element_text(hjust = 0.5)
     )
@@ -166,23 +172,33 @@ prepared_for_delong <- preds %>%
 delong_res <- prepared_for_delong %>% 
   nest_by(model) %>% 
   mutate(
-    model_roc = list(roc(data$true, data$proba)),
-    AFP_roc = list(roc(data$true, data$AFP)),
-    roc_test_res = list(roc.test(model_roc, AFP_roc)),
+    model_roc = list(pROC::roc(data$true, data$proba)),
+    AFP_roc = list(pROC::roc(data$true, data$AFP)),
+    roc_test_res = list(pROC::roc.test(model_roc, AFP_roc)),
     delong_p = roc_test_res$p.value
   ) %>% 
   select(model, delong_p)
 
+auc_df <- prepared_for_delong %>% 
+  select(sample, true, proba, AFP, model) %>% 
+  pivot_longer(c(proba, AFP), names_to = "predictor", values_to = "value") %>%
+  group_by(model, predictor) %>% 
+  roc_auc(true, value, event_level = "second") %>% 
+  pivot_wider(names_from = predictor, values_from = .estimate, names_prefix = "auc_") %>% 
+  select(-c(.metric, .estimator))
+
 AFP_roc_plot_df <- prepared_for_delong %>% 
   nest_by(model) %>% 
   left_join(delong_res, by = "model") %>%
+  left_join(auc_df, by = "model") %>%
   arrange(model) %>%
   mutate(plot = list(
-    plot_roc(data) + 
+    plot_roc_compared_with_AFP(data, auc_AFP, auc_proba) + 
       ggtitle(model) +
       labs(subtitle = paste("DeLong p-value:", round(delong_p, 3)))
   ))
 
+
 AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
-tgutil::ggpreview(AFP_ROC_p, width = 12, height = 3)
-ggsave("results/figures/ml/roc_AFP.pdf", AFP_ROC_p, width = 12, height = 3)
+tgutil::ggpreview(AFP_ROC_p, width = 12, height = 4)
+ggsave("results/figures/ml/roc_AFP.pdf", AFP_ROC_p, width = 12, height = 4)
