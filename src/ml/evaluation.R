@@ -202,3 +202,78 @@ AFP_roc_plot_df <- prepared_for_delong %>%
 AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(AFP_ROC_p, width = 12, height = 4)
 ggsave("results/figures/ml/roc_AFP.pdf", AFP_ROC_p, width = 12, height = 4)
+
+
+# Plot ROC with and without AFP-----
+preds_with_AFP <- read_csv("results/data/ml/AFP_preds.csv") %>% 
+  mutate(true = factor(true), pred = factor(pred)) %>% 
+  mutate(model = case_match(
+    model, 
+    "HCC_HC" ~ "HCC vs HC",
+    "HCC_CHB" ~ "HCC vs CHB",
+    "HCC_LC" ~ "HCC vs LC",
+    "global" ~ "HCC vs Rest",
+  )) %>% 
+  mutate(model = factor(model, levels = c("HCC vs HC", "HCC vs CHB", "HCC vs LC", "HCC vs Rest")))
+
+prepared_for_delong <- bind_rows(list(
+  no_AFP = preds %>% filter(dataset == "test") %>% select(-dataset),
+  has_AFP = preds_with_AFP
+), .id = "features") %>% 
+  select(-pred) %>% 
+  pivot_wider(names_from = features, values_from = proba, names_prefix = "proba_")
+
+delong_res <- prepared_for_delong %>% 
+  nest_by(model) %>% 
+  mutate(
+    has_AFP_roc = list(pROC::roc(data$true, data$proba_has_AFP)),
+    no_AFP_roc = list(pROC::roc(data$true, data$proba_no_AFP)),
+    roc_test_res = list(pROC::roc.test(has_AFP_roc, no_AFP_roc)),
+    delong_p = roc_test_res$p.value
+  ) %>% 
+  select(model, delong_p)
+
+auc_df <- prepared_for_delong %>%
+  select(sample, true, proba_has_AFP, proba_no_AFP, model) %>% 
+  pivot_longer(c(proba_has_AFP, proba_no_AFP), names_to = "predictor", values_to = "value") %>%
+  group_by(model, predictor) %>% 
+  roc_auc(true, value, event_level = "second") %>% 
+  pivot_wider(names_from = predictor, values_from = .estimate, names_prefix = "auc_") %>% 
+  select(-c(.metric, .estimator))
+
+plot_roc_with_and_without_AFP <- function(data, auc_no_AFP, auc_has_AFP) {
+  data %>% 
+    pivot_longer(c(proba_no_AFP, proba_has_AFP), names_to = "predictor", values_to = "value") %>% 
+    group_by(predictor) %>% 
+    roc_curve(true, value, event_level = "second") %>% 
+    autoplot() +
+    scale_color_manual(
+      values = c(proba_has_AFP = "#3A3D8F", proba_no_AFP = "#ED6A5A"),
+      labels = c(
+        proba_no_AFP = str_glue("Without AFP ({sprintf('%.3f', auc_no_AFP)})"), 
+        proba_has_AFP = str_glue("With AFP ({sprintf('%.3f', auc_has_AFP)})")
+      )
+    ) +
+    guides(color = guide_legend(title = NULL, position = "inside")) +
+    theme(
+      panel.grid = element_blank(),
+      legend.position.inside = c(0.65, 0.2),
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5)
+    )
+}
+
+AFP_roc_plot_df <- prepared_for_delong %>%
+  nest_by(model) %>% 
+  left_join(delong_res, by = "model") %>%
+  left_join(auc_df, by = "model") %>%
+  arrange(model) %>%
+  mutate(plot = list(
+    plot_roc_with_and_without_AFP(data, auc_proba_no_AFP, auc_proba_has_AFP) + 
+      ggtitle(model) +
+      labs(subtitle = paste("DeLong p-value:", round(delong_p, 3)))
+  ))
+
+has_AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
+tgutil::ggpreview(has_AFP_ROC_p, width = 12, height = 4)
+ggsave("results/figures/ml/roc_with_and_without_AFP.pdf", has_AFP_ROC_p, width = 12, height = 4)
