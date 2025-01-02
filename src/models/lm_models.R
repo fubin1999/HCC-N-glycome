@@ -6,7 +6,7 @@ library(easystats)
 # data <- read_csv("results/data/prepared/processed_abundance.csv")
 # groups <- read_csv("results/data/prepared/groups.csv")
 # clinical <- read_csv("results/data/prepared/clinical.csv")
-# var_name <- "trait"
+# var_name <- "glycan"
 
 data <- read_csv(snakemake@input[["data"]])
 groups <- read_csv(snakemake@input[["groups"]])
@@ -37,7 +37,7 @@ model_performances <- models %>%
 
 # Get model coefficients-----
 model_coefficients <- models %>%
-  mutate(coefficients = list(model_parameters(model, standardize = "smart"))) %>%
+  mutate(coefficients = list(standardize_parameters(model, method = "refit", two_sd = TRUE))) %>%
   select(-model) %>%
   unnest(coefficients) %>%
   mutate(Parameter = case_match(

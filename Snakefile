@@ -89,17 +89,12 @@ rule all:
         "results/figures/cor_with_liver_function/correlation_comparison.pdf",
 
         # ===== Linear Regression Model Data =====
-        "results/data/models/gcm_model_comparison.csv",
-        "results/data/models/gcm_parameters.csv",
         "results/data/models/glycan_model_performances.csv",
         "results/data/models/glycan_parameters.csv",
         "results/data/models/trait_model_performances.csv",
         "results/data/models/trait_parameters.csv",
 
         # ===== Linear Regression Model Figures =====
-        "results/figures/models/gcm_model_check/",
-        "results/figures/models/gcm_model_comparison_radars.pdf",
-        "results/figures/models/gcm_forest_plot.pdf",
         "results/figures/models/glycan_forest_plot.pdf",
         "results/figures/models/trait_forest_plot.pdf",
         "results/figures/models/key_trait_forest_plot.pdf",
@@ -899,23 +894,6 @@ rule pairwise_comparison_of_clinical_between_subtypes_and_other_groups:
 
 
 # ==================== Linear Regression Models ====================
-rule compare_lm_models:
-    # Compare the four linear regression models for each GCM:
-    # 1. GCM ~ age + sex + group
-    # 2. GCM ~ age + sex + ALBI_score
-    # 3. GCM ~ age + sex + group + ALBI_score
-    # 4. GCM ~ age + sex + group * ALBI_score
-    input:
-        "results/data/glycan_coexpr/eigen_glycans.csv",
-        GROUPS,
-        CLINICAL
-    output:
-        "results/data/models/gcm_model_comparison.csv",
-        "results/data/models/gcm_parameters.csv",
-        directory("results/figures/models/gcm_model_check/")
-    script:
-        "src/models/model_comparison.R"
-
 rule fit_lm_models:
     # Fit a lm model for each glycan or trait using this formula:
     # GCM ~ age + sex + group + ALBI_score
@@ -939,15 +917,6 @@ rule plot_model_comparison_radars:
         "results/figures/models/gcm_model_comparison_radars.pdf"
     script:
         "src/models/model_compare_radar.R"
-
-rule plot_gcm_forest_plot:
-    # Draw forest plot for each GCM.
-    input:
-        "results/data/models/gcm_parameters.csv"
-    output:
-        "results/figures/models/gcm_forest_plot.pdf"
-    script:
-        "src/models/gcm_forest_plot.R"
 
 rule plot_lm_forest_plot:
     # Draw forest plot for each glycan or derived trait.
