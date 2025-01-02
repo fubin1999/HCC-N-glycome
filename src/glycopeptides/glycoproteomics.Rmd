@@ -1,0 +1,493 @@
+---
+title: "glycoproteomics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(glyread)
+library(glyclean)
+library(patchwork)
+library(cowplot)
+library(rstatix)
+```
+
+```{r read_data, include=FALSE}
+data <- read_pglyco3_pglycoquant(
+  "data/pooled/glycopeptides.list", 
+  quant_method = "label-free",
+  quant_aggr_method = "gp"
+) %>% 
+  median_normalize() %>% 
+  sample_min_impute() %>% 
+  as_tibble() %>% 
+  mutate(
+    glycan_composition = str_replace(glycan_composition, "A", "S"),
+    sample = str_split_i(sample, "-", -1),
+    group = str_split_i(sample, "_", 1),
+    group = case_match(group, "H" ~ "HC", "M" ~ "CHB", "Y" ~ "LC", "C" ~ "HCC"),
+    group = factor(group, levels = c("HC", "CHB", "LC", "HCC")),
+    sample = paste0(group, str_split_i(sample, "_", 2)),
+    protein = str_split_i(proteins, ";", 1),
+    protein = str_extract(protein, "sp\\|.*?\\|(.*?)_", group = 1),
+    protein_site = str_split_i(protein_sites, ";", 1),
+    glycosite = str_glue("{protein} ({protein_site})")
+  ) %>% 
+  select(-proteins, -protein_sites)
+
+convert <- function(comp) {
+  comp = str_replace(comp, "\\[.*?\\]", "")
+  comp = str_replace(comp, "Hex\\((\\d+)\\)", "H\\1")
+  comp = str_replace(comp, "HexNAc\\((\\d+)\\)", "N\\1")
+  comp = str_replace(comp, "dHex\\((\\d+)\\)", "F\\1")
+  comp = str_replace(comp, "NeuAc\\((\\d+)\\)", "S\\1")
+  return(comp)
+}
+
+pooled_glycome_data <- read_csv("results/data/glyhunter_results_pooled_serum/summary_area.csv") %>% 
+  mutate(glycan = convert(glycan)) %>% 
+  pivot_longer(-glycan, names_to = "sample", values_to = "area") %>% 
+  mutate(sample = case_match(
+    sample,
+    "20241225_0_N21_1" ~ "HC",
+    "20241225_0_N22_1" ~ "CHB",
+    "20241225_0_N23_1" ~ "LC",
+    "20241225_0_N24_1" ~ "HCC"
+  )) %>% 
+  mutate(abundance = area / sum(area, na.rm = TRUE), .by = sample) %>% 
+  select(-area) %>% 
+  complete(glycan, sample, fill = list(abundance = 0))
+
+gcms <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv") %>% 
+  mutate(gcm = paste0("GCM", cluster), .keep = "unused")
+```
+
+```{r basic_stats}
+n_glycopeptides <- n_distinct(data$peptide, data$peptide_site, data$glycan_composition)
+n_glycoforms <- n_distinct(data$protein, data$protein_site, data$glycan_composition)
+n_glyosites <- n_distinct(data$protein, data$protein_site)
+n_glycoproteins <- n_distinct(data$protein)
+n_glycans <- n_distinct(data$glycan_composition)
+```
+
+```{r}
+mean_data <- data %>% 
+  summarise(abundance = mean(value, na.rm = TRUE), .by = -c(sample, value))
+```
+
+```{r}
+top_30_glycans <- pooled_glycome_data %>% 
+  summarise(mean_abundance = mean(abundance, na.rm = TRUE), .by = glycan) %>% 
+  slice_max(mean_abundance, n = 30) %>% 
+  pull(glycan)
+```
+
+```{r}
+# A tibble with four columns: 'group', 'proteins', 'protein_sites', 'abundance'
+glycome_contribution <- mean_data %>% 
+  summarise(abundance = sum(abundance, na.rm = TRUE), .by = c(group, glycosite))
+
+N_SITES <- 25
+
+pseudo_glycome_diff_n_sites <- expand_grid(
+  n_glycosites = 1:N_SITES, 
+  group = unique(glycome_contribution$group)
+) %>% 
+  rowwise() %>% 
+  mutate(
+    glycome_contrib = list(
+      glycome_contribution %>% 
+        filter(group == .env[["group"]]) %>% 
+        slice_max(abundance, n = n_glycosites)
+    ),
+    pseudo_glycome = list(
+      mean_data %>% 
+        filter(group == .env[["group"]], glycan_composition %in% top_30_glycans) %>% 
+        semi_join(glycome_contrib, by = "glycosite") %>% 
+        summarise(abundance = sum(abundance, na.rm = TRUE), .by = glycan_composition) %>% 
+        mutate(abundance = abundance / sum(abundance))
+    )
+  ) %>% 
+  ungroup() %>% 
+  select(-glycome_contrib) %>% 
+  unnest(pseudo_glycome) %>% 
+  rename(glycan = glycan_composition)
+
+pseudo_real_glycome_cor <- pseudo_glycome_diff_n_sites %>% 
+  left_join(
+    pooled_glycome_data, 
+    by = c("group" = "sample", "glycan"),
+    suffix = c("_pseudo", "_real")
+  ) %>% 
+  group_by(n_glycosites, group) %>% 
+  rstatix::cor_test(abundance_pseudo, abundance_real) %>% 
+  select(n_glycosites, group, cor)
+```
+
+```{r}
+pseudo_real_glycome_cor_plot_data <- glycome_contribution %>% 
+  mutate(rank = rank(-abundance), .by = group) %>% 
+  right_join(
+    pseudo_real_glycome_cor, 
+    by = c("rank" = "n_glycosites", "group")
+  ) %>% 
+  mutate(cor = if_else(cor < 0, 0, cor),) %>% 
+  select(group, glycosite, abundance, cor)
+
+plot_pseudo_glycome_corr <- function(data) {
+  scale_factor <- 8e11
+  ggplot(data, aes(x = reorder(glycosite, desc(abundance)))) +
+    geom_col(aes(y = abundance), fill = "#D6C89B") +
+    geom_point(aes(y = cor * scale_factor), color = "#88642d") +
+    geom_line(aes(y = cor * scale_factor, group = 1), color = "#88642d") +
+    labs(x = "Glycosite", y = "Total Abundance") +
+    scale_y_continuous(
+      sec.axis = sec_axis(~ . / scale_factor, name = "Pearson's r"),
+      expand = expansion(mult = c(0, 0.05))
+    ) +
+    theme_bw() +
+    theme(
+      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+      axis.ticks = element_blank(),
+      panel.grid = element_blank()
+    )
+}
+
+pseudo_glycome_corr_p <- pseudo_real_glycome_cor_plot_data %>% 
+  nest_by(group) %>% 
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
+  arrange(group) %>% 
+  mutate(p = list(plot_pseudo_glycome_corr(data) + ggtitle(group))) %>% 
+  pull(p) %>% 
+  reduce(`+`) +
+  plot_layout(axis_titles = "collect") &
+  theme(plot.title = element_text(hjust = 0.5))
+tgutil::ggpreview(pseudo_glycome_corr_p, width = 10, height = 6)
+```
+
+```{r}
+combine_rest <- function(data, .order_by, .n, .aggr_func = sum) {
+  data %>% 
+    arrange(desc({{ .order_by }})) %>%
+    mutate(item = if_else(row_number() > .n, "Others", {{ .order_by }}))
+}
+
+glycome_contribution_rank <- glycome_contribution %>% 
+  mutate(rank = rank(-abundance), .by = group) %>% 
+  select(-abundance)
+
+pseudo_glycome_plot_data <- mean_data %>% 
+  filter(glycan_composition %in% top_30_glycans) %>%
+  summarise(
+    abundance = sum(abundance, na.rm = TRUE), 
+    .by = c(group, glycosite, glycan_composition)
+    ) %>% 
+  left_join(glycome_contribution_rank, by = c("group", "glycosite")) %>% 
+  mutate(glycosite = if_else(rank <= 10, glycosite, "Others"),.by = group) %>% 
+  mutate(glycosite = factor(glycosite, levels = c(setdiff(unique(glycosite), "Others"), "Others"))) %>% 
+  select(group, glycosite, glycan = glycan_composition, abundance) %>% 
+  summarise(abundance = sum(abundance, na.rm = TRUE), .by = -abundance)
+
+pseudo_corr <- mean_data %>% 
+  summarise(abundance = sum(abundance), .by = c(group, glycan_composition)) %>% 
+  filter(glycan_composition %in% top_30_glycans) %>%
+  rename(glycan = glycan_composition) %>%
+  left_join(
+    pooled_glycome_data, 
+    by = c("group" = "sample", "glycan"),
+    suffix = c("_pseudo", "_real")
+    ) %>% 
+  group_by(group) %>%
+  rstatix::cor_test(abundance_pseudo, abundance_real) %>% 
+  select(group, cor, p, ci_lower = conf.low, ci_upper = conf.high) %>% 
+  mutate(label = str_glue("Pearson's r = {cor}, 95% CI [{scales::number(ci_lower, 0.001)}, {scales::number(ci_upper, 0.001)}]\np-value =  {scales::scientific(p)}"))
+
+plot_pseudo_glycome <- function(group) {
+  y_H5N4S2 <- pooled_glycome_data %>% 
+    filter(sample == !!group) %>% 
+    filter(glycan == "H5N4S2") %>% 
+    pull(abundance)
+  p <- pseudo_glycome_plot_data %>% 
+    filter(group == !!group) %>% 
+    mutate(abundance = abundance / sum(abundance)) %>%
+    ggplot() +
+    geom_col(aes(glycan, abundance, fill = glycosite), position = "stack") +
+    geom_col(
+      data = pooled_glycome_data %>% 
+        filter(sample == !!group) %>% 
+        filter(glycan %in% top_30_glycans),
+      aes(glycan, -abundance),
+      fill = "grey90"
+    ) +
+    geom_text(
+      data = pooled_glycome_data %>% 
+        filter(sample == !!group) %>% 
+        filter(glycan %in% top_30_glycans),
+      aes(glycan, -abundance, label = glycan),
+      angle = 90, hjust = 1, vjust = 0.5, nudge_y = -0.01, color = "grey30", size = 3.5
+      ) +
+    annotate(
+      "text", x = 11, y = -y_H5N4S2+0.01, label = "H5N4S2", 
+      color = "grey30", angle = 90, vjust = 0.5, hjust = 0
+      ) +
+    scale_fill_brewer(palette = "Spectral") +
+    scale_y_continuous(
+      expand = expansion(mult = c(0, 0)),
+      labels = function(x) scales::percent_format()(abs(x))
+      ) +
+    ggtitle(group) +
+    guides(fill = guide_legend(title = "Glycosite", position = "inside", ncol = 2)) +
+    theme_classic() +
+    theme(
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.line.x = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      legend.position.inside = c(0.67, 0.8),
+      legend.title = element_text(hjust = 0.5),
+      plot.title = element_text(hjust = 0.5)
+      )
+  ggdraw(p) +
+    draw_text(
+      "Pseudo-Glycome", x = 0.1, y = 0.9, 
+      size = 12, hjust = 0, vjust = 0.5, fontface = "bold"
+    ) +
+    draw_text(
+      "Real-Glycome", x = 0.1, y = 0.1,
+      size = 12, hjust = 0, vjust = 0.5, fontface = "bold"
+    ) +
+    draw_text(
+      pseudo_corr %>% filter(group == !!group) %>% pull(label),
+      x = 0.5, y = 0.15, size = 12, hjust = 0, vjust = 0.5
+    )
+}
+
+pseudo_glycome_comparing_p <- map(c("HC", "CHB", "LC", "HCC"), plot_pseudo_glycome) %>% 
+  plot_grid(plotlist = ., ncol = 2)
+tgutil::ggpreview(pseudo_glycome_comparing_p, width = 16, height = 10)
+ggsave("results/figures/glycoproteomics/pseudo_glycome_comparing.pdf", pseudo_glycome_comparing_p, width = 16, height = 10)
+```
+
+```{r}
+hole_size <- 1.5
+H5N4S2_donut <- mean_data %>% 
+  filter(glycan_composition == "H5N4S2", group == "HC") %>% 
+  summarise(abundance = sum(abundance), .by = glycosite) %>% 
+  mutate(
+    rank = rank(-abundance),
+    glycosite = if_else(rank <= 10, glycosite, "Others"),
+    ) %>% 
+  summarise(abundance = sum(abundance), .by = glycosite) %>% 
+  mutate(
+    glycosite = fct_reorder(glycosite, -abundance),
+    glycosite = factor(glycosite, levels = c(setdiff(levels(glycosite), "Others"), "Others"))
+    ) %>%
+  mutate(
+    rela_abundance = abundance / sum(abundance),
+    rela_abundance = if_else(rela_abundance < 0.05, NA, rela_abundance)
+    ) %>%
+  ggplot(aes(x = hole_size, y = abundance, fill = glycosite)) +
+  geom_col() +
+  geom_text(
+    aes(label = scales::percent(rela_abundance, 0.1)),
+    position = position_stack(vjust = 0.5),
+    ) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Spectral") +
+  xlim(c(0.2, hole_size + 0.5)) +
+  guides(fill = guide_legend(title = "Glycosite", ncol = 2)) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+  )
+H5N4S2_donut <- ggdraw(H5N4S2_donut) +
+  draw_text(
+    "H5N4S2", x = 0.26, y = 0.5, size = 12, 
+    hjust = 0.5, vjust = 0.5, fontface = "bold"
+  )
+tgutil::ggpreview(H5N4S2_donut, width = 5, height = 4)
+ggsave("results/figures/glycoproteomics/H5N4S2_donut.pdf", H5N4S2_donut, width = 5, height = 4)
+```
+
+```{r}
+hole_size <- 1.5
+H5N5F1S1_donut <- mean_data %>% 
+  filter(glycan_composition == "H5N5F1S1", group == "HC") %>% 
+  summarise(abundance = sum(abundance), .by = glycosite) %>% 
+  mutate(
+    rank = rank(-abundance),
+    glycosite = if_else(rank <= 10, glycosite, "Others"),
+    ) %>% 
+  summarise(abundance = sum(abundance), .by = glycosite) %>% 
+  mutate(
+    glycosite = fct_reorder(glycosite, -abundance),
+    glycosite = factor(glycosite, levels = c(setdiff(levels(glycosite), "Others"), "Others"))
+    ) %>%
+  mutate(
+    rela_abundance = abundance / sum(abundance),
+    rela_abundance = if_else(rela_abundance < 0.05, NA, rela_abundance)
+    ) %>%
+  ggplot(aes(x = hole_size, y = abundance, fill = glycosite)) +
+  geom_col() +
+  geom_text(
+    aes(label = scales::percent(rela_abundance, 0.1)),
+    position = position_stack(vjust = 0.5),
+    ) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "Spectral") +
+  xlim(c(0.2, hole_size + 0.5)) +
+  guides(fill = guide_legend(title = "Glycosite", ncol = 2)) +
+  theme(
+    panel.background = element_blank(),
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+  )
+H5N5F1S1_donut <- ggdraw(H5N5F1S1_donut) +
+  draw_text(
+    "H5N5F1S1", x = 0.26, y = 0.5, size = 12, 
+    hjust = 0.5, vjust = 0.5, fontface = "bold"
+  )
+tgutil::ggpreview(H5N5F1S1_donut, width = 5, height = 4)
+ggsave("results/figures/glycoproteomics/H5N5F1S1_donut.pdf", H5N5F1S1_donut, width = 5, height = 4)
+```
+
+```{r}
+relative_contribution <- mean_data %>% 
+  filter(group == "HC") %>% 
+  mutate(rela_contrib = abundance / sum(abundance, na.rm = TRUE), .by = glycan_composition) %>% 
+  summarise(rela_contrib = sum(rela_contrib, na.rm = TRUE), .by = glycosite) %>% 
+  mutate(rank = rank(-rela_contrib), .keep = "unused")
+glycan_composition_p <- mean_data %>% 
+  filter(group == "HC") %>% 
+  left_join(relative_contribution, by = "glycosite") %>%
+  mutate(glycosite = if_else(rank <= 10, glycosite, "Others")) %>%
+  summarise(abundance = sum(abundance), .by = c(glycan_composition, glycosite)) %>%
+  inner_join(gcms, by = c("glycan_composition" = "glycan")) %>%
+  mutate(glycan_order = as.integer(str_sub(gcm, 4))) %>% 
+  mutate(glycosite = factor(glycosite, levels = c(
+    setdiff(unique(glycosite), "Others")[1:7],
+    "Others",
+    setdiff(unique(glycosite), "Others")[8:10]
+  ))) %>%
+  ggplot(aes(reorder(glycan_composition, glycan_order), abundance, fill = glycosite)) +
+  geom_col(position = "fill") +
+  labs(y = "Relative Abundance", glycosite = "Glycosite") +
+  guides(fill = guide_legend(title = "Glycosite", ncol = 2)) +
+  scale_y_continuous(
+    labels = scales::percent_format(),
+    expand = expansion(mult = c(0, 0))
+    ) +
+  scale_fill_brewer(palette = "Spectral") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+    axis.title.x = element_blank(),
+  )
+tgutil::ggpreview(glycan_composition_p, width = 13, height = 2.4)
+ggplot2::ggsave("results/figures/glycoproteomics/HC_glycan_composition.pdf", glycan_composition_p, width = 13, height = 2.4)
+```
+
+```{r}
+plot_bar_for_selected <- function(glycans, n_sites) {
+  glycosite_rank <- mean_data %>% 
+    filter(glycan_composition %in% glycans) %>% 
+    summarise(abundance = sum(abundance), .by = glycosite) %>% 
+    mutate(rank = rank(-abundance), .keep = "unused")
+  mean_data %>% 
+    filter(glycan_composition %in% glycans) %>% 
+    summarise(abundance = sum(abundance), .by = c(group, glycosite)) %>% 
+    left_join(glycosite_rank, by = "glycosite") %>%
+    mutate(glycosite = if_else(rank <= n_sites, glycosite, "Others")) %>%
+    summarise(abundance = sum(abundance), .by = c(group, glycosite)) %>%
+    mutate(
+      glycosite = fct_reorder(glycosite, -abundance),
+      glycosite = factor(glycosite, levels = c(setdiff(unique(glycosite), "Others"), "Others"))
+      ) %>%
+    ggplot(aes(x = group, y = abundance, fill = glycosite)) +
+    geom_col() +
+    labs(x = "Group", y = "Total Abundance", fill = "Glycosite") +
+    scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
+    scale_fill_brewer(palette = "Spectral") +
+    theme_classic() +
+    theme(
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      plot.title = element_text(hjust = 0.5)
+    )
+}
+```
+
+```{r}
+marker_glycans <- c("H6N5F1S3", "H5N4F1", "H3N4F1", "H6N5S3", "H5N2", "H5N4S1")
+marker_bar_plots <- map(marker_glycans, ~ plot_bar_for_selected(.x, 5) + ggtitle(.x))
+marker_bar_p <- plot_grid(plotlist = marker_bar_plots, nrow = 2)
+tgutil::ggpreview(marker_bar_p, width = 10, height = 5)
+ggsave("results/figures/glycoproteomics/marker_bar_plots.pdf", marker_bar_p, width = 10, height = 5)
+```
+
+```{r}
+library(limma)
+
+ssg_expr_mat <- data %>% 
+  # Keep only site-specific glycans with no missing values.
+  filter(mean(value == 0) == 0, .by = variable) %>%
+  mutate(ssg = paste(protein, protein_site, glycan_composition, sep = "_")) %>% 
+  summarise(value = sum(value), .by = c(sample, ssg)) %>% 
+  mutate(value = log2(value)) %>% 
+  pivot_wider(names_from = sample, values_from = value) %>% 
+  column_to_rownames("ssg")
+group <- factor(str_sub(colnames(ssg_expr_mat), 1, -2))
+
+design <- model.matrix(~ 0 + group)
+colnames(design) <- levels(group)
+rownames(design) <- colnames(ssg_expr_mat)
+
+contrasts <- c("CHB-HC", "LC-HC", "HCC-HC")
+cm <- makeContrasts(contrasts = contrasts, levels = design)
+fit <- lmFit(ssg_expr_mat, design)
+fit2 <- contrasts.fit(fit, cm)
+fit2 <- eBayes(fit2)
+dea_res <- map(contrasts, ~ topTable(fit2, coef = .x, number = Inf)) %>% 
+  set_names(contrasts) %>% 
+  bind_rows(.id = "contrast") %>% 
+  rownames_to_column("ssg") %>% 
+  as_tibble() %>% 
+  mutate(ssg = str_remove(ssg, "\\.{3}.*$"))
+
+write_csv(dea_res, "results/data/glycoproteomics/ssg_dea_result.csv")
+```
+
+```{r}
+dea_res %>% 
+  filter(contrast == "CHB-HC") %>% 
+  mutate(
+    regulate = case_when(
+      logFC > 4 & adj.P.Val < 0.05 ~ "up",
+      logFC < -4 & adj.P.Val < 0.05 ~ "down",
+      .default = "no"
+    ),
+    label = if_else(regulate != "no" & AveExpr > 28, ssg, NA)
+  ) %>% 
+  ggplot(aes(logFC, -log10(P.Value))) +
+  geom_point(aes(size = AveExpr, color = regulate), alpha = 0.5) +
+  geom_vline(xintercept = c(4, -4), linetype = "dashed") +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +
+  ggrepel::geom_text_repel(
+    aes(label = label), 
+    max.overlaps = 25, force = 100, min.segment.length = 0,
+    ) +
+  labs(x = "log2 Fold Change", y = "-log10 P-value", size = "Ave. Expr.") +
+  guides(color = "none") +
+  scale_size_continuous(range = c(0.2, 3)) +
+  scale_color_manual(values = c(up = "#D7191C", down = "#2B83BA", no = "grey70")) +
+  theme_classic()
+tgutil::ggpreview(last_plot(), width = 5, height = 4)
+```
+

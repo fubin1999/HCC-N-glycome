@@ -221,3 +221,4 @@ docs/
 *snakemake
 
 src/ml/AutogluonModels/
+**/MALDI_raw/
