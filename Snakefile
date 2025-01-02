@@ -157,12 +157,6 @@ rule all:
         "results/figures/TCGA/cluster_KM.pdf",
         "results/figures/TCGA/single_gene_KM/",
 
-        # ===== Glycoproteomics Data =====
-        "results/data/glycoproteomics/dea_results.csv"
-
-        # ===== Glycoproteomics Figures =====
-
-
 # ==================== Prepare Data ====================
 rule build_db:
     # Convert the serum glycan CSV file into a byonic database for GlyHunter.
@@ -1184,26 +1178,6 @@ rule prepare_GD2_data_for_ml:
         "results/data/ml/test_data_GD2.csv"
     script:
         "src/ml/prepare_val_data.R"
-
-
-# ==================== Glycoproteomics ====================
-rule prepare_gp_data:
-    # Prepare glycoproteomics data.
-    input:
-        "data/glycoproteome.list",
-    output:
-        "results/data/glycoproteomics/prepared.csv"
-    script:
-        "src/glycopeptides/preprocess.R"
-
-rule gp_dea:
-    # Perform differential expression analysis on glycoproteomics data.
-    input:
-        "results/data/glycoproteomics/prepared.csv"
-    output:
-        "results/data/glycoproteomics/dea_results.csv"
-    script:
-        "src/glycopeptides/dea.R"
 
 
 # ==================== Others ====================
