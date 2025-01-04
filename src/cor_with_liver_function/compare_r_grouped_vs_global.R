@@ -1,8 +1,8 @@
 library(tidyverse)
 library(patchwork)
 
-# corr_result_global <- read_csv("results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv")
-# corr_result_grouped <- read_csv("results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv")
+corr_result_global <- read_csv("results/data/cor_with_liver_function/global_cor_result_with_liver_functions.csv")
+corr_result_grouped <- read_csv("results/data/cor_with_liver_function/grouped_cor_result_with_liver_functions.csv")
 
 corr_result_global <- read_csv(snakemake@input[[1]])
 corr_result_grouped <- read_csv(snakemake@input[[2]])
@@ -37,7 +37,7 @@ plot_func <- function(data) {
 }
 
 plot_list <- map(
-  c("HC", "CHB", "HCC", "LC"),
+  c("HC", "CHB", "LC", "HCC"),
   ~ plot_data %>%
     rename(grouped = all_of(.x)) %>%
     plot_func() +
@@ -46,3 +46,24 @@ plot_list <- map(
 p <- reduce(plot_list, `+`) + plot_layout(nrow = 1)
 # tgutil::ggpreview(width = 12, height = 3)
 ggsave(snakemake@output[[1]], p, width = 12, height = 3)
+
+
+ALBI_result %>% 
+  filter(group != "global") %>%
+  left_join(
+    ALBI_result %>% filter(group == "global") %>% select(feature, cor), 
+    by = "feature", suffix = c("", "_global")
+    ) %>% 
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
+  ggplot(aes(group, cor, color = cor_global)) +
+  geom_line(aes(group = feature)) + 
+  geom_point() +
+  labs(x = "", y = "Spearman's rho\nin each group", color = "Global\nSpearman's\nrho") +
+  scale_color_gradient2(low = "#275D87", mid = "white", high = "#D26F32") +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_blank()
+  )
+# tgutil::ggpreview(width = 4, height = 3)
+# ggsave("results/figures/cor_with_liver_function/ALBI_score_parallel_plot.pdf", width = 4, height = 3)
