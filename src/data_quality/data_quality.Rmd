@@ -10,40 +10,117 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 ```{r message=FALSE, warning=FALSE}
 library(tidyverse)
+library(patchwork)
 ```
 
 ```{r}
-abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-groups <- read_csv("results/data/prepared/groups.csv")
-plates <- read_csv("data/cohort_GD1/plates.csv")
+abundance_1 <- read_csv("results/data/prepared/raw_abundance.csv")
+groups_1 <- read_csv("results/data/prepared/groups.csv")
+plates_1 <- read_csv("data/cohort_GD1/plates.csv")
+
+data_1 <- abundance_1 %>% 
+  pivot_longer(-sample, names_to = "glycan", values_to = "area") %>% 
+  left_join(groups_1, by = "sample") %>% 
+  filter(group == "QC") %>%
+  select(-group) %>% 
+  left_join(plates_1 %>% select(sample, plate), by = "sample") %>% 
+  select(plate, sample, glycan, area)
+
+data_1 <- data_1 %>% 
+  pivot_wider(id_cols = glycan, names_from = sample, values_from = area) %>% 
+  mutate(S529 = (S536 + S573) / 2, S745 = (S683 + S721) / 2) %>% 
+  pivot_longer(-glycan, names_to = "sample", values_to = "area") %>%
+  left_join(data_1 %>% distinct(sample, plate), by = "sample") %>% 
+  select(plate, sample, glycan, area)
+
+convert_glycan <- function(comp) {
+  comp = str_replace(comp, "\\[.*?\\]", "")
+  comp = str_replace(comp, "Hex\\((\\d+)\\)", "H\\1")
+  comp = str_replace(comp, "HexNAc\\((\\d+)\\)", "N\\1")
+  comp = str_replace(comp, "dHex\\((\\d+)\\)", "F\\1")
+  comp = str_replace(comp, "NeuAc\\((\\d+)\\)", "S\\1")
+  return(comp)
+}
+
+abundance_2 <- read_csv("results/data/glyhunter_results_GD2/summary_area.csv")
+groups_2 <- read_csv("data/cohort_GD2/maldi_pos_and_group.csv")
+
+data_2 <- abundance_2 %>% 
+  mutate(glycan = convert_glycan(glycan)) %>% 
+  pivot_longer(-glycan, names_to = "sample", values_to = "area") %>% 
+  mutate(maldi_pos = str_split_i(sample, "_", 3), .keep = "unused") %>%
+  left_join(groups_2, by = "maldi_pos") %>% 
+  filter(group == "QC") %>% 
+  mutate(plate = if_else(str_starts(maldi_pos, "D"), 9, 10)) %>% 
+  select(plate, sample, glycan, area)
+
+abundance_3 <- read_csv("results/data/glyhunter_results_SH/summary_area.csv")
+groups_3 <- read_csv("data/cohort_SH/maldi_pos_and_group.csv")
+
+data_3 <- abundance_3 %>% 
+  mutate(glycan = convert_glycan(glycan)) %>% 
+  pivot_longer(-glycan, names_to = "sample", values_to = "area") %>% 
+  mutate(maldi_pos = str_split_i(sample, "_", 3), .keep = "unused") %>%
+  left_join(groups_3, by = "maldi_pos") %>% 
+  filter(group == "QC") %>% 
+  mutate(plate = if_else(maldi_pos %in% c("D1", "D2", "D3"), 11, 12)) %>% 
+  select(plate, sample, glycan, area)
+
+data <- bind_rows(list(
+  GD1 = data_1,
+  GD2 = data_2,
+  XZ  = data_3
+), .id = "cohort") %>% 
+  complete(nesting(cohort, plate, sample), glycan, fill = list(area = NA)) %>% 
+  mutate(abundance = area / sum(area, na.rm = TRUE) * 100, .by = sample, .keep = "unused")
+
+rm(data_1, data_2, data_3)
+rm(abundance_1, groups_1, plates_1, abundance_2, groups_2, abundance_3, groups_3)
 ```
 
 ```{r}
-tidy_data <- abundance %>% 
-  pivot_longer(-sample, names_to = "glycan", values_to = "abundance") %>% 
-  left_join(groups, by = "sample") %>% 
-  left_join(plates %>% select(sample, plate), by = "sample")
+top_30_glycans <- data %>% 
+  summarise(mean_abundance = mean(abundance, na.rm = TRUE), .by = glycan) %>% 
+  slice_max(mean_abundance, n = 30) %>% 
+  pull(glycan)
 
-qc_data <-  tidy_data %>% 
-  filter(group == "QC")
-
-sample_data <- tidy_data %>% 
-  filter(!group == "QC")
+top_30_data <- data %>% 
+  filter(glycan %in% top_30_glycans) %>% 
+  mutate(abundance = abundance / sum(abundance, na.rm = TRUE) * 100, .by = sample)
 ```
 
 ```{r}
-qc_cv <- qc_data %>% 
-  group_by(glycan) %>% 
-  summarise(cv = sd(abundance) / mean(abundance))
+qc_cv <- top_30_data %>% 
+  summarise(cv = sd(abundance, na.rm = TRUE) / mean(abundance, na.rm = TRUE), .by = c(plate, cohort, glycan))
 ```
 
 ```{r}
-qc_cor_mat <- qc_data %>% 
+qc_cv %>% 
+  summarise(median_cv = median(cv, na.rm = TRUE), .by = cohort)
+```
+
+```{r}
+ggplot(qc_cv, aes(x = cv, fill = cohort)) +
+  geom_density(alpha = 0.5) +
+  labs(x = "Coefficient of Variation", y = "Density") +
+  guides(fill = guide_legend(title = "Cohort", position = "inside")) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.02)), limits = c(0, 1)) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.02))) +
+  theme_classic() +
+  theme(
+    legend.position.inside = c(0.7, 0.5)
+  )
+ggsave("results/figures/data_quality/QC_CV_density.pdf", width = 3, height = 3)
+tgutil::ggpreview(width = 3, height = 3)
+```
+
+```{r}
+qc_cor_mat <- top_30_data %>% 
   select(sample, glycan, abundance) %>% 
   pivot_wider(names_from = sample, values_from = abundance) %>% 
   column_to_rownames("glycan") %>%
   log2() %>% 
-  cor()
+  cor(use = "complete.obs")
 qc_cor <- qc_cor_mat %>% 
   as.data.frame() %>% 
   rownames_to_column("sample1") %>% 
@@ -56,100 +133,92 @@ qc_cor <- qc_cor_mat %>%
 ```
 
 ```{r}
+median(qc_cor$r, na.rm = TRUE)
+```
+
+```{r}
 temp <- qc_cor %>% 
-  left_join(plates %>% select(sample, plate), by = c("sample1" = "sample")) %>% 
-  rename(plate1 = plate) %>%
-  left_join(plates %>% select(sample, plate), by = c("sample2" = "sample")) %>%
-  rename(plate2 = plate)
+  left_join(data %>% distinct(sample, plate, cohort), by = c("sample1" = "sample")) %>% 
+  rename(plate1 = plate, cohort1 = cohort) %>%
+  left_join(data %>% distinct(sample, plate, cohort), by = c("sample2" = "sample")) %>%
+  rename(plate2 = plate, cohort2 = cohort)
 inter_plate_qc_cor <- temp %>% 
   filter(plate1 != plate2)
 intra_plate_qc_cor <- temp %>% 
   filter(plate1 == plate2)
+inter_cohort_qc_cor <- temp %>% 
+  filter(cohort1 != cohort2)
+intra_cohort_qc_cor <- temp %>% 
+  filter(cohort1 == cohort2)
 rm(temp)
 ```
 
 ```{r}
-global_cv <- sample_data %>% 
-  group_by(glycan) %>% 
-  summarise(cv = sd(abundance) / mean(abundance))
-
-per_group_cv <- sample_data %>% 
-  group_by(glycan, group) %>% 
-  summarise(cv = sd(abundance) / mean(abundance), .groups = "drop")
-```
-
-For QC samples, median CV: `r median(qc_cv$cv)`.
-`r sum(qc_cv$cv < 0.2)` (`r sum(qc_cv$cv < 0.2) / nrow(qc_cv) * 100`%) glycans have CV < 0.2.
-For pair-wise correlation, median r: `r median(qc_cor$r)`,
-inter-plate median r: `r median(inter_plate_qc_cor$r)`,
-intra-plate median r: `r median(intra_plate_qc_cor$r)`.
-
-```{r}
-qc_cor_plot <- qc_cor %>% 
-  mutate(
-    sample1_order = as.integer(str_sub(sample1, start = 2)),
-    sample2_order = as.integer(str_sub(sample2, start = 2))
-  ) %>%
-  ggplot(aes(reorder(sample1, sample1_order), reorder(sample2, sample2_order), fill = r)) +
-  geom_tile(color = "white", linewidth = 1) +
-  geom_text(aes(label = sprintf("%.2f", r)), size = 3, color = "white", fontface = "bold") +
-  guides(fill = guide_colorbar(position = "inside")) +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    legend.position.inside = c(0.2, 0.6),
-    axis.title = element_blank(),
-    axis.text.x = element_text(angle = 45),
-  ) +
-  scale_fill_distiller(palette = "YlOrRd", limits = c(0, 1), direction = 1) +
-  scale_y_discrete(position = "right", labels = paste0("QC", 1:21)) +
-  scale_x_discrete(position = "bottom", labels = paste0("QC", 2:22))
-tgutil::ggpreview(qc_cor_plot, width = 8, height = 8)
+cli::cat_line(median(inter_plate_qc_cor$r))
+cli::cat_line(median(intra_plate_qc_cor$r))
+cli::cat_line(median(inter_cohort_qc_cor$r))
+cli::cat_line(median(intra_cohort_qc_cor$r))
 ```
 
 ```{r}
-cor_boxplot <- bind_rows(list(
+# Should be run in console
+pdf("results/figures/data_quality/QC_corrplot.pdf", width = 8, height = 8)
+corrplot::corrplot(
+  qc_cor_mat,
+  method = "ellipse",
+  type = "upper",
+  tl.pos = "lt",
+  tl.cex = 0.6,
+  tl.col = "black",
+  col = corrplot::COL1("Oranges"),
+  col.lim = c(0, 1)
+)
+corrplot::corrplot(
+  qc_cor_mat,
+  add = TRUE,
+  method = "color",
+  type = "lower",
+  tl.pos = "n",
+  addCoef.col = "white",
+  addgrid.col = "white",
+  number.cex = 0.4,
+  number.digits = 2,
+  col = corrplot::COL1("Oranges"),
+  col.lim = c(0, 1)
+)
+dev.off()
+```
+
+```{r}
+plate_cor_boxplot <- bind_rows(list(
   `inter-plate` = inter_plate_qc_cor %>% select(sample1, sample2, r),
   `intra-plate` = intra_plate_qc_cor %>% select(sample1, sample2, r)
 ), .id = "type") %>% 
   ggplot(aes(type, r)) +
-  geom_boxplot(aes(fill = type)) +
-  ggsignif::geom_signif(
-    comparisons = list(c("inter-plate", "intra-plate")),
-    textsize = 3, vjust = -0.5,
-    map_signif_level = function(p) {
-      paste0("wilcox p = ", sprintf("%.2f", p))
-    }
-  ) +
-  annotate(
-    "text", x = 1, y = median(inter_plate_qc_cor$r) - 0.005, 
-    label = sprintf("%.3f", median(inter_plate_qc_cor$r))
-  ) +
-  annotate(
-    "text", x = 2, y = median(intra_plate_qc_cor$r) - 0.005, 
-    label = sprintf("%.3f", median(intra_plate_qc_cor$r))
-  ) +
-  guides(fill = "none") +
+  geom_boxplot(aes(color = type), outlier.alpha = 0) +
+  geom_jitter(aes(color = type), width = 0.2, alpha = 0.5) +
+  guides(fill = "none", color = "none") +
   labs(x = NULL, y = "Pearson's r") +
-  scale_y_continuous(expand = expansion(mult = 0, 0.02)) +
   theme_bw() +
   theme(
     panel.grid = element_blank(),
   )
-tgutil::ggpreview(cor_boxplot, width = 2.5, height = 3)
-```
 
-```{r}
-qc_boxplot <- ggplot(qc_data, aes(reorder(sample, plate), log2(abundance), fill = factor(plate))) +
-  geom_boxplot() +
-  labs(x = "Sample", y = "log2(Abundance)", fill = "plate") +
+cohort_cor_boxplot <- bind_rows(list(
+  `inter-cohort` = inter_cohort_qc_cor %>% select(sample1, sample2, r),
+  `intra-cohort` = intra_cohort_qc_cor %>% select(sample1, sample2, r)
+), .id = "type") %>% 
+  ggplot(aes(type, r)) +
+  geom_boxplot(aes(color = type), outlier.alpha = 0) +
+  geom_jitter(aes(color = type), width = 0.2, alpha = 0.5) +
+  guides(fill = "none", color = "none") +
+  labs(x = NULL, y = "Pearson's r") +
   theme_bw() +
   theme(
     panel.grid = element_blank(),
-    axis.text.x = element_blank(),
-    axis.ticks.x = element_blank(),
-  ) +
-  scale_y_continuous(expand = c(0.8, 0.8))
-tgutil::ggpreview(qc_boxplot, width = 6, height = 3)
-```
+  )
 
+cor_boxplots <- plate_cor_boxplot + cohort_cor_boxplot + plot_layout(nrow = 1)
+ggsave("results/figures/data_quality/QC_cor_boxplots.pdf", cor_boxplots, width = 5, height = 3)
+tgutil::ggpreview(cor_boxplots, width = 5, height = 3)
+```
