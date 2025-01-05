@@ -64,7 +64,7 @@ p <- reduce(plot_df$plot, `+`) +
   plot_layout(nrow = 1, guides = "collect") &
   lims(x = c(-0.8, 1.4), y = ylim) &
   scale_color_manual(
-    values = c("up" = "#CD0000", "down" = "steelblue", "no" = "grey"),
+    values = c("up" = "#D26F32", "down" = "#275D87", "no" = "grey"),
   ) &
   scale_size_continuous(range = c(1, 5), limits = c(0, 1.5)) &
   labs(x = "log2FC", y = "-log10p", color = "Regulate", size = "|log2FC|") &

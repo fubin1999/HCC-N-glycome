@@ -39,7 +39,7 @@ p <- fold_change %>%
     show.legend = FALSE
   ) +
   scale_color_manual(
-    values = c("Neither" = "grey", "Both" = "#CD0000", "HCvsHCC" = "#FF9494", "HCvsLC" = "#FF9494"),
+    values = c("Neither" = "grey", "Both" = "#D26F32", "HCvsHCC" = "#FFB689", "HCvsLC" = "#FFB689"),
     labels = c(
       "Neither" = "Neither",
       "Both" = "Up in Both",
