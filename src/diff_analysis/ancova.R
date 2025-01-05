@@ -20,7 +20,7 @@ cov_albi <- snakemake@params[["cov_albi"]]
 data <- data %>%
   pivot_longer(-sample, names_to = var_name, values_to = "value") %>%
   inner_join(groups, by = "sample") %>%
-  inner_join(clinical |> select(sample, sex, age, ALBI_score), by = "sample") %>%
+  inner_join(clinical, by = "sample") %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 
 if (var_name == "glycan") {
@@ -28,7 +28,7 @@ if (var_name == "glycan") {
 }
 
 if (cov_albi) {
-  formula <- value ~ age * sex + ALBI_score + group
+  formula <- value ~ age * sex + ALBI_score + TP + TBIL + GGT + AST + ALT + ALB + AAR + group
 } else {
   formula <- value ~ age * sex + group
 }
