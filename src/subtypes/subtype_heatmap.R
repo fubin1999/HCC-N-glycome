@@ -4,7 +4,7 @@ library(circlize)
 
 # abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 # clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-# anova_result <- read_csv("results/data/subtypes/anova.csv")
+# anova_result <- read_csv("results/data/subtypes/subtype_glycan_anova.csv")
 # coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
 # clinical <- read_csv("results/data/prepared/clinical.csv")
 
@@ -39,7 +39,7 @@ mat <- data %>%
 col_anno_df <- data %>%
   mutate(subtype = str_glue("Subtype {class}"), subtype = as.factor(subtype)) %>%
   select(sample, subtype) %>%
-  left_join(clinical %>% select(sample, child_pugh, ALBI_stage, TNM_stage), by = "sample") %>%
+  left_join(clinical %>% select(-starts_with("HB")), by = "sample") %>%
   rename(
     `Glycan Subtype` = subtype,
     `Child-Pugh Class` = child_pugh,
@@ -83,8 +83,8 @@ row_anno <- rowAnnotation(
 
 col <- colorRamp2(c(-2, 0, 2), c("#3d5a80", "white", "#ee6c4d"))
 
-pdf(snakemake@output[[1]], width = 6, height = 5)
-set.seed(1)
+pdf(snakemake@output[[1]], width = 12, height = 8)
+set.seed(3)
 Heatmap(
   mat,
   name = "Z-score",
