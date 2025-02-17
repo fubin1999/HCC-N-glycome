@@ -12,28 +12,60 @@ library(cowplot)
 library(rstatix)
 ```
 
+```{r basic_stats}
+raw_data <- read_pglyco3_pglycoquant(
+  "data/pooled/glycopeptides.list", 
+  quant_method = "label-free",
+  quant_aggr_method = "gp"
+) %>% as_tibble()
+
+n_glycopeptides <- n_distinct(raw_data$peptide, raw_data$peptide_site, raw_data$glycan_composition)
+n_glycoforms <- n_distinct(raw_data$proteins, raw_data$protein_sites, raw_data$glycan_composition)
+n_glyosites <- n_distinct(raw_data$proteins, raw_data$protein_sites)
+n_glycoproteins <- n_distinct(raw_data$proteins)
+n_glycans <- n_distinct(raw_data$glycan_composition)
+
+cli::cat_bullet(c(
+  paste0("Number of glycopeptides: ", n_glycopeptides),
+  paste0("Number of glycoforms: ", n_glycoforms),
+  paste0("Number of glycosites: ", n_glyosites),
+  paste0("Number of glycoproteins: ", n_glycoproteins),
+  paste0("Number of glycans: ", n_glycans)
+))
+```
+
 ```{r read_data, include=FALSE}
 data <- read_pglyco3_pglycoquant(
   "data/pooled/glycopeptides.list", 
   quant_method = "label-free",
   quant_aggr_method = "gp"
 ) %>% 
+  remove_missing_variables(prop = 0) %>% 
   median_normalize() %>% 
   sample_min_impute() %>% 
   as_tibble() %>% 
   mutate(
     glycan_composition = str_replace(glycan_composition, "A", "S"),
+    peptide = str_replace(peptide, "J", "N"),
     sample = str_split_i(sample, "-", -1),
     group = str_split_i(sample, "_", 1),
     group = case_match(group, "H" ~ "HC", "M" ~ "CHB", "Y" ~ "LC", "C" ~ "HCC"),
     group = factor(group, levels = c("HC", "CHB", "LC", "HCC")),
     sample = paste0(group, str_split_i(sample, "_", 2)),
-    protein = str_split_i(proteins, ";", 1),
-    protein = str_extract(protein, "sp\\|.*?\\|(.*?)_", group = 1),
-    protein_site = str_split_i(protein_sites, ";", 1),
-    glycosite = str_glue("{protein} ({protein_site})")
-  ) %>% 
-  select(-proteins, -protein_sites)
+    first_protein = str_split_i(proteins, ";", 1),
+    first_protein = str_extract(first_protein, "sp\\|.*?\\|(.*?)_", group = 1),
+    first_protein_site = str_split_i(protein_sites, ";", 1),
+    glycosite = str_glue("{first_protein} (N{first_protein_site})"),
+    glycosite = if_else(str_detect(proteins, ";"), paste0(glycosite, "*"), glycosite)
+  )
+
+pro_data <- read_csv("data/pooled/proteins.csv") %>% 
+  select(protein = Accession, matches(".*\\d Area")) %>% 
+  pivot_longer(-protein, names_to = "sample", values_to = "abundance", names_pattern = "(.*) Area") %>% 
+  mutate(
+    protein = str_extract(protein, ".*?\\|(.*?)_", group = 1),
+    group = str_sub(sample, 1, -2),
+    )
 
 convert <- function(comp) {
   comp = str_replace(comp, "\\[.*?\\]", "")
@@ -60,14 +92,14 @@ pooled_glycome_data <- read_csv("results/data/glyhunter_results_pooled_serum/sum
 
 gcms <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv") %>% 
   mutate(gcm = paste0("GCM", cluster), .keep = "unused")
+
+full_glycome_data <- read_csv("results/data/prepared/raw_abundance_full.csv")
 ```
 
-```{r basic_stats}
-n_glycopeptides <- n_distinct(data$peptide, data$peptide_site, data$glycan_composition)
-n_glycoforms <- n_distinct(data$protein, data$protein_site, data$glycan_composition)
-n_glyosites <- n_distinct(data$protein, data$protein_site)
-n_glycoproteins <- n_distinct(data$protein)
-n_glycans <- n_distinct(data$glycan_composition)
+```{r}
+n_distinct(pro_data$protein)
+length(intersect(pro_data$protein, data$first_protein))
+length(intersect(data$glycan_composition, colnames(full_glycome_data)[-1]))
 ```
 
 ```{r}
@@ -395,13 +427,13 @@ ggplot2::ggsave("results/figures/glycoproteomics/HC_glycan_composition.pdf", gly
 ```
 
 ```{r}
-plot_bar_for_selected <- function(glycans, n_sites) {
+plot_bar_for_selected <- function(glycan, n_sites) {
   glycosite_rank <- mean_data %>% 
-    filter(glycan_composition %in% glycans) %>% 
+    filter(glycan_composition == !!glycan) %>% 
     summarise(abundance = sum(abundance), .by = glycosite) %>% 
     mutate(rank = rank(-abundance), .keep = "unused")
   mean_data %>% 
-    filter(glycan_composition %in% glycans) %>% 
+    filter(glycan_composition == !!glycan) %>% 
     summarise(abundance = sum(abundance), .by = c(group, glycosite)) %>% 
     left_join(glycosite_rank, by = "glycosite") %>%
     mutate(glycosite = if_else(rank <= n_sites, glycosite, "Others")) %>%
@@ -410,8 +442,8 @@ plot_bar_for_selected <- function(glycans, n_sites) {
       glycosite = fct_reorder(glycosite, -abundance),
       glycosite = factor(glycosite, levels = c(setdiff(unique(glycosite), "Others"), "Others"))
       ) %>%
-    ggplot(aes(x = group, y = abundance, fill = glycosite)) +
-    geom_col() +
+    ggplot() +
+    geom_col(aes(x = group, y = abundance, fill = glycosite)) +
     labs(x = "Group", y = "Total Abundance", fill = "Glycosite") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
     scale_fill_brewer(palette = "Spectral") +
@@ -425,69 +457,600 @@ plot_bar_for_selected <- function(glycans, n_sites) {
 ```
 
 ```{r}
-marker_glycans <- c("H6N5F1S3", "H5N4F1", "H3N4F1", "H6N5S3", "H5N2", "H5N4S1")
-marker_bar_plots <- map(marker_glycans, ~ plot_bar_for_selected(.x, 5) + ggtitle(.x))
-marker_bar_p <- plot_grid(plotlist = marker_bar_plots, nrow = 2)
-tgutil::ggpreview(marker_bar_p, width = 10, height = 5)
-ggsave("results/figures/glycoproteomics/marker_bar_plots.pdf", marker_bar_p, width = 10, height = 5)
+walk(
+  unique(union(pooled_glycome_data$glycan, gcms$glycan)),
+  ~ {
+    p <- plot_bar_for_selected(.x, 5) + ggtitle(.x)
+    ggsave(
+      file.path("results/figures/glycoproteomics/glycan_bar", paste0(.x, "_bar_plot.pdf")), 
+      p, width = 3.5, height = 2, create.dir = TRUE
+    )
+  }
+)
 ```
 
 ```{r}
 library(limma)
 
-ssg_expr_mat <- data %>% 
-  # Keep only site-specific glycans with no missing values.
-  filter(mean(value == 0) == 0, .by = variable) %>%
-  mutate(ssg = paste(protein, protein_site, glycan_composition, sep = "_")) %>% 
-  summarise(value = sum(value), .by = c(sample, ssg)) %>% 
-  mutate(value = log2(value)) %>% 
-  pivot_wider(names_from = sample, values_from = value) %>% 
-  column_to_rownames("ssg")
-group <- factor(str_sub(colnames(ssg_expr_mat), 1, -2))
+ssg_dea_result <- local({
+  ssg_expr_mat <- data %>% 
+    mutate(ssg = paste(first_protein, paste0("N", first_protein_site), glycan_composition, sep = "_")) %>% 
+    summarise(value = sum(value), .by = c(sample, ssg)) %>% 
+    mutate(value = log2(value)) %>% 
+    pivot_wider(names_from = sample, values_from = value) %>% 
+    column_to_rownames("ssg")
+  group <- factor(str_sub(colnames(ssg_expr_mat), 1, -2), levels = c("HC", "CHB", "LC", "HCC"))
+  
+  design <- model.matrix(~ 0 + group)
+  colnames(design) <- levels(group)
+  rownames(design) <- colnames(ssg_expr_mat)
+  
+  contrasts <- c("CHB-HC", "LC-HC", "HCC-HC")
+  cm <- makeContrasts(contrasts = contrasts, levels = design)
+  fit <- lmFit(ssg_expr_mat, design)
+  fit2 <- contrasts.fit(fit, cm)
+  fit2 <- eBayes(fit2)
+  dea_res <- map(contrasts, ~ topTable(fit2, coef = .x, number = Inf)) %>% 
+    set_names(contrasts) %>% 
+    bind_rows(.id = "contrast") %>% 
+    rownames_to_column("ssg") %>% 
+    as_tibble() %>% 
+    mutate(ssg = str_remove(ssg, "\\.{3}.*$"))
+  
+  dea_res
+})
 
-design <- model.matrix(~ 0 + group)
-colnames(design) <- levels(group)
-rownames(design) <- colnames(ssg_expr_mat)
-
-contrasts <- c("CHB-HC", "LC-HC", "HCC-HC")
-cm <- makeContrasts(contrasts = contrasts, levels = design)
-fit <- lmFit(ssg_expr_mat, design)
-fit2 <- contrasts.fit(fit, cm)
-fit2 <- eBayes(fit2)
-dea_res <- map(contrasts, ~ topTable(fit2, coef = .x, number = Inf)) %>% 
-  set_names(contrasts) %>% 
-  bind_rows(.id = "contrast") %>% 
-  rownames_to_column("ssg") %>% 
-  as_tibble() %>% 
-  mutate(ssg = str_remove(ssg, "\\.{3}.*$"))
-
-write_csv(dea_res, "results/data/glycoproteomics/ssg_dea_result.csv")
+# write_csv(ssg_dea_result, "results/data/glycoproteomics/ssg_dea_result.csv")
 ```
 
 ```{r}
-dea_res %>% 
-  filter(contrast == "CHB-HC") %>% 
-  mutate(
-    regulate = case_when(
-      logFC > 4 & adj.P.Val < 0.05 ~ "up",
-      logFC < -4 & adj.P.Val < 0.05 ~ "down",
-      .default = "no"
-    ),
-    label = if_else(regulate != "no" & AveExpr > 28, ssg, NA)
-  ) %>% 
-  ggplot(aes(logFC, -log10(P.Value))) +
-  geom_point(aes(size = AveExpr, color = regulate), alpha = 0.5) +
-  geom_vline(xintercept = c(4, -4), linetype = "dashed") +
-  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +
-  ggrepel::geom_text_repel(
-    aes(label = label), 
-    max.overlaps = 25, force = 100, min.segment.length = 0,
-    ) +
-  labs(x = "log2 Fold Change", y = "-log10 P-value", size = "Ave. Expr.") +
-  guides(color = "none") +
-  scale_size_continuous(range = c(0.2, 3)) +
-  scale_color_manual(values = c(up = "#D7191C", down = "#2B83BA", no = "grey70")) +
-  theme_classic()
-tgutil::ggpreview(last_plot(), width = 5, height = 4)
+pro_dea_result <- local({
+  pro_expr_mat <- pro_data %>% 
+    mutate(
+      abundance = if_else(abundance == 0, NA, abundance),
+      log_abundance = log2(abundance + 1)
+      ) %>%
+    pivot_wider(id_cols = protein, names_from = sample, values_from = log_abundance) %>% 
+    column_to_rownames("protein") %>% 
+    glyclean:::.sample_min_impute()
+  group <- factor(str_sub(colnames(pro_expr_mat), 1, -2), levels = c("HC", "CHB", "LC", "HCC"))
+  
+  design <- model.matrix(~ 0 + group)
+  colnames(design) <- levels(group)
+  rownames(design) <- colnames(pro_expr_mat)
+  
+  contrasts <- c("CHB-HC", "LC-HC", "HCC-HC")
+  cm <- makeContrasts(contrasts = contrasts, levels = design)
+  fit <- lmFit(pro_expr_mat, design)
+  fit2 <- contrasts.fit(fit, cm)
+  fit2 <- eBayes(fit2)
+  dea_res <- map(contrasts, ~ topTable(fit2, coef = .x, number = Inf)) %>% 
+    set_names(contrasts) %>% 
+    bind_rows(.id = "contrast") %>% 
+    rownames_to_column("protein") %>% 
+    as_tibble() %>% 
+    mutate(protein = str_remove(protein, "\\.{3}.*$"))
+  
+  dea_res
+})
+
+# write_csv(pro_dea_result, "results/data/glycoproteomics/pro_dea_result.csv")
 ```
 
+```{r}
+double_volcano_plot_data <- ssg_dea_result %>% 
+  select(ssg, contrast, logFC, adj.P.Val) %>% 
+  mutate(
+    protein = str_split_i(ssg, "_", 1),
+    glycan = str_split_i(ssg, "_", 3),
+    ) %>% 
+  inner_join(
+    pro_dea_result %>% select(protein, contrast, logFC, adj.P.Val), 
+    by = c("protein", "contrast"), suffix = c("_ssg", "_pro"), multiple = "all"
+    ) %>% 
+  janitor::clean_names() %>% 
+  mutate(
+    regulate = case_when(
+      adj_p_val_ssg < 0.05 & adj_p_val_pro > 0.05 & log_fc_ssg > 2 ~ "up",
+      adj_p_val_ssg < 0.05 & adj_p_val_pro > 0.05 & log_fc_ssg < -2 ~ "down",
+      adj_p_val_ssg < 0.05 & adj_p_val_pro < 0.05 & log_fc_ssg - log_fc_pro > 2 ~ "up",
+      adj_p_val_ssg < 0.05 & adj_p_val_pro < 0.05 & log_fc_ssg - log_fc_pro < -2 ~ "down",
+      .default = "no"
+    ),
+    selected = regulate != "no",
+    selected = if_else(
+      ssg %in% (mean_data %>% 
+        slice_max(abundance, prop = 0.1, by = glycan_composition) %>% 
+        mutate(ssg = paste(first_protein, paste0("N", first_protein_site), glycan_composition, sep = "_")) %>% 
+        distinct(ssg) %>% 
+        pull(ssg)),
+      selected, FALSE
+    ),
+    selected = if_else(
+      glycan %in% unique(pooled_glycome_data$glycan),
+      selected, FALSE
+    ),
+    selected = factor(selected, levels = c(FALSE, TRUE))
+  )
+
+plot_double_volcano <- function(data) {
+  ggplot() +
+    geom_point(
+      data = data %>% filter(selected == FALSE),
+      mapping = aes(log_fc_pro, log_fc_ssg),
+      color = "grey", alpha = 0.5, size = 2
+    ) +
+    geom_hline(yintercept = c(-2, 2), linetype = "dashed", color = "grey30") +
+    geom_abline(slope = 1, intercept = c(-2, 2), linetype = "dashed", color = "grey30") +
+    geom_point(
+      data = data %>% filter(selected == TRUE),
+      mapping = aes(log_fc_pro, log_fc_ssg),
+      fill = "#D26F32", color = "#863401", size = 4, alpha = 0.8, shape = 21
+    ) +
+    ggrepel::geom_text_repel(
+      data = data %>% filter(selected == TRUE),
+      mapping = aes(log_fc_pro, log_fc_ssg, label = ssg),
+      color = "black", size = 3, min.segment.length = 0, point.padding = 0.6, 
+      force_pull = 0.05, max.overlaps = 20, force = 3
+    ) +
+    labs(x = "Log2 Fold Change (Protein)", y = "Log2 Fold Change (Site-Specific Glycan)") +
+    theme_bw() +
+    theme(
+      panel.grid = element_blank(),
+      plot.title = element_text(hjust = 0.5)
+    )
+}
+
+CHB_HC_double_volcano <- double_volcano_plot_data %>% 
+  filter(contrast == "CHB-HC") %>% 
+  plot_double_volcano() +
+  xlim(-2, 2) +
+  ggtitle("CHB vs HC")
+LC_HC_double_volcano <- double_volcano_plot_data %>%
+  filter(contrast == "LC-HC") %>% 
+  plot_double_volcano() +
+  xlim(-2.5, 2.5) +
+  ggtitle("LC vs HC")
+HCC_HC_double_volcano <- double_volcano_plot_data %>%
+  filter(contrast == "HCC-HC") %>% 
+  plot_double_volcano() +
+  xlim(-2.5, 2.5) +
+  ggtitle("HCC vs HC")
+double_volcanos <- plot_grid(CHB_HC_double_volcano, LC_HC_double_volcano, HCC_HC_double_volcano, nrow = 1)
+
+ggsave("results/figures/glycoproteomics/double_volcanos.pdf", double_volcanos, width = 12, height = 4)
+tgutil::ggpreview(width = 12, height = 4)
+```
+
+```{r}
+up_ssg_venn <- double_volcano_plot_data %>% 
+  filter(regulate == "up") %>% 
+  select(ssg, contrast) %>% 
+  mutate(up = TRUE) %>% 
+  pivot_wider(id_cols = ssg, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  ggvenn::ggvenn(
+    show_percentage = FALSE, 
+    fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
+    text_size = 6
+    ) +
+  ggtitle("Up-regulated SSGs") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
+
+down_ssg_venn <- double_volcano_plot_data %>% 
+  filter(regulate == "down") %>% 
+  select(ssg, contrast) %>% 
+  mutate(up = TRUE) %>% 
+  pivot_wider(id_cols = ssg, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  ggvenn::ggvenn(
+    show_percentage = FALSE, 
+    fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
+    text_size = 6
+    ) +
+  ggtitle("Down-regulated SSGs") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
+
+up_gp_venn <- double_volcano_plot_data %>% 
+  filter(regulate == "up") %>% 
+  distinct(contrast, protein) %>% 
+  mutate(up = TRUE) %>% 
+  pivot_wider(id_cols = protein, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  ggvenn::ggvenn(
+    show_percentage = FALSE, 
+    fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
+    text_size = 6
+    ) +
+  ggtitle("Up-regulated GPs") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
+
+down_gp_venn <- double_volcano_plot_data %>% 
+  filter(regulate == "down") %>% 
+  distinct(contrast, protein) %>% 
+  mutate(up = TRUE) %>% 
+  pivot_wider(id_cols = protein, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  ggvenn::ggvenn(
+    show_percentage = FALSE, 
+    fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
+    text_size = 6
+    ) +
+  ggtitle("Down-regulated GPs") +
+  theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
+
+dys_regulate_venn <- up_ssg_venn + down_ssg_venn + up_gp_venn + down_gp_venn +
+  plot_layout(nrow = 1)
+tgutil::ggpreview(dys_regulate_venn, width = 16, height = 4)
+ggsave("results/figures/glycoproteomics/diff_venn.pdf", dys_regulate_venn, width = 16, height = 4)
+```
+
+```{r}
+double_volcano_plot_data %>% 
+  filter(regulate == "up") %>% 
+  distinct(contrast, protein) %>% 
+  mutate(dys = TRUE) %>% 
+  pivot_wider(id_cols = protein, names_from = contrast, values_from = dys, values_fill = FALSE) %>% 
+  filter(!`CHB-HC` & !`LC-HC` & `HCC-HC`)
+```
+
+```{r}
+library(clusterProfiler)
+
+protein_map <- data %>% 
+  mutate(
+    first_protein = str_split_i(proteins, ";", 1),
+    first_gene = str_split_i(genes, ";", 1)
+    ) %>% 
+  distinct(first_protein, first_gene) %>% 
+  separate_wider_delim(first_protein, delim = "|", names = c(NA, "uniprot_id", "uniprot_entry")) %>% 
+  mutate(uniprot_entry = str_split_i(uniprot_entry, "_", 1)) %>% 
+  rename(symbol = first_gene) %>% 
+  mutate(entrez_id = bitr(
+    symbol, 
+    fromType = "SYMBOL", 
+    toType = "ENTREZID", 
+    OrgDb = org.Hs.eg.db::org.Hs.eg.db,
+    drop = FALSE
+    )$ENTREZID)
+
+extract_dys_proteins <- function(group, name_type) {
+  double_volcano_plot_data %>% 
+    filter(contrast == paste0(.env$group, "-HC"), regulate != "no") %>% 
+    distinct(protein) %>% 
+    left_join(protein_map, by = c("protein" = "uniprot_entry")) %>% 
+    filter(!is.na(all_of(name_type))) %>% 
+    pull(all_of(name_type))
+}
+
+dys_proteins <- map(c("HCC", "LC", "CHB"), extract_dys_proteins, name_type = "entrez_id")
+names(dys_proteins) <- c("HCC", "LC", "CHB")
+ck <- compareCluster(dys_proteins, fun="enrichKEGG", organism="hsa", pvalueCutoff=0.05)
+
+kegg_res <- as_tibble(ck) %>% 
+  separate_longer_delim(geneID, "/") %>% 
+  left_join(protein_map %>% select(geneID = entrez_id, uniprot_entry), by = "geneID") %>% 
+  select(-geneID) %>% 
+  summarise(proteins = paste(uniprot_entry, collapse = ","), .by = -uniprot_entry)
+write_csv(kegg_res, "results/data/glycoproteomics/kegg_result.csv")
+
+kegg_dotplot <- dotplot(ck, showCategory = 15)
+tgutil::ggpreview(kegg_dotplot, width = 5, height = 5)
+ggsave("results/figures/glycoproteomics/kegg_dotplot.pdf", kegg_dotplot, width = 5, height = 5)
+
+rm(ck)
+```
+
+```{r}
+cg <- compareCluster(
+  dys_proteins, 
+  fun="enrichGO", 
+  OrgDb = "org.Hs.eg.db", 
+  ont = "BP",
+  pvalueCutoff = 0.01, 
+  pAdjustMethod = "BH")
+cg <- simplify(cg)
+
+go_bp_res <- as_tibble(cg) %>% 
+  separate_longer_delim(geneID, "/") %>% 
+  left_join(protein_map %>% select(geneID = entrez_id, uniprot_entry), by = "geneID") %>% 
+  select(-geneID) %>% 
+  summarise(proteins = paste(uniprot_entry, collapse = ","), .by = -uniprot_entry)
+
+go_bp_dotplot <- dotplot(cg)
+tgutil::ggpreview(go_bp_dotplot, width = 5, height = 6)
+
+write_csv(go_bp_res, "results/data/glycoproteomics/go_bp_result.csv")
+ggsave("results/figures/glycoproteomics/go_bp_dotplot.pdf", go_bp_dotplot, width = 5, height = 6)
+rm(cg)
+```
+
+```{r}
+plot_site_pro_dual <- function(glycosite, n = 5, sec_axe_scale = 5e3) {
+  protein <- str_extract(glycosite, "(.*) \\(.*\\)", group = 1)
+  pro_data <- pro_data %>% 
+    filter(protein == .env$protein) %>% 
+    summarise(mean = mean(abundance), sd = sd(abundance), .by = group)
+  
+  glycosite_mean_data <- mean_data %>% 
+    filter(glycosite == .env$glycosite) %>% 
+    summarise(abundance = sum(abundance), .by = c(group, glycan_composition))
+  
+  rank <- glycosite_mean_data %>% 
+    summarise(abundance = mean(abundance), .by = glycan_composition) %>% 
+    mutate(rank = rank(-abundance), .keep = "unused")
+  
+  glycosite_mean_data %>%
+    left_join(rank, by = "glycan_composition") %>%
+    mutate(glycan_composition = if_else(rank <= .env$n, glycan_composition, "Others"),) %>% 
+    summarise(abundance = sum(abundance), .by = c(group, glycan_composition)) %>% 
+    ggplot() +
+    geom_col(aes(group, abundance, fill = glycan_composition), position = "stack") +
+    geom_point(data = pro_data, aes(group, mean * sec_axe_scale), color = "grey30", size = 1.5) +
+    geom_errorbar(
+      data = pro_data, 
+      aes(group, ymin = (mean - sd) * sec_axe_scale, ymax = (mean + sd) * sec_axe_scale), 
+      width = 0.2, color = "grey30"
+      ) +
+    geom_line(data = pro_data, aes(group, mean * sec_axe_scale, group = 1), color = "grey30") +
+    labs(x = "Group", y = "Site-Specific\nGlycan Intensity", fill = "Glycan", title = glycosite) +
+    scale_y_continuous(
+      expand = expansion(mult = c(0, 0.05)),
+      sec.axis = sec_axis(~ . / sec_axe_scale, name = "Protein LFQ"),
+      ) +
+    theme_bw() +
+    theme(
+      panel.grid = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.x = element_blank(),
+      plot.title = element_text(hjust = 0.5)
+    )
+}
+
+A2MG_869_p <- plot_site_pro_dual("A2MG (N869)", sec_axe_scale = 4e3) + 
+  scale_fill_manual(values = RColorBrewer::brewer.pal(6, "Spectral"))
+A1AG1_93_p <- plot_site_pro_dual("A1AG1 (N93)", n = 5, sec_axe_scale = 1e5) + 
+  scale_fill_brewer(palette = "Spectral")
+
+tgutil::ggpreview(width = 4, height = 2)
+ggsave("results/figures/glycoproteomics/A2MG_869_p.pdf", A2MG_869_p, width = 4, height = 2)
+ggsave("results/figures/glycoproteomics/A1AG1_93_p.pdf", A1AG1_93_p, width = 4.5, height = 2)
+```
+
+```{r}
+ALBU_data <- data %>% 
+  filter(first_protein == "ALBU") %>% 
+  summarise(value = sum(value), .by = c(sample, group, glycan_composition, glycosite)) %>% 
+  mutate(log_value = log2(value))
+
+
+P_STEP <- 4
+ALBU_p_df <- ssg_dea_result %>% 
+  filter(str_detect(ssg, "ALBU")) %>% 
+  mutate(glycan_composition = str_split_i(ssg, "_", 3)) %>% 
+  separate_wider_delim(contrast, delim = "-", names = c("group2", "group1")) %>% 
+  mutate(p_label = paste0("p = ", scales::number(adj.P.Val, 0.001))) %>% 
+  select(glycan_composition, group1, group2, label = p_label, y.position = AveExpr) %>% 
+  mutate(y.position = case_when(
+    group1 == "HC" & group2 == "CHB" ~ y.position + P_STEP,
+    group1 == "CHB" & group2 == "LC" ~ y.position + P_STEP,
+    group1 == "LC" & group2 == "HCC" ~ y.position + P_STEP,
+    group1 == "HC" & group2 == "LC" ~ y.position + 2 * P_STEP,
+    group1 == "CHB" & group2 == "HCC" ~ y.position + 2 * P_STEP,
+    group1 == "HC" & group2 == "HCC" ~ y.position + 3 * P_STEP,
+  ))
+
+ggplot(ALBU_data, aes(group, log_value)) +
+  geom_col(
+    data = ALBU_data %>% summarise(log_value = mean(log_value), .by = c(group, glycan_composition)),
+    aes(y = log_value), fill = "#D6C89B"
+  ) +
+  ggbeeswarm::geom_quasirandom(color = "#88642d", alpha = 0.5) +
+  ggprism::add_pvalue(ALBU_p_df, bracket.size = 0.3, tip.length = 0, label.size = 2.8, vjust = -0.2) +
+  facet_wrap(~ glycan_composition) +
+  labs(x = "", y = "Log2 Intensity") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  theme_bw() +
+  theme(
+    strip.background = element_blank()
+  )
+
+tgutil::ggpreview(width = 3.5, height = 3)
+ggsave("results/figures/glycoproteomics/ALBU_p.pdf", width = 3.5, height = 3)
+```
+
+```{r}
+ALBU_ssg_abund_p <- data %>% 
+  summarise(abundance = sum(value), .by = c(sample, first_protein, first_protein_site, glycan_composition)) %>% 
+  summarise(abundance = mean(abundance), .by = c(first_protein, first_protein_site, glycan_composition)) %>% 
+  mutate(ssg = paste(first_protein, paste0("N", first_protein_site), glycan_composition, sep = "_")) %>% 
+  mutate(is_ALBU = first_protein == "ALBU", label = if_else(is_ALBU, ssg, NA)) %>%
+  ggplot(aes(reorder(ssg, desc(abundance)), log(abundance))) +
+  geom_point(color = "grey") +
+  geom_point(aes(alpha = is_ALBU), color = "red") +
+  ggrepel::geom_text_repel(aes(label = label), max.overlaps = 20, size = 3) +
+  guides(alpha = "none") +
+  scale_alpha_manual(values = c(0, 1)) +
+  labs(x = "Site-Specific Glycan", y = "Log2 Intensity") +
+  scale_x_discrete(expand = expansion(mult = c(0.01, 0.01))) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+  )
+
+ALBU_abund_p <- pro_data %>% 
+  summarise(abundance = mean(abundance), .by = protein) %>% 
+  mutate(is_ALBU = protein == "ALBU", label = if_else(is_ALBU, protein, NA)) %>%
+  ggplot(aes(reorder(protein, desc(abundance)), log(abundance))) +
+  geom_point(color = "grey") +
+  geom_point(aes(alpha = is_ALBU), color = "red") +
+  ggrepel::geom_text_repel(aes(label = label), max.overlaps = 20, size = 3) +
+  guides(alpha = "none") +
+  scale_alpha_manual(values = c(0, 1)) +
+  labs(x = "Protein", y = "Log2 Intensity") +
+  scale_x_discrete(expand = expansion(mult = c(0.01, 0.01))) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+  )
+
+ALBU_abund_p <- ALBU_ssg_abund_p + ALBU_abund_p
+tgutil::ggpreview(width = 6, height = 3)
+ggsave("results/figures/glycoproteomics/ALBU_abund_p.pdf", width = 6, height = 3)
+```
+
+```{r}
+library(lmerTest)
+
+struc_data <- read_pglyco3_pglycoquant(
+  "data/pooled/glycopeptides.list", 
+  quant_method = "label-free",
+  quant_aggr_method = "gfs"
+) %>% 
+  remove_missing_variables(prop = 0) %>% 
+  median_normalize() %>% 
+  sample_min_impute() %>% 
+  as_tibble() %>% 
+  mutate(
+    glycan_composition = str_replace(glycan_composition, "A", "S"),
+    sample = str_split_i(sample, "-", -1),
+    group = str_split_i(sample, "_", 1),
+    group = case_match(group, "H" ~ "HC", "M" ~ "CHB", "Y" ~ "LC", "C" ~ "HCC"),
+    group = factor(group, levels = c("HC", "CHB", "LC", "HCC")),
+    sample = paste0(group, str_split_i(sample, "_", 2)),
+    first_protein = str_split_i(proteins, ";", 1),
+    first_protein = str_extract(first_protein, "sp\\|.*?\\|(.*?)_", group = 1),
+    first_protein_site = str_split_i(protein_sites, ";", 1),
+    glycosite = str_glue("{first_protein} (N{first_protein_site})"),
+    glycosite = if_else(str_detect(proteins, ";"), paste0(glycosite, "*"), glycosite)
+  )
+
+struc_df <- struc_data %>% 
+  distinct(glycan_structure) %>% 
+  mutate(glycan_graph = glyparse::parse_pglyco_struc(glycan_structure))
+
+glycan_properties <- glymotif::describe_n_glycans(deframe(struc_df))
+
+prepared_for_decouple <- struc_data %>% 
+  left_join(glycan_properties, by = c("glycan_structure" = "glycan")) %>% 
+  filter(glycan_type == "complex", n_antennae >= 2) %>%
+  mutate(
+    enzy_FUT8 = n_core_fuc,
+    enzy_FUT3 = as.integer(n_arm_fuc > 0),
+    enzy_MGAT3 = as.integer(bisecting),
+    `enzy_MGAT4/5` = if_else(is.na(n_antennae), 0, as.integer(n_antennae > 2)),
+    enzy_B4GALT = as.integer(n_gal > 0),
+    `enzy_ST3/6GAL` = as.integer(str_extract(glycan_composition, "S(\\d+)", group = 1)),
+    `enzy_ST3/6GAL` = if_else(is.na(`enzy_ST3/6GAL`), 0, as.integer(`enzy_ST3/6GAL` > 0)),
+  ) %>% 
+  select(sample, group, value, variable, glycosite, glycan_composition, starts_with("enzy_"))
+
+run_nglybai <- function(data) {
+  decouple_mat <- data %>% 
+    select(sample, variable, value) %>% 
+    pivot_wider(names_from = variable, values_from = value) %>% 
+    column_to_rownames("sample") %>% 
+    as.matrix() %>% 
+    log2() %>% 
+    scale() %>% 
+    t()
+  decouple_net <- data %>% 
+    select(variable, starts_with("enzy_")) %>% 
+    pivot_longer(starts_with("enzy_"), names_to = "source", values_to = "mor", names_prefix = "enzy_") %>% 
+    rename(target = variable) %>% 
+    distinct()
+  decoupleR::run_ulm(decouple_mat, decouple_net, minsize = 0)
+}
+
+nglybai_res <- prepared_for_decouple %>% 
+  nest_by(glycosite) %>% 
+  mutate(decouple_res = list(run_nglybai(data))) %>% 
+  select(-data) %>% 
+  unnest(decouple_res) %>% 
+  ungroup()
+
+lmm_res <- nglybai_res %>% 
+  mutate(
+    group = str_sub(condition, 1, -2),
+    group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))
+    ) %>% 
+  nest_by(source) %>% 
+  mutate(
+    mod = list(lmer(score ~ group + (1 | glycosite), data = data)),
+    params = list(parameters::model_parameters(mod))
+    ) %>% 
+  select(source, params) %>% 
+  unnest(params) %>% 
+  ungroup() %>% 
+  filter(!str_starts(Parameter, "SD"))
+
+write_csv(lmm_res, "results/data/glycoproteomics/lmm_res.csv")
+```
+
+```{r}
+lmm_res %>% 
+  filter(Parameter != "(Intercept)") %>% 
+  mutate(
+    Parameter = factor(Parameter, levels = c("groupCHB", "groupLC", "groupHCC")),
+    size = abs(t),
+    color = case_when(
+      p < 0.05 & t > 0 ~ "up",
+      p < 0.05 & t < 0 ~ "down",
+      .default = "no"
+    )) %>% 
+  ggplot(aes(source, Parameter)) +
+  geom_point(aes(size = size, color = color)) +
+  scale_color_manual(values = c(no = "grey", up = "#D26F32", down = "#275D87")) +
+  labs(x = "Glycotransferase", y = "Effect", color = "Regulate", size = "t") +
+  guides(size = "none") +
+  coord_equal() +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+    legend.title = element_text(hjust = 0.5)
+  )
+tgutil::ggpreview(width = 4, height = 2)
+ggsave("results/figures/glycoproteomics/nglybai_dotplot.pdf", width = 4, height = 2)
+```
+
+```{r}
+nglybai_res %>% 
+  filter(source == "B4GALT") %>% 
+  mutate(score = as.double(scale(score)), .by = glycosite) %>% 
+  filter(!is.na(score)) %>% 
+  mutate(group = str_sub(condition, 1, -2)) %>% 
+  summarise(score = mean(score), .by = c(group, glycosite)) %>% 
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
+  ggplot(aes(glycosite, group, fill = score)) +
+  geom_tile(color = "white", linewidth = 1) +
+  coord_equal() +
+  scale_fill_gradient(low = "#EBDAE9", high = "#64529B") +
+  labs(x = "Glycosite", y = "Group", title = "Activity Scores for B4GALT") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
+  )
+tgutil::ggpreview(width = 8, height = 3)
+ggsave("results/figures/glycoproteomics/B4GALT_as_heatmap.pdf", width = 8, height = 3)
+```
+
+```{r}
+nglybai_res %>% 
+  filter(source == "FUT8") %>% 
+  mutate(score = as.double(scale(score)), .by = glycosite) %>% 
+  filter(!is.na(score)) %>% 
+  mutate(group = str_sub(condition, 1, -2)) %>% 
+  summarise(score = mean(score), .by = c(group, glycosite)) %>% 
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
+  ggplot(aes(glycosite, group, fill = score)) +
+  geom_tile(color = "white", linewidth = 1) +
+  coord_equal() +
+  scale_fill_gradient(low = "#EBDAE9", high = "#64529B") +
+  labs(x = "Glycosite", y = "Group", title = "Activity Scores for FUT8") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
+  )
+tgutil::ggpreview(width = 16, height = 3)
+ggsave("results/figures/glycoproteomics/FUT8_as_heatmap.pdf", width = 16, height = 3)
+```
