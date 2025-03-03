@@ -1,0 +1,223 @@
+GGDB ID	GGDB Symbol	Families	Pathway Class Labels	Designations	Organism
+"[{""label"":""gg128"",""id"":""11320""}]"	MGAT4A	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""mannosyl (alpha-1,3-)-glycoprotein beta-1,4-N-acetylglucosaminyltransferase, isozyme A""]"	Homo sapiens
+"[{""label"":""gg036"",""id"":""50515""}]"	CHST11	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin D-N-acetylgalactosamine-4-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg218"",""id"":""84992""}]"	PIGY	"[""N-Acetylglucosaminyltransferase""]"	"[""GPI-anchor""]"	"[""GlcNAc-T complex""]"	Homo sapiens
+"[{""label"":""gg173"",""id"":""55343""}]"	SLC35C1	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""GDP-fucose transporter""]"	Homo sapiens
+"[{""label"":""gg015"",""id"":""9956""}]"	HS3ST2	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate D-glucosaminyl 3-O-sulfotransferase-2""]"	Homo sapiens
+"[{""label"":""gg207"",""id"":""64409""}]"	GALNT19	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 19""]"	Homo sapiens
+"[{""label"":""gg052"",""id"":""8869""}]"	ST3GAL5	"[""Sialyltransferase""]"	"[""O-glycan, not mucin-type"",""glycolipid, ganglio series""]"	"[""CMP-NeuAc:lactosylceramide alpha-2,3-sialyltransferase""]"	Homo sapiens
+"[{""label"":""gg144"",""id"":""10195""}]"	ALG3	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""Dol-P-Mannose:Man5GlcNAc2-PP-dolichol alpha-1,3-mannosyltransferase""]"	Homo sapiens
+"[{""label"":""gg167"",""id"":""79586""}]"	CHPF	"[""N-Acetylgalactosaminyltransferase Glucuronyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin sulfate synthase 2, chondroitin polymerizing factor, glucuronosyl-N-acetylgalactosaminyl-proteoglycan 4-beta-N-acetylgalactosaminyltransferase, N-acetylgalactosaminyl-proteoglycan 3-beta-glucuronosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg206"",""id"":""84912""}]"	SLC35B4	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""UDP-Xylose/N-Acetylglucosamine transporter""]"	Homo sapiens
+"[{""label"":""gg177"",""id"":""23169""}]"	SLC35D1	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""UDP-glucuronic acid/UDP-N-acetylgalactosamine dual transporter""]"	Homo sapiens
+"[{""label"":""gg149"",""id"":""84920""}]"	ALG10	"[""Glucosyltransferase""]"	"[""N-glycan""]"	"[""Dol-P-Glucose:Glc2Man9GlcNAc2-PP-dolichol alpha-1,2-glucosyltransferase""]"	Homo sapiens
+"[{""label"":""gg229"",""id"":""54872""}]"	PIGG	"[""""]"	"[""GPI-anchor""]"	"[""GPI EtNP Transferase 2; 2 transcript variants""]"	Homo sapiens
+"[{""label"":""gg048"",""id"":""6482""}]"	ST3GAL1	"[""Sialyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""O-glycan, mucin-type"",""glycolipid, ganglio series"",""glycolipid, globo series""]"	"[""CMP-NeuAc:beta-galactoside alpha-2,3-sialyltransferase I""]"	Homo sapiens
+"[{""label"":""gg162"",""id"":""2137""}]"	EXTL3	"[""N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate GlcA/GlcNAc transferase like 3""]"	Homo sapiens
+"[{""label"":""gg216"",""id"":""5283""}]"	PIGH	"[""N-Acetylglucosaminyltransferase""]"	"[""GPI-anchor""]"	"[""GlcNAc-T complex""]"	Homo sapiens
+"[{""label"":""gg030"",""id"":""4166""}]"	CHST6	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, keratan sulfate""]"	"[""corneal N-acetylglucosamine 6-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg092"",""id"":""11226""}]"	GALNT6	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 6""]"	Homo sapiens
+"[{""label"":""gg038"",""id"":""166012""}]"	CHST13	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin D-N-acetylgalactosamine-4-O-sulfotransferase 3""]"	Homo sapiens
+"[{""label"":""gg047"",""id"":""51363""}]"	CHST15	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""N-Acetylgalactosamine 4-sulfate 6-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg148"",""id"":""79796""}]"	ALG9	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""Dol-P-Mannose:Man6GlcNAc2-PP-dolichol alpha-1,2-mannosyltransferase, Dol-P-Mannose:Man8GlcNAc2-PP-dolichol alpha-1,2-mannosyltransferase""]"	Homo sapiens
+"[{""label"":""gg041"",""id"":""9514""}]"	GAL3ST1	"[""Sulfotransferases""]"	"[""sphingolipid""]"	"[""galactosylceramide 3-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg111"",""id"":""2651""}]"	GCNT2	"[""N-Acetylglucosaminyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""glucosaminyl (N-acetyl) transferase 2, I-branching enzyme (I blood group)""]"	Homo sapiens
+"[{""label"":""gg081"",""id"":""9334""}]"	B4GALT5	"[""Galactosyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""beta 1,4-galactosyltransferase 5""]"	Homo sapiens
+"[{""label"":""gg170"",""id"":""64132""}]"	XYLT2	"[""Xylosyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate"",""Glycosaminoglycan, heparan sulfate""]"	"[""xylosyltransferase II""]"	Homo sapiens
+"[{""label"":""gg141"",""id"":""1798""}]"	DPAGT1	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""UDP-GlcNAc:Dolichol phosphate N-acetylglucosaminephosphotransferase""]"	Homo sapiens
+"[{""label"":""gg200"",""id"":""28""}]"	A(ABO)	"[""N-Acetylgalactosaminyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""alpha 1,3-N-acetylgalactosaminytransferase""]"	Homo sapiens
+"[{""label"":""gg032"",""id"":""90161""}]"	HS6ST2	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate 6-O-sulfotransferase 2""]"	Homo sapiens
+"[{""label"":""gg053"",""id"":""10402""}]"	ST3GAL6	"[""Sialyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""CMP-NeuAc:alpha-2,3-sialyltransferase""]"	Homo sapiens
+"[{""label"":""gg106"",""id"":""283358""}]"	B4GALNT3	"[""N-Acetylgalactosaminyltransferase""]"	"[""terminal modification""]"	"[""beta 1,4 N-acetylgalactosaminyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg172"",""id"":""120071""}]"	GYLTL1B	"[""Glucuronyltransferase"",""Xylosyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""glycosyltransferase-like 1B""]"	Homo sapiens
+"[{""label"":""gg117"",""id"":""10331""}]"	B3GNT3	"[""N-Acetylglucosaminyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg021"",""id"":""8509""}]"	NDST2	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""N-deacetylase/N-sulfotransferase (heparan glucosaminyl) 2""]"	Homo sapiens
+"[{""label"":""gg156"",""id"":""135152""}]"	B3GAT2	"[""Glucuronyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""beta-1,3-glucuronyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg133"",""id"":""3955""}]"	LFNG	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""LFNG O-fucosylpeptide 3-beta-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg020"",""id"":""3340""}]"	NDST1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""N-deacetylase/N-sulfotransferase (heparan glucosaminyl) 1""]"	Homo sapiens
+"[{""label"":""gg088"",""id"":""2590""}]"	GALNT2	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg078"",""id"":""8704""}]"	B4GALT2	"[""Galactosyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""N-glycan"",""O-glycan, not mucin-type"",""glycolipid, lacto/neolacto series""]"	"[""beta 1,4-galactosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg043"",""id"":""89792""}]"	GAL3ST3	"[""Sulfotransferases""]"	"[""terminal modification""]"	"[""beta-galactose-3-O-sulfotransferase 3""]"	Homo sapiens
+"[{""label"":""gg107"",""id"":""338707""}]"	B4GALNT4	"[""N-Acetylgalactosaminyltransferase""]"	"[""terminal modification""]"	"[""beta 1,4 N-acetylgalactosaminyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg098"",""id"":""79695""}]"	GALNT12	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 12""]"	Homo sapiens
+"[{""label"":""gg166"",""id"":""55454""}]"	CSGALNACT2	"[""N-Acetylgalactosaminyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin sulfate N-acetylgalactosaminyltransferase 2, glucuronosyl-N-acetylgalactosaminyl-proteoglycan 4-beta-N-acetylgalactosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg116"",""id"":""10678""}]"	B3GNT2	"[""N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""glycolipid, lacto/neolacto series""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg151"",""id"":""79087""}]"	ALG12	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""Dol-P-Mannose:Man7GlcNAc2-PP-dolichol alpha-1,6-mannosyltransferase""]"	Homo sapiens
+"[{""label"":""gg096"",""id"":""55568""}]"	GALNT10	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 10""]"	Homo sapiens
+"[{""label"":""gg212"",""id"":""57452""}]"	GALNT16	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-N-acetyl-alpha-D-galactosamine:polypeptide N-acetylgalactosaminyltransferase 16""]"	Homo sapiens
+"[{""label"":""gg054"",""id"":""6480""}]"	ST6GAL1	"[""Sialyltransferase""]"	"[""N-glycan"",""O-glycan, not mucin-type""]"	"[""CMP-NeuAc:galactoside alpha-2,6-sialyltransferase""]"	Homo sapiens
+"[{""label"":""gg225"",""id"":""9488""}]"	PIGB	"[""Mannosyltransferases""]"	"[""GPI-anchor""]"	"[""GPI-MT-III""]"	Homo sapiens
+"[{""label"":""gg146"",""id"":""29929""}]"	ALG6	"[""Glucosyltransferase""]"	"[""N-glycan""]"	"[""Dol-P-Glucose:Man9GlcNAc2-PP-dolichol alpha-1,3-glucosyltransferase""]"	Homo sapiens
+"[{""label"":""gg210"",""id"":""285203""}]"	EOGT	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""EGF domain-specific O-linked N-acetylglucosamine (GlcNAc) transferase""]"	Homo sapiens
+"[{""label"":""gg127"",""id"":""4248""}]"	MGAT3	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""mannosyl (beta-1,4-)-glycoprotein beta-1,4-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg074"",""id"":""126792""}]"	B3GALT6	"[""Galactosyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate"",""Glycosaminoglycan, heparan sulfate""]"	"[""beta 1,3-galactosyltransferase 6""]"	Homo sapiens
+"[{""label"":""gg223"",""id"":""55650""}]"	PIGV	"[""Mannosyltransferases""]"	"[""GPI-anchor""]"	"[""GPI-MT-II; 2 transcript variants (NM_001202554.1, NM_017837.3)""]"	Homo sapiens
+"[{""label"":""gg122"",""id"":""374907""}]"	B3GNT8	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 8""]"	Homo sapiens
+"[{""label"":""gg004"",""id"":""2526""}]"	FUT4	"[""Fucosyltransferase""]"	"[""O-glycan, not mucin-type"",""glycolipid, lacto/neolacto series""]"	"[""alpha1,3-fucosyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg057"",""id"":""10610""}]"	ST6GALNAC2	"[""Sialyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""GalNAc alpha-2, 6-sialyltransferase II""]"	Homo sapiens
+"[{""label"":""gg100"",""id"":""79623""}]"	GALNT14	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 14""]"	Homo sapiens
+"[{""label"":""gg163"",""id"":""22856""}]"	CHSY1	"[""N-Acetylgalactosaminyltransferase Glucuronyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin sulfate synthase 1, glucuronosyl-N-acetylgalactosaminyl-proteoglycan 4-beta-N-acetylgalactosaminyltransferase, N-acetylgalactosaminyl-proteoglycan 3-beta-glucuronosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg006"",""id"":""2528""}]"	FUT6	"[""Fucosyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""alpha1,3-fucosyltransferase 6""]"	Homo sapiens
+"[{""label"":""gg011"",""id"":""170384""}]"	FUT11	"[""Fucosyltransferase""]"	"[""unassign""]"	"[""alpha1,3-fucosyltransferase 11""]"	Homo sapiens
+"[{""label"":""gg002"",""id"":""2524""}]"	FUT2	"[""Fucosyltransferase""]"	"[""glycolipid, globo series"",""glycolipid, lacto/neolacto series""]"	"[""alpha1,2-fucosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg227"",""id"":""84720""}]"	PIGO	"[""""]"	"[""GPI-anchor""]"	"[""GPI EtNP Transferase 3; 3 transcript variants (NM_001201484.1, NM_032634.3, NM_152850.3)""]"	Homo sapiens
+"[{""label"":""gg213"",""id"":""9091""}]"	PIGQ	"[""N-Acetylglucosaminyltransferase""]"	"[""GPI-anchor""]"	"[""GlcNAc-T complex; 2 transcript variants, (NM_004204.3, NM_148920.2)""]"	Homo sapiens
+"[{""label"":""gg115"",""id"":""11041""}]"	B4GAT1	"[""N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""glycolipid, lacto/neolacto series""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg159"",""id"":""2132""}]"	EXT2	"[""Glucuronyltransferase N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate GlcA/GlcNAc transferase 2, glucuronosyl-N-acetylglucosaminyl-proteoglycan 4-alpha-N-acetylglucosaminyltransferase, N-acetylglucosaminyl-proteoglycan 4-beta-glucuronosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg010"",""id"":""84750""}]"	FUT10	"[""Fucosyltransferase""]"	"[""N-glycan""]"	"[""alpha1,3-fucosyltransferase 10""]"	Homo sapiens
+"[{""label"":""gg108"",""id"":""9245""}]"	GCNT3	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""glucosaminyl (N-acetyl) transferase 3, mucin type""]"	Homo sapiens
+"[{""label"":""gg029"",""id"":""23563""}]"	CHST5	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, keratan sulfate""]"	"[""intestinal N-acetylglucosamine 6-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg214"",""id"":""5279""}]"	PIGC	"[""N-Acetylglucosaminyltransferase""]"	"[""GPI-anchor""]"	"[""GlcNAc-T complex; 2 transcipt variants(NM_153747.1, NM_002642.3)""]"	Homo sapiens
+"[{""label"":""gg105"",""id"":""124872""}]"	B4GALNT2	"[""N-Acetylgalactosaminyltransferase""]"	"[""N-glycan"",""O-glycan, mucin-type"",""glycolipid, ganglio series""]"	"[""beta 1,4 N-acetylgalactosaminyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg012"",""id"":""23509""}]"	POFUT1	"[""Fucosyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""protein o-fucosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg046"",""id"":""83539""}]"	CHST9	"[""Sulfotransferases""]"	"[""N-glycan""]"	"[""N-acetylgalactosamine-4-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg031"",""id"":""9394""}]"	HS6ST1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate 6-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg221"",""id"":""93183""}]"	PIGM	"[""Mannosyltransferases""]"	"[""GPI-anchor""]"	"[""GPI-MT-I""]"	Homo sapiens
+"[{""label"":""gg062"",""id"":""6489""}]"	ST8SIA1	"[""Sialyltransferase""]"	"[""glycolipid, ganglio series"",""glycolipid, globo series"",""glycolipid, lacto/neolacto series""]"	"[""ST8 alpha-N-acetyl-neuraminide alpha-2,8-sialyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg019"",""id"":""222537""}]"	HS3ST5	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate 3-OST-5""]"	Homo sapiens
+"[{""label"":""gg007"",""id"":""2529""}]"	FUT7	"[""Fucosyltransferase""]"	"[""O-glycan, not mucin-type"",""glycolipid, lacto/neolacto series""]"	"[""alpha1,3-fucosyltransferase 7""]"	Homo sapiens
+"[{""label"":""gg085"",""id"":""28""}]"	B(ABO)	"[""Galactosyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""alpha 1,3-galactosyltransferase""]"	Homo sapiens
+"[{""label"":""gg237"",""id"":""64711""}]"	HS3ST6	"[""""]"	"[""additional""]"	"[""heparan sulfate-glucosamine 3-sulfotransferase 6""]"	Homo sapiens
+"[{""label"":""gg176"",""id"":""7355""}]"	SLC35A2	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""UDP-galactose transporter""]"	Homo sapiens
+"[{""label"":""gg217"",""id"":""51227""}]"	PIGP	"[""N-Acetylglucosaminyltransferase""]"	"[""GPI-anchor""]"	"[""GlcNAc-T complex; 2 transcript variants (NM_153681.2, NM_153682.2)""]"	Homo sapiens
+"[{""label"":""gg178"",""id"":""10559""}]"	SLC35A1	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""CMP-sialic acid transporter""]"	Homo sapiens
+"[{""label"":""gg049"",""id"":""6483""}]"	ST3GAL2	"[""Sialyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""O-glycan, mucin-type"",""glycolipid, ganglio series"",""glycolipid, globo series""]"	"[""CMP-NeuAc:beta-galactoside alpha-2,3-sialyltransferase II""]"	Homo sapiens
+"[{""label"":""gg024"",""id"":""9653""}]"	HS2ST1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate 2-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg231"",""id"":""8733""}]"	GAA1	"[""""]"	"[""GPI-anchor""]"	"[""GPI transamidase complex; required for the cleavage of the GPI attachment signal peptide.""]"	Homo sapiens
+"[{""label"":""gg056"",""id"":""55808""}]"	ST6GALNAC1	"[""Sialyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""GalNAc alpha-2, 6-sialyltransferase I""]"	Homo sapiens
+"[{""label"":""gg073"",""id"":""10317""}]"	B3GALT5	"[""Galactosyltransferase""]"	"[""glycolipid, globo series"",""glycolipid, lacto/neolacto series""]"	"[""beta 1,3-galactosyltransferase 5""]"	Homo sapiens
+"[{""label"":""gg064"",""id"":""51046""}]"	ST8SIA3	"[""Sialyltransferase""]"	"[""N-glycan"",""glycolipid, ganglio series""]"	"[""ST8 alpha-N-acetyl-neuraminide alpha-2,8-sialyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg158"",""id"":""2131""}]"	EXT1	"[""Glucuronyltransferase N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate GlcA/GlcNAc transferase 1, glucuronosyl-N-acetylglucosaminyl-proteoglycan 4-alpha-N-acetylglucosaminyltransferase, N-acetylglucosaminyl-proteoglycan 4-beta-glucuronosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg083"",""id"":""11285""}]"	B4GALT7	"[""Galactosyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate"",""Glycosaminoglycan, heparan sulfate""]"	"[""beta 1,4-galactosyltransferase 7""]"	Homo sapiens
+"[{""label"":""gg067"",""id"":""338596""}]"	ST8SIA6	"[""Sialyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""ST8 alpha-N-acetyl-neuraminide alpha-2,8-sialyltransferase 6""]"	Homo sapiens
+"[{""label"":""gg059"",""id"":""27090""}]"	ST6GALNAC4	"[""Sialyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""GalNAc alpha-2, 6-sialyltransferase IV""]"	Homo sapiens
+"[{""label"":""gg131"",""id"":""146664""}]"	MGAT5B	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan"",""O-glycan, not mucin-type""]"	"[""mannosyl (alpha-1,6-)-glycoprotein beta-1,6-N-acetyl-glucosaminyltransferase, isozyme B""]"	Homo sapiens
+"[{""label"":""gg061"",""id"":""30815""}]"	ST6GALNAC6	"[""Sialyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""GalNAc alpha-2, 6-sialyltransferase VI""]"	Homo sapiens
+"[{""label"":""gg014"",""id"":""9957""}]"	HS3ST1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate D-glucosaminyl 3-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg026"",""id"":""56548""}]"	CHST7	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin 6-sulfotransferase-2""]"	Homo sapiens
+"[{""label"":""gg219"",""id"":""9487""}]"	PIGL	"[""""]"	"[""GPI-anchor""]"	"[""de-N-acetylase (GlcNAc-PI -\u003e GlcN-PI)""]"	Homo sapiens
+"[{""label"":""gg072"",""id"":""8705""}]"	B3GALT4	"[""Galactosyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""beta 1,3-galactosyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg186"",""id"":""727936""}]"	GXYLT2	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""glucoside xylosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg120"",""id"":""192134""}]"	B3GNT6	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 6 (core 3 synthase)""]"	Homo sapiens
+"[{""label"":""gg037"",""id"":""55501""}]"	CHST12	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin D-N-acetylgalactosamine-4-O-sulfotransferase 2""]"	Homo sapiens
+"[{""label"":""gg084"",""id"":""7368""}]"	CGT	"[""Galactosyltransferase""]"	"[""sphingolipid""]"	"[""UDP-Galactose ceramide galactosyl transferase""]"	Homo sapiens
+"[{""label"":""gg142"",""id"":""56052""}]"	ALG1	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""GDP-Mannose:GlcNAc2-PP-dolichol beta-1,4-mannosyltransferase""]"	Homo sapiens
+"[{""label"":""gg121"",""id"":""93010""}]"	B3GNT7	"[""N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 7""]"	Homo sapiens
+"[{""label"":""gg180"",""id"":""11046""}]"	SLC35D2	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""UDP-N-acetylglucosamine transporter(fringe connection)""]"	Homo sapiens
+"[{""label"":""gg101"",""id"":""117248""}]"	GALNT15	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase T15""]"	Homo sapiens
+"[{""label"":""gg169"",""id"":""64131""}]"	XYLT1	"[""Xylosyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate"",""Glycosaminoglycan, heparan sulfate""]"	"[""xylosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg203"",""id"":""8818""}]"	DPM2	"[""Mannosyltransferases""]"	"[""GPI-anchor"",""N-glycan""]"	"[""dolichol-phosphate mannosyltransferase polypeptide 2, regulatory subunit""]"	Homo sapiens
+"[{""label"":""gg001"",""id"":""2523""}]"	FUT1	"[""Fucosyltransferase""]"	"[""glycolipid, globo series"",""glycolipid, lacto/neolacto series""]"	"[""alpha1,2-fucosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg202"",""id"":""199857""}]"	ALG14	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""asparagine-linked glycosylation 14 homolog (yeast)""]"	Homo sapiens
+"[{""label"":""gg185"",""id"":""283464""}]"	GXYLT1	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""glucoside xylosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg094"",""id"":""26290""}]"	GALNT8	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 8""]"	Homo sapiens
+"[{""label"":""gg174"",""id"":""23443""}]"	SLC35A3	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""UDP-N-acetylglucosamine transporter""]"	Homo sapiens
+"[{""label"":""gg018"",""id"":""9951""}]"	HS3ST4	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate D-glucosaminyl 3-O-sulfotransferase-4""]"	Homo sapiens
+"[{""label"":""gg204"",""id"":""54344""}]"	DPM3	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""dolichol-phosphate mannosyltransferase polypeptide 3""]"	Homo sapiens
+"[{""label"":""gg140"",""id"":""8813""}]"	DPM1	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""dolichol-phosphate mannosyltransferase polypeptide 1, catalytic subunit""]"	Homo sapiens
+"[{""label"":""gg211"",""id"":""442117""}]"	GALNT17	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-N-acetyl-alpha-D-galactosamine:polypeptide N-acetylgalactosaminyltransferase 17""]"	Homo sapiens
+"[{""label"":""gg063"",""id"":""8128""}]"	ST8SIA2	"[""Sialyltransferase""]"	"[""N-glycan""]"	"[""ST8 alpha-N-acetyl-neuraminide alpha-2,8-sialyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg102"",""id"":""8706""}]"	B3GALNT1	"[""N-Acetylgalactosaminyltransferase""]"	"[""glycolipid, globo series""]"	"[""beta 1,3-N-acetylgalactosaminyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg209"",""id"":""152002""}]"	XXYLT1	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""xyloside xylosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg005"",""id"":""2527""}]"	FUT5	"[""Fucosyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""alpha1,3-fucosyltransferase 5""]"	Homo sapiens
+"[{""label"":""gg126"",""id"":""4247""}]"	MGAT2	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""mannosyl (alpha-1,6-)-glycoprotein beta-1,2-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg236"",""id"":""84197""}]"	POMK	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""""]"	Homo sapiens
+"[{""label"":""gg134"",""id"":""5986""}]"	RFNG	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""RFNG O-fucosylpeptide 3-beta-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg235"",""id"":""84892""}]"	POMGNT2	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""""]"	Homo sapiens
+"[{""label"":""gg124"",""id"":""51146""}]"	A4GNT	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""alpha-1,4-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg132"",""id"":""4242""}]"	MFNG	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""MFNG O-fucosylpeptide 3-beta-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg045"",""id"":""64377""}]"	CHST8	"[""Sulfotransferases""]"	"[""N-glycan""]"	"[""N-acetylgalactosamine-4-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg160"",""id"":""2134""}]"	EXTL1	"[""N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate GlcA/GlcNAc transferase like 1""]"	Homo sapiens
+"[{""label"":""gg089"",""id"":""2591""}]"	GALNT3	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg129"",""id"":""11282""}]"	MGAT4B	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""mannosyl (alpha-1,3-)-glycoprotein beta-1,4-N-acetylglucosaminyltransferase, isozyme B""]"	Homo sapiens
+"[{""label"":""gg066"",""id"":""29906""}]"	ST8SIA5	"[""Sialyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""ST8 alpha-N-acetyl-neuraminide alpha-2,8-sialyltransferase 5""]"	Homo sapiens
+"[{""label"":""gg091"",""id"":""11227""}]"	GALNT5	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 5""]"	Homo sapiens
+"[{""label"":""gg103"",""id"":""148789""}]"	B3GALNT2	"[""N-Acetylgalactosaminyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""beta 1,3-N-acetylgalactosaminyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg025"",""id"":""9469""}]"	CHST3	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin 6-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg033"",""id"":""266722""}]"	HS6ST3	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate 6-O-sulfotransferase 3""]"	Homo sapiens
+"[{""label"":""gg135"",""id"":""3036""}]"	HAS1	"[""Glucuronyltransferase N-Acetylglucosaminyltransferase""]"	"[""Hyaluronic acid""]"	"[""hyaluronan synthase 1""]"	Homo sapiens
+"[{""label"":""gg022"",""id"":""9348""}]"	NDST3	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""N-deacetylase/N-sulfotransferase (heparan glucosaminyl) 3""]"	Homo sapiens
+"[{""label"":""gg138"",""id"":""10585""}]"	POMT1	"[""Mannosyltransferases""]"	"[""O-glycan, not mucin-type""]"	"[""protein O-mannosyl-transferase""]"	Homo sapiens
+"[{""label"":""gg097"",""id"":""63917""}]"	GALNT11	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 11""]"	Homo sapiens
+"[{""label"":""gg187"",""id"":""2218""}]"	FCMD	"[""Glycosyltransferase-like""]"	"[""O-glycan, not mucin-type""]"	"[""Fukuyama type congenital muscular dystrophy (fukutin)""]"	Homo sapiens
+"[{""label"":""gg034"",""id"":""10164""}]"	CHST4	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, keratan sulfate""]"	"[""high endothelial cell (HEC)-specific N-acetylglucosamine 6-O-sulfotransferase (L-selectin ligand sulfotransferase)""]"	Homo sapiens
+"[{""label"":""gg232"",""id"":""94005""}]"	PIGS	"[""""]"	"[""GPI-anchor""]"	"[""GPI transamidase complex""]"	Homo sapiens
+"[{""label"":""gg087"",""id"":""2589""}]"	GALNT1	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg157"",""id"":""27087""}]"	B3GAT1	"[""Glucuronyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""beta-1,3-glucuronyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg095"",""id"":""50614""}]"	GALNT9	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 9""]"	Homo sapiens
+"[{""label"":""gg161"",""id"":""2135""}]"	EXTL2	"[""N-Acetylgalactosaminyltransferase N-Acetylglucosaminyltransferase""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate a4-N-Acetylhexosaminyltransferase, glucuronyl-galactosyl-proteoglycan 4-alpha-N-acetylglucosaminyltransferase/alpha-1,4-N-acetylgalactosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg003"",""id"":""2525""}]"	FUT3	"[""Fucosyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""alpha1,3/4-fucosyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg188"",""id"":""79147""}]"	FKRP	"[""Glycosyltransferase-like""]"	"[""O-glycan, not mucin-type""]"	"[""hFKRP""]"	Homo sapiens
+"[{""label"":""gg143"",""id"":""85365""}]"	ALG2	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""GDP-Mannose:ManGlcNAc2-PP-dolichol alpha-1,3-mannosyltransferase, GDP-Mannose:Man2GlcNAc2-PP-dolichol alpha-1,6-mannosyltransferase""]"	Homo sapiens
+"[{""label"":""gg228"",""id"":""5281""}]"	PIGF	"[""""]"	"[""GPI-anchor""]"	"[""Component of EtNP transferase; PIGO-PIGF and GPI7-PIGF complexes; 2 transcript variants (NM_002643.3, NM_173074.2)""]"	Homo sapiens
+"[{""label"":""gg055"",""id"":""84620""}]"	ST6GAL2	"[""Sialyltransferase""]"	"[""N-glycan"",""O-glycan, not mucin-type""]"	"[""CMP-NeuAc:galactoside alpha-2,6-sialyltransferase""]"	Homo sapiens
+"[{""label"":""gg153"",""id"":""55757""}]"	UGGT2 (UGCGL2)	"[""Glucosyltransferase""]"	"[""N-glycan""]"	"[""UDP-glucose:glycoprotein glucosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg077"",""id"":""2683""}]"	B4GALT1	"[""Galactosyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""N-glycan"",""O-glycan, not mucin-type"",""glycolipid, lacto/neolacto series""]"	"[""beta 1,4-galactosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg109"",""id"":""2650""}]"	GCNT1	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""glucosaminyl (N-acetyl) transferase 1, core 2 (beta-1,6-N-acetylglucosaminyltransferase)""]"	Homo sapiens
+"[{""label"":""gg205"",""id"":""79868""}]"	ALG13	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""glycosyltransferase 28 domain containing 1""]"	Homo sapiens
+"[{""label"":""gg233"",""id"":""51604""}]"	PIGT	"[""""]"	"[""GPI-anchor""]"	"[""GPI transamidase complex; 4 transcript variants (NM_001184729.2, NM_015937.5, NM_001184730.2, NM_001184728.2)""]"	Homo sapiens
+"[{""label"":""gg028"",""id"":""9435""}]"	CHST2	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, keratan sulfate""]"	"[""carbohydrate N-acetylglucosamine-6-O-sulfotransferase 2""]"	Homo sapiens
+"[{""label"":""gg058"",""id"":""256435""}]"	ST6GALNAC3	"[""Sialyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""GalNAc alpha-2, 6-sialyltransferase III""]"	Homo sapiens
+"[{""label"":""gg039"",""id"":""10090""}]"	UST	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""dermatan/chondroitin sulfate 2-O-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg123"",""id"":""55624""}]"	POMGNT1	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""protein O-linked mannose beta1,2-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg175"",""id"":""10237""}]"	SLC35B1	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""UDP-galactose transporter related 1""]"	Homo sapiens
+"[{""label"":""gg023"",""id"":""64579""}]"	NDST4	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""N-deacetylase/N-sulfotransferase 4""]"	Homo sapiens
+"[{""label"":""gg110"",""id"":""51301""}]"	GCNT4	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""glucosaminyl (N-acetyl) transferase 4, core 2 (beta-1,6-N-acetylglucosaminyltransferase)""]"	Homo sapiens
+"[{""label"":""gg070"",""id"":""8708""}]"	B3GALT1	"[""Galactosyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""beta 1,3-galactosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg154"",""id"":""7357""}]"	UGCG	"[""Glucosyltransferase""]"	"[""sphingolipid""]"	"[""UDP-glucose ceramide glucosyltransferase""]"	Homo sapiens
+"[{""label"":""gg044"",""id"":""79690""}]"	GAL3ST4	"[""Sulfotransferases""]"	"[""terminal modification""]"	"[""beta-galactose-3-O-sulfotransferase 4""]"	Homo sapiens
+"[{""label"":""gg114"",""id"":""8473""}]"	OGT	"[""N-Acetylglucosaminyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""O-linked N-acetylglucosamine (GlcNAc) transferase (UDP-N-acetylglucosamine:polypeptide-N-acetylglucosaminyl transferase)""]"	Homo sapiens
+"[{""label"":""gg119"",""id"":""84002""}]"	B3GNT5	"[""N-Acetylglucosaminyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 5""]"	Homo sapiens
+"[{""label"":""gg226"",""id"":""80235""}]"	PIGZ	"[""Mannosyltransferases""]"	"[""GPI-anchor""]"	"[""GPI-MT-IV""]"	Homo sapiens
+"[{""label"":""gg040"",""id"":""113189""}]"	CHST14	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""dermatan-4-sulfotransferase-1""]"	Homo sapiens
+"[{""label"":""gg086"",""id"":""26301""}]"	GBGT1	"[""N-Acetylgalactosaminyltransferase""]"	"[""glycolipid, globo series""]"	"[""Forssman synthetase, globoside alpha1,3-N-acetylgalactosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg009"",""id"":""2530""}]"	FUT8	"[""Fucosyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""N-glycan""]"	"[""alpha1,6-fucosyltransferase 8""]"	Homo sapiens
+"[{""label"":""gg137"",""id"":""3038""}]"	HAS3	"[""Glucuronyltransferase N-Acetylglucosaminyltransferase""]"	"[""Hyaluronic acid""]"	"[""hyaluronan synthase 3""]"	Homo sapiens
+"[{""label"":""gg152"",""id"":""56886""}]"	UGGT1 (UGCGL1)	"[""Glucosyltransferase""]"	"[""N-glycan""]"	"[""UDP-glucose:glycoprotein glucosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg068"",""id"":""53947""}]"	A4GALT	"[""Galactosyltransferase""]"	"[""glycolipid, globo series""]"	"[""alpha 1,4-galactosyltransferase""]"	Homo sapiens
+"[{""label"":""gg016"",""id"":""9955""}]"	HS3ST3A1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate D-glucosaminyl 3-O-sulfotransferase-3A""]"	Homo sapiens
+"[{""label"":""gg075"",""id"":""56913""}]"	C1GALT1	"[""Galactosyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""core1 UDP-galactose:N-acetylgalactosamine-alpha-R beta 1,3-galactosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg179"",""id"":""347734""}]"	SLC35B2	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""3'-phosphoadenosine 5'-phosphosulfate transporter""]"	Homo sapiens
+"[{""label"":""gg130"",""id"":""4249""}]"	MGAT5	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""mannosyl (alpha-1,6-)-glycoprotein beta-1,6-N-acetyl-glucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg008"",""id"":""10690""}]"	FUT9	"[""Fucosyltransferase""]"	"[""O-glycan, not mucin-type"",""glycolipid, globo series"",""glycolipid, lacto/neolacto series""]"	"[""alpha1,3-fucosyltransferase 9""]"	Homo sapiens
+"[{""label"":""gg017"",""id"":""9953""}]"	HS3ST3B1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, heparan sulfate""]"	"[""heparan sulfate D-glucosaminyl 3-O-sulfotransferase-3B""]"	Homo sapiens
+"[{""label"":""gg208"",""id"":""56983""}]"	POGLUT1	"[""""]"	"[""O-glycan, not mucin-type""]"	"[""protein O-glucosyltransferase 1""]"	Homo sapiens
+"[{""label"":""gg035"",""id"":""9486""}]"	CHST10	"[""Sulfotransferases""]"	"[""O-glycan, not mucin-type""]"	"[""HNK-1 sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg136"",""id"":""3037""}]"	HAS2	"[""Glucuronyltransferase N-Acetylglucosaminyltransferase""]"	"[""Hyaluronic acid""]"	"[""hyaluronan synthase 2""]"	Homo sapiens
+"[{""label"":""gg050"",""id"":""6487""}]"	ST3GAL3	"[""Sialyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""glycolipid, lacto/neolacto series""]"	"[""CMP-NeuAc:Gal beta1,3(4)GlcNAc alpha 2,3-sialyltransferase""]"	Homo sapiens
+"[{""label"":""gg118"",""id"":""79369""}]"	B3GNT4	"[""N-Acetylglucosaminyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""UDP-GlcNAc:betaGal beta-1,3-N-acetylglucosaminyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg139"",""id"":""29954""}]"	POMT2	"[""Mannosyltransferases""]"	"[""O-glycan, not mucin-type""]"	"[""putative protein O-mannosyl-transferase""]"	Homo sapiens
+"[{""label"":""gg224"",""id"":""23556""}]"	PIGN	"[""""]"	"[""GPI-anchor""]"	"[""GPI EtNP Transferase1; 2 transcription variants (NM_001202554.1, NM_017837.3)""]"	Homo sapiens
+"[{""label"":""gg147"",""id"":""79053""}]"	ALG8	"[""Glucosyltransferase""]"	"[""N-glycan""]"	"[""Dol-P-Glucose:GlcMan9GlcNAc2-PP-dolichol alpha-1,3-glucosyltransferase""]"	Homo sapiens
+"[{""label"":""gg201"",""id"":""440138""}]"	ALG11	"[""Mannosyltransferases""]"	"[""N-glycan""]"	"[""asparagine-linked glycosylation 11 homolog (S. cerevisiae, alpha-1,2-mannosyltransferase)""]"	Homo sapiens
+"[{""label"":""gg230"",""id"":""10026""}]"	PIGK	"[""""]"	"[""GPI-anchor""]"	"[""GPI transamidase complex, putative enzymatic component (catalytic subunit)""]"	Homo sapiens
+"[{""label"":""gg079"",""id"":""8703""}]"	B4GALT3	"[""Galactosyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""N-glycan"",""O-glycan, not mucin-type"",""glycolipid, lacto/neolacto series""]"	"[""beta 1,4-galactosyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg155"",""id"":""26229""}]"	B3GAT3	"[""Glucuronyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate"",""Glycosaminoglycan, heparan sulfate""]"	"[""beta-1,3-glucuronyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg093"",""id"":""51809""}]"	GALNT7	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 7""]"	Homo sapiens
+"[{""label"":""gg165"",""id"":""55790""}]"	CSGALNACT1	"[""N-Acetylgalactosaminyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin sulfate N-acetylgalactosaminyltransferase 1, glucuronosyl-N-acetylgalactosaminyl-proteoglycan 4-beta-N-acetylgalactosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg104"",""id"":""2583""}]"	B4GALNT1	"[""N-Acetylgalactosaminyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""beta-1,4-N-acetylgalactosaminyltransferase 1, GM2/GD2 synthase""]"	Homo sapiens
+"[{""label"":""gg181"",""id"":""168391""}]"	GALNT20	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-N-acetyl-alpha-D-galactosamine:polypeptide N-acetylgalactosaminyltransferase-like 5""]"	Homo sapiens
+"[{""label"":""gg042"",""id"":""64090""}]"	GAL3ST2	"[""Sulfotransferases""]"	"[""terminal modification""]"	"[""glycoprotein beta-Gal 3'-sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg145"",""id"":""29880""}]"	ALG5	"[""Glucosyltransferase""]"	"[""N-glycan""]"	"[""asparagine-linked glycosylation 5, dolichol-phosphate beta-glucosyltransferase homolog (S. cerevisiae)""]"	Homo sapiens
+"[{""label"":""gg090"",""id"":""8693""}]"	GALNT4	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg171"",""id"":""9215""}]"	LARGE	"[""Glucuronyltransferase"",""Xylosyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""acetylglucosaminyltransferase-like protein""]"	Homo sapiens
+"[{""label"":""gg164"",""id"":""54480""}]"	CSGlcA-T	"[""Glucuronyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin sulfate glucuronyltransferase""]"	Homo sapiens
+"[{""label"":""gg060"",""id"":""81849""}]"	ST6GALNAC5	"[""Sialyltransferase""]"	"[""glycolipid, ganglio series""]"	"[""GalNAc alpha-2, 6-sialyltransferase V""]"	Homo sapiens
+"[{""label"":""gg027"",""id"":""8534""}]"	CHST1	"[""Sulfotransferases""]"	"[""Glycosaminoglycan, keratan sulfate""]"	"[""keratan sulfate D-galactose-6-O sulfotransferase""]"	Homo sapiens
+"[{""label"":""gg220"",""id"":""284098""}]"	PIGW	"[""""]"	"[""GPI-anchor""]"	"[""GPI inositol acyltransferase""]"	Homo sapiens
+"[{""label"":""gg065"",""id"":""7903""}]"	ST8SIA4	"[""Sialyltransferase""]"	"[""N-glycan"",""O-glycan, mucin-type""]"	"[""ST8 alpha-N-acetyl-neuraminide alpha-2,8-sialyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg222"",""id"":""54965""}]"	PIGX	"[""Mannosyltransferases""]"	"[""GPI-anchor""]"	"[""GPI-MT-I (putative regulatory subunit)""]"	Homo sapiens
+"[{""label"":""gg080"",""id"":""8702""}]"	B4GALT4	"[""Galactosyltransferase""]"	"[""Glycosaminoglycan, keratan sulfate"",""O-glycan, not mucin-type"",""glycolipid, lacto/neolacto series""]"	"[""beta 1,4-galactosyltransferase 4""]"	Homo sapiens
+"[{""label"":""gg234"",""id"":""128869""}]"	PIGU	"[""""]"	"[""GPI-anchor""]"	"[""GPI transamidase complex""]"	Homo sapiens
+"[{""label"":""gg082"",""id"":""9331""}]"	B4GALT6	"[""Galactosyltransferase""]"	"[""sphingolipid""]"	"[""beta 1,4-galactosyltransferase 6""]"	Homo sapiens
+"[{""label"":""gg125"",""id"":""4245""}]"	MGAT1	"[""N-Acetylglucosaminyltransferase""]"	"[""N-glycan""]"	"[""mannosyl (alpha-1,3-)-glycoprotein beta-1,2-N-acetylglucosaminyltransferase""]"	Homo sapiens
+"[{""label"":""gg183"",""id"":""374378""}]"	GALNT18	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-N-acetyl-alpha-D-galactosamine:polypeptide N-acetylgalactosaminyltransferase 18""]"	Homo sapiens
+"[{""label"":""gg184"",""id"":""145173""}]"	B3GLCT	"[""Glucosyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""beta1,3-glucosyltransferase""]"	Homo sapiens
+"[{""label"":""gg071"",""id"":""8707""}]"	B3GALT2	"[""Galactosyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""beta 1,3-galactosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg099"",""id"":""114805""}]"	GALNT13	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase""]"	"[""O-glycan, mucin-type""]"	"[""UDP-GalNAc:polypeptide N-acetylgalactosaminyltransferase 13""]"	Homo sapiens
+"[{""label"":""gg013"",""id"":""23275""}]"	POFUT2	"[""Fucosyltransferase""]"	"[""O-glycan, not mucin-type""]"	"[""protein o-fucosyltransferase 2""]"	Homo sapiens
+"[{""label"":""gg192"",""id"":""51000""}]"	SLC35B3	"[""Nucleotide Sugar Transporter""]"	"[""SLC/transporter""]"	"[""solute carrier family 35, member B3""]"	Homo sapiens
+"[{""label"":""gg215"",""id"":""5277""}]"	PIGA	"[""N-Acetylglucosaminyltransferase""]"	"[""GPI-anchor""]"	"[""GlcNAc-T complex; 2 transcript variants (NM_002641.3,  NM_020473.3)""]"	Homo sapiens
+"[{""label"":""gg168"",""id"":""337876""}]"	CSS3	"[""N-Acetylgalactosaminyltransferase Glucuronyltransferase""]"	"[""Glycosaminoglycan, chondroitin sulfate""]"	"[""chondroitin sulfate synthase 3, glucuronosyl-N-acetylgalactosaminyl-proteoglycan 4-beta-N-acetylgalactosaminyltransferase, N-acetylgalactosaminyl-proteoglycan 3-beta-glucuronosyltransferase 3""]"	Homo sapiens
+"[{""label"":""gg051"",""id"":""6484""}]"	ST3GAL4	"[""Sialyltransferase""]"	"[""glycolipid, lacto/neolacto series""]"	"[""Gal-beta(1-3/1-4)GlcNAc alpha-2.3-sialyltransferase""]"	Homo sapiens
+"[{""label"":""gg076"",""id"":""29071""}]"	C1GALT1C1	"[""Glycosyltransferase chaperone ""]"	"[""O-glycan, mucin-type""]"	"[""core1 UDP-galactose:N-acetylgalactosamine-alpha-R beta 1,3-galactosyltransferase 2""]"	Homo sapiens

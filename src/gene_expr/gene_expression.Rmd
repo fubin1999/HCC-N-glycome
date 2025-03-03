@@ -1,0 +1,747 @@
+---
+title: "Glyco-Gene Expression Analysis"
+output: html_document
+---
+
+```{r import}
+library(TCGAbiolinks)
+library(GEOquery)
+library(tidyverse)
+library(cowplot)
+library(rlang)
+```
+
+```{r prepare-glyco-gene-data}
+ggdb_data <- read_tsv("data/ggdb_glycogenes.tsv") %>% 
+  janitor::clean_names()
+reactome_data <- read_tsv("data/reactome_glycoproteins.tsv") %>% 
+  janitor::clean_names()
+
+gene_families <- ggdb_data %>% 
+  select(ggdb_symbol, families) %>% 
+  mutate(families = str_remove_all(families, '[\\[\\]\\"]')) %>% 
+  mutate(families = case_match(
+    families,
+    c("", "Glycosyltransferase chaperone ", "Glycosyltransferase-like") ~ "Others",
+    .default = "Glycosyltransferase"
+  ))
+
+key_genes <- c(
+  "B4GALT3",
+  "B4GALT2",
+  "B4GALT1",
+  "FUT3",
+  "FUT4",
+  "MGAT1",
+  "FUT6",
+  "MGAT5",
+  "MGAT2",
+  "FUT5",
+  "MGAT5B",
+  "FUT11",
+  "FUT10",
+  "ALG14",
+  "ALG1",
+  "DPAGT1",
+  "ALG2",
+  "ALG13",
+  "MGAT4C",
+  "MGAT4A",
+  "MGAT4B",
+  "FUT9",
+  "FUT8",
+  "MGAT3",
+  "ST6GAL1",
+  "ST6GAL2",
+  "ST3GAL3",
+  "ST3GAL4",
+  "ST3GAL6"
+)
+
+glyco_proteins <- reactome_data %>% 
+  separate_wider_delim(molecule_name, delim = " ", names = c(NA, "gene")) %>% 
+  select(protein = identifier, gene) %>% 
+  left_join(gene_families, by = c("gene" = "ggdb_symbol")) %>% 
+  mutate(families = replace_na(families, "Others")) %>% 
+  mutate(key_gene = gene %in% key_genes)
+
+rm(ggdb_data, reactome_data, gene_families)
+```
+
+# TCGA
+
+```{r download-TCGA-gene-expression}
+# gene_expr_query <- GDCquery(
+#   project = "TCGA-LIHC",
+#   data.category = "Transcriptome Profiling",
+#   data.type = "Gene Expression Quantification",
+#   workflow.type = "STAR - Counts",
+#   sample.type = c("Primary Tumor", "Solid Tissue Normal"),
+# )
+# 
+# gene_expr_query_result <- getResults(gene_expr_query)
+# GDCdownload(gene_expr_query_result, directory = "results/data/GDCdata", files.per.chunk = 10)
+# 
+# GDCprepare(
+#   gene_expr_query,
+#   directory = "results/data/GDCdata",
+#   save = TRUE,
+#   save.filename = "results/data/TCGA/prepared_gene_expr.rda"
+# )
+```
+
+```{r load-and-prepare-TCGA-data}
+load("results/data/TCGA/prepared_gene_expr.rda")
+tcga_data <- data
+rm(data)
+prepared <- TCGAanalyze_Preprocessing(tcga_data)
+unlink("PreprocessingOutput.png")
+normed <- TCGAanalyze_Normalization(prepared, geneInfo = geneInfoHT)
+
+# Rownames of `normed` is gene_id. Convert to gene_name.
+gene_ids <- tcga_data@rowRanges@elementMetadata@listData$gene_id
+gene_ids <- str_split_i(gene_ids, fixed("."), 1)
+gene_names <- tcga_data@rowRanges@elementMetadata@listData$gene_name
+rownames(normed) <- gene_names[match(rownames(normed), gene_ids)]
+
+# Keep only the glycogenes
+expr_mat <- normed[rownames(normed) %in% glyco_proteins$gene,]
+
+rm(prepared, gene_ids, gene_names, normed)
+```
+
+```{r dea}
+samplesNT <- TCGAquery_SampleTypes(
+  barcode = colnames(expr_mat),
+  typesample = c("NT")
+)
+samplesTP <- TCGAquery_SampleTypes(
+  barcode = colnames(expr_mat), 
+  typesample = c("TP")
+)
+dea_result <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+# write_csv(dea_result, "results/data/TCGA/dea_results.csv")
+```
+
+```{r analysis-dea-result}
+dea_result %>% 
+  filter(FDR < 0.05, logFC > 1)
+dea_result %>% 
+  filter(FDR < 0.05, logFC < -1)
+dea_result %>% head()
+
+# Synthesis of Dolichol-P-P-GlcNAc2Man9Glc3
+dlp_genes <- c("DOLPP1", "DOLK", "SRD5A3", "DPAGT1", "GPI", "MPI", "PMM2",
+               "GMPPA", "GMPPB", "RFT1", "MPDU1", "DPM1", "DPM2", "DPM3")
+dea_result %>% 
+  filter((gene %in% dlp_genes) | str_starts(gene, "ALG"))
+
+er_lectins <- c("MLEC", "CANX", "CALR")
+
+ost_genes <- c("RPN1", "RPN2", "DDOST", "TMEM258", "DAD1", "OST4", "STT3A", "STT3B", "MAGT1", "TUSC3")
+dea_result %>% 
+  filter(gene %in% ost_genes)
+
+dea_result %>% 
+  filter(gene %in% c("MOGS", "GANAB", "PRKCSH", "MLEC", "CANX", "CALR", "UGGT1", "UGGT2", "LMAN2/VIP36", "ERLEC1/ XTP3B"))
+
+dea_result %>% 
+  filter(str_starts(gene, "FUT"))
+
+dea_result %>%
+  filter(str_starts(gene, "MGAT[45]"))
+
+dea_result %>%
+  filter(str_starts(gene, "ALG"))
+```
+
+```{r volcano}
+volcano_data <- dea_result %>% 
+  left_join(glyco_proteins, by = "gene") %>% 
+  mutate(
+    regulate = case_when(
+      logFC > 1 & FDR < 0.05 ~ "up",
+      logFC < -1 & FDR < 0.05 ~ "down",
+      TRUE ~ "no"
+    ),
+    label = if_else(abs(logFC) > 1.7 & FDR < 0.05 & families == "Glycosyltransferase", gene, "")
+  )
+
+volcano_no_legend <- ggplot(volcano_data, aes(logFC, -log10(FDR))) +
+  geom_point(
+    aes(color = regulate), 
+    data = filter(volcano_data, families == "Others"),
+    size = 1.5, shape = 16, alpha = 0.5
+    ) +
+  scale_color_manual(values = c(up = "#CD0000", down = "#27408B", no = "grey")) +
+  geom_point(
+    aes(fill = regulate),
+    data = filter(volcano_data, families == "Glycosyltransferase"),
+    size = 2, shape = 23, alpha = 1
+    ) +
+  scale_fill_manual(values = c(up = "#CD0000", down = "#27408B", no = "grey")) +
+  ggrepel::geom_text_repel(
+    aes(label = label), 
+    size = 3, segment.size = 0.4,
+    min.segment.length = 0, 
+    force = 5, max.overlaps = Inf
+    ) +
+  labs(
+    x = expression(paste("log"[2], "FC")),
+    y = expression(paste("-log"[10], " FDR"))
+    ) +
+  guides(color = "none", fill = "none") +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    legend.position.inside = c(0.35, 0.8)
+  )
+
+volcano_legend_plot <- ggplot(volcano_data, aes(logFC, -log10(FDR))) +
+  geom_point(aes(shape = families, alpha = families), size = 1.5, fill = "black") +
+  scale_shape_manual(values = c("Glycosyltransferase" = 23, "Others" = 16)) +
+  scale_alpha_manual(values = c("Glycosyltransferase" = 1, "Others" = 0.5)) +
+  theme_classic() +
+  guides(
+    shape = guide_legend(title = NULL), 
+    alpha = guide_legend(title = NULL)
+    )
+
+volcano_legend <- get_legend(volcano_legend_plot)
+volcano <- ggdraw() +
+  draw_plot(volcano_no_legend, x = 0, y = 0, width = 0.8, height = 1) +
+  draw_plot(volcano_legend, x = 0.25, y = 0.75, width = 0.2, height = 0.1)
+
+rm(volcano_no_legend, volcano_legend_plot, volcano_legend)
+
+tgutil::ggpreview(volcano, width = 4, height = 3)
+# ggsave("results/figures/gene_expr/volcano.pdf", volcano, width = 4, height = 3)
+```
+
+```{r heatmap}
+library(circlize)
+library(ComplexHeatmap)
+
+scaled_expr_mat <- t(apply(expr_mat, 1, function(x) {
+    q10 = quantile(x, 0.1)
+    q90 = quantile(x, 0.9)
+    x[x < q10] = q10
+    x[x > q90] = q90
+    scale(x)
+}))
+colnames(scaled_expr_mat) <- colnames(expr_mat)
+column_splits <- str_sub(str_split_i(colnames(scaled_expr_mat), fixed("-"), 4L), 1L, -2L)
+column_splits <- if_else(column_splits == "01", "Tumor", "Normal")
+color_fun <- colorRamp2(c(-2, 0, 2), c("green", "black", "red"))
+genes_to_label <- dea_result %>% 
+  left_join(glyco_proteins, by = "gene") %>%
+  filter(FDR < 0.05, abs(logFC) > 1, families == "Glycosyltransferase", key_gene) %>% 
+  pull(gene)
+row_anno <- rowAnnotation(
+  gene = anno_mark(
+    at = match(genes_to_label, rownames(scaled_expr_mat)), 
+    labels = genes_to_label
+  )
+)
+ht <- Heatmap(
+  scaled_expr_mat,
+  name = "Gene\nExpression",
+  col = color_fun,
+  right_annotation = row_anno,
+  show_column_names = FALSE,
+  show_row_names = FALSE,
+  show_row_dend = FALSE,
+  show_column_dend = FALSE,
+  column_split = column_splits,
+  width = unit(15, "cm"),
+  height = unit(7.5, "cm"),
+)
+ht <- draw(ht)
+w = ComplexHeatmap:::width(ht)
+w = convertX(w, "inch", valueOnly = TRUE)
+h = ComplexHeatmap:::height(ht)
+h = convertY(h, "inch", valueOnly = TRUE)
+
+# pdf("results/figures/gene_expr/heatmap.pdf", width = w, height = h)
+draw(ht)
+# dev.off()
+
+rm(scaled_expr_mat, column_splits, color_fun, genes_to_label, row_anno, w, h)
+```
+
+# GEO
+
+```{r download-GEO-data}}
+gse_set <- list()
+
+get_gse <- function(gse_id) {
+  gse_set[[gse_id]] <- getGEO(gse_id, destdir = "results/data/GEO")
+}
+
+gse_set[["GSE77509"]] <- getGEO("GSE77509", destdir = "results/data/GEO")  # GPL16791
+gse_set[["GSE214846"]] <- getGEO("GSE214846", destdir = "results/data/GEO")  # GPL24676
+gse_set[["GSE113617"]] <- getGEO("GSE113617", destdir = "results/data/GEO")  # GPL11154
+gse_set[["GSE124535"]] <- getGEO("GSE124535", destdir = "results/data/GEO")  # GPL20795
+gse_set[["GSE202069"]] <- getGEO("GSE202069", destdir = "results/data/GEO")  # GPL24676
+gse_set[["GSE65485"]] <- getGEO("GSE65485", destdir = "results/data/GEO")  # GPL11154	
+gse_set[["GSE207435"]] <- getGEO("GSE207435", destdir = "results/data/GEO")  # GPL24676
+
+gse_set <- map(gse_set, ~ .x[[1]])
+
+geo_dea_results <- list()
+```
+
+```{r dea-GSE77509}
+sample_info <- pData(gse_set[["GSE77509"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE77509_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$source_name_ch1 == "adjacent normal"]
+samplesTP <- rownames(sample_info)[sample_info$source_name_ch1 == "primary tumor"]
+
+geo_dea_results[["GSE77509"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r dea-GSE214846}
+sample_info <- pData(gse_set[["GSE214846"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE214846_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$`tissue:ch1` == "paracancerous normal tissues"]
+samplesTP <- rownames(sample_info)[sample_info$`tissue:ch1` == "hepatocellular carcinoma"]
+
+geo_dea_results[["GSE214846"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r dea-GSE113617}
+sample_info <- pData(gse_set[["GSE113617"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE113617_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$source_name_ch1 == "Non-tumor"]
+samplesTP <- rownames(sample_info)[sample_info$source_name_ch1 == "Hepatocellular carcinoma"]
+
+geo_dea_results[["GSE113617"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r dea-GSE124535}
+sample_info <- pData(gse_set[["GSE124535"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE124535_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$`tissue:ch1` == "non-tumor"]
+samplesTP <- rownames(sample_info)[sample_info$`tissue:ch1` == "HCC"]
+
+geo_dea_results[["GSE124535"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r dea-GSE202069}
+sample_info <- pData(gse_set[["GSE202069"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE202069_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$source_name_ch1 == "Nontumor"]
+samplesTP <- rownames(sample_info)[sample_info$source_name_ch1 == "Tumor"]
+
+geo_dea_results[["GSE202069"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r dea-GSE65485}
+sample_info <- pData(gse_set[["GSE65485"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE65485_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$`tumor status:ch1` == "Adjacent Normal tissue"]
+samplesTP <- rownames(sample_info)[sample_info$`tumor status:ch1` == "Tumor"]
+
+geo_dea_results[["GSE65485"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r dea-GSE207435}
+sample_info <- pData(gse_set[["GSE207435"]])
+var_info <- read_tsv("results/data/GEO/gene_anno.tsv")
+expr_mat <- read_tsv("results/data/GEO/GSE207435_raw_counts.tsv") %>% 
+  column_to_rownames("GeneID") %>% 
+  as.matrix()
+
+rownames(expr_mat) <- var_info$Symbol
+expr_mat <- expr_mat[rownames(expr_mat) %in% glyco_proteins$gene,]
+
+samplesNT <- rownames(sample_info)[sample_info$`disease state:ch1` == "Normal"]
+samplesTP <- rownames(sample_info)[sample_info$`disease state:ch1` == "Tumor"]
+
+geo_dea_results[["GSE207435"]] <- TCGAanalyze_DEA(
+  mat1 = expr_mat[,samplesNT],
+  mat2 = expr_mat[,samplesTP],
+  Cond1type = "Normal",
+  Cond2type = "Tumor",
+) %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble()
+
+rm(sample_info, var_info, expr_mat, samplesNT, samplesTP)
+```
+
+```{r combine-DEA-results}
+dea_results <- geo_dea_results
+dea_results[["TCGA"]] <- dea_result
+dea_results <- bind_rows(dea_results, .id = "dataset")
+
+# dea_results %>% 
+#   filter(dataset != "TCGA") %>% 
+#   write_csv("results/data/GEO/dea_results.csv")
+```
+
+```{r draw-dataset-dea}
+genes_to_show <- dea_results %>% 
+  semi_join(glyco_proteins %>% filter(key_gene), by = "gene") %>% 
+  group_by(gene) %>% 
+  summarise(n_sig = sum(FDR < 0.05 & abs(logFC) > 1)) %>% 
+  filter(n_sig > 0) %>% 
+  pull(gene)
+
+plot_data <- dea_results %>% 
+  filter(gene %in% genes_to_show) %>% 
+  mutate(signif = if_else(FDR < 0.05, "*", "")) %>% 
+  select(dataset, gene, logFC, signif)
+
+mat <- plot_data %>% 
+  select(-signif) %>% 
+  pivot_wider(names_from = dataset, values_from = logFC) %>% 
+  column_to_rownames("gene") %>%
+  as.matrix()
+
+sig_mat <- plot_data %>% 
+  select(-logFC) %>% 
+  pivot_wider(names_from = dataset, values_from = signif) %>% 
+  column_to_rownames("gene") %>%
+  as.matrix()
+
+column_split <- c(rep("GEO", 7), "TCGA")
+
+color <- colorRamp2(c(-2, 0, 2), c("#27408B", "white", "#CD0000"))
+ht <- Heatmap(
+  mat,
+  name = "logFC",
+  col = color,
+  rect_gp = gpar(col = "white", lwd = 2),
+  column_names_rot = 45,
+  column_split = column_split,
+  column_title = NULL,
+  cluster_column_slices = FALSE,
+  cell_fun = function(j, i, x, y, width, height, fill) {
+      grid.text(sig_mat[i, j], x, y-unit(1, "mm"), gp = gpar(fontsize = 10))
+  },
+  width = ncol(mat) * unit(5, "mm"),
+  height = nrow(mat) * unit(5, "mm"),
+)
+ht <- draw(ht)
+
+rm(genes_to_show, plot_data, mat, sig_mat, column_split, color)
+
+# w = ComplexHeatmap:::width(ht)
+# w = convertX(w, "inch", valueOnly = TRUE)
+# h = ComplexHeatmap:::height(ht)
+# h = convertY(h, "inch", valueOnly = TRUE)
+# 
+# pdf("results/figures/gene_expr/dataset_dea.pdf", width = w, height = h)
+draw(ht)
+# dev.off()
+```
+
+```{r draw-dataset-dea}
+plot_data <- dea_results %>% 
+  mutate(signif = if_else(FDR < 0.05, "*", "")) %>% 
+  select(dataset, gene, logFC, signif)
+
+mat <- plot_data %>% 
+  select(-signif) %>% 
+  pivot_wider(names_from = dataset, values_from = logFC) %>% 
+  column_to_rownames("gene") %>%
+  as.matrix()
+
+sig_mat <- plot_data %>% 
+  select(-logFC) %>% 
+  pivot_wider(names_from = dataset, values_from = signif) %>% 
+  column_to_rownames("gene") %>%
+  as.matrix()
+
+column_split <- c(rep("GEO", 7), "TCGA")
+
+color <- colorRamp2(c(-2, 0, 2), c("#27408B", "white", "#CD0000"))
+ht <- Heatmap(
+  mat,
+  name = "logFC",
+  col = color,
+  show_row_names = FALSE,
+  show_row_dend = FALSE,
+  column_names_rot = 45,
+  column_split = column_split,
+  column_title = NULL,
+  cluster_column_slices = FALSE,
+  width = unit(5, "cm"),
+  height = unit(5, "cm"),
+)
+ht <- draw(ht)
+
+rm(plot_data, mat, sig_mat, column_split, color)
+
+# w = ComplexHeatmap:::width(ht)
+# w = convertX(w, "inch", valueOnly = TRUE)
+# h = ComplexHeatmap:::height(ht)
+# h = convertY(h, "inch", valueOnly = TRUE)
+# 
+# pdf("results/figures/gene_expr/dataset_dea_full.pdf", width = w, height = h)
+# draw(ht)
+# dev.off()
+```
+
+```{r geo-volcanos}
+prepare_volcano_data <- function(dea_result) {
+  volcano_data <- dea_result %>% 
+  left_join(glyco_proteins, by = "gene") %>% 
+  mutate(
+    regulate = case_when(
+      logFC > 1 & FDR < 0.05 ~ "up",
+      logFC < -1 & FDR < 0.05 ~ "down",
+      TRUE ~ "no"
+    ),
+    label = if_else(abs(logFC) > 1.7 & FDR < 0.05 & families == "Glycosyltransferase", gene, "")
+  )
+}
+
+plot_volcano <- function(plot_data) {
+  ggplot(plot_data, aes(logFC, -log10(FDR))) +
+    geom_point(
+      aes(color = regulate), 
+      data = filter(plot_data, families == "Others"),
+      size = 1.5, shape = 16, alpha = 0.5
+      ) +
+    scale_color_manual(values = c(up = "#CD0000", down = "#27408B", no = "grey")) +
+    geom_point(
+      aes(fill = regulate),
+      data = filter(plot_data, families == "Glycosyltransferase"),
+      size = 2, shape = 23, alpha = 1
+      ) +
+    scale_fill_manual(values = c(up = "#CD0000", down = "#27408B", no = "grey")) +
+    ggrepel::geom_text_repel(
+      aes(label = label), 
+      size = 3, segment.size = 0.4,
+      min.segment.length = 0, 
+      force = 5, max.overlaps = Inf
+      ) +
+    labs(
+      x = expression(paste("log"[2], "FC")),
+      y = expression(paste("-log"[10], " FDR"))
+      ) +
+    guides(color = "none", fill = "none") +
+    theme_bw() +
+    theme(
+      panel.grid = element_blank(),
+      legend.position.inside = c(0.35, 0.8)
+    )
+}
+
+volcano_legend_plot <- ggplot(geo_volcano_data[[1]], aes(logFC, -log10(FDR))) +
+  geom_point(aes(shape = families, alpha = families), size = 1.5, fill = "black") +
+  scale_shape_manual(values = c("Glycosyltransferase" = 23, "Others" = 16)) +
+  scale_alpha_manual(values = c("Glycosyltransferase" = 1, "Others" = 0.5)) +
+  theme_classic() +
+  guides(
+    shape = guide_legend(title = NULL), 
+    alpha = guide_legend(title = NULL)
+    )
+volcano_legend <- get_legend(volcano_legend_plot)
+
+geo_volcano_data <- map(geo_dea_results, prepare_volcano_data)
+geo_volcanos <- map(geo_volcano_data, plot_volcano)
+geo_volcanos <- map2(geo_volcanos, names(geo_volcanos), ~ .x + ggtitle(.y))
+volcano_plots <- append(geo_volcanos, list(volcano_legend))
+geo_volcano_panel <- plot_grid(plotlist = volcano_plots, ncol = 3, labels = c(letters[1:7], ""))
+
+# ggsave("results/figures/gene_expr/geo_volcanos.pdf", geo_volcano_panel, width = 9, height = 9)
+tgutil::ggpreview(geo_volcano_panel, width = 9, height = 9)
+```
+
+```{r survival}
+library(survival)
+library(survminer)
+library(broom)
+
+survival_data <- read_csv("data/TCGA_LIHC_survival.csv", na = "#N/A") %>% 
+  rename(patient_barcode = bcr_patient_barcode) %>%
+  pivot_longer(-patient_barcode, names_to = "key", values_to = "value") %>% 
+  mutate(
+    event = if_else(str_ends(key, "time"), str_split_i(key, fixed("."), 1), key),
+    var = if_else(str_ends(key, "time"), "time", "status"),
+    .keep = "unused"
+  ) %>% 
+  pivot_wider(names_from = var, values_from = value) %>% 
+  mutate(status = as.integer(status))
+
+survival_data <- expr_mat %>% 
+  as.data.frame() %>% 
+  rownames_to_column("gene") %>% 
+  as_tibble() %>% 
+  pivot_longer(-gene, names_to = "sample_barcode", values_to = "count") %>% 
+  filter(sample_barcode %in% samplesTP) %>% 
+  mutate(
+    patient_barcode = str_extract(sample_barcode, "^(.+?-.+?-.+?)-", group = 1),
+    .keep = "unused"
+  ) %>% 
+  inner_join(survival_data, by = "patient_barcode")
+
+survival_fits <- survival_data %>% 
+  mutate(log_count = log(count + 1)) %>% 
+  nest_by(gene, event) %>% 
+  mutate(fit = list(coxph(Surv(time, status) ~ log_count, data = data)))
+
+survival_results <- survival_fits %>% 
+  mutate(tidy = list(tidy(fit))) %>% 
+  select(gene, event, tidy) %>% 
+  unnest(tidy) %>% 
+  ungroup() %>% 
+  mutate(hr = exp(estimate))
+
+# write_csv(survival_results, "results/data/TCGA/survival_results.csv")
+
+survival_results %>% 
+  filter(p.value < 0.05, (hr > 1.5) | (hr < 1/1.5), gene %in% key_genes)
+```
+
+```{r KM-plot}
+survival_results %>% 
+  filter(gene %in% key_genes) %>% 
+  filter(p.value < 0.05) %>% 
+  slice_max(hr, by = event)
+
+draw_KM_for_gene <- function(gene, event) {
+  cat <- survival_data %>% 
+    filter(gene == !!gene, event == !!event) %>% 
+    surv_cutpoint(variables = "count", event = "status", time = "time") %>% 
+    surv_categorize()
+  fit <- survfit(Surv(time, status) ~ count, data = cat)
+  p_value <- survival_results %>% 
+    filter(gene == !!gene, event == !!event) %>%
+    pull(p.value)
+  hr <- survival_results %>% 
+    filter(gene == !!gene, event == !!event) %>%
+    pull(hr)
+  ggsurvplot(
+    fit, 
+    data = cat,
+    conf.int = TRUE,
+    palette = "npg", 
+    legend.title = "", legend.labs = c("High", "Low"),
+  )$plot +
+    labs(
+      title = paste(gene, event),
+      subtitle = str_glue("HR={round(hr, 2)}, {scales::label_pvalue(add_p = TRUE)(p_value)}"),
+      ) +
+    guides(color = guide_legend(position = "inside")) +
+    theme(
+      legend.direction = "horizontal",
+      legend.position.inside = c(0.6, 0.9),
+    )
+}
+
+KM_plots <- map(
+  list(c("B4GALT2", "OS"), c("B4GALT2", "DSS"), c("B4GALT3", "PFI"), c("B4GALT3", "DFI")),
+  ~ draw_KM_for_gene(.x[[1]], .x[[2]])
+  )
+KM_plot_merged <- plot_grid(plotlist = KM_plots, nrow = 1)
+# ggsave("results/figures/gene_expr/KM_plots.pdf", KM_plot_merged, width = 16, height = 4)
+tgutil::ggpreview(KM_plot_merged, width = 16, height = 4)
+```
+
