@@ -222,3 +222,4 @@ docs/
 
 src/ml/AutogluonModels/
 **/MALDI_raw/
+src/utils/GlycanFormatConverter-cli.jar

@@ -1,0 +1,182 @@
+---
+title: "Sialic Acid Isomers"
+format: html
+---
+
+```{r}
+#| label: load-libraries
+
+library(tidyverse)
+library(glymotif)
+library(glyparse)
+library(rstatix)
+library(ggprism)
+```
+
+```{r}
+#| label: define-colors
+
+group_colors <- c("HC" = "#7A848D", "CHB" = "#A2AFA6", "LC" = "#FEC37D", "HCC" = "#CC5F5A")
+```
+
+```{r}
+#| label: read-data
+
+glyhunter_result <- read_csv("results/data/glyhunter_results_sia_iso/summary_area.csv")
+maldi_pos <- readxl::read_excel("data/sia_iso/maldi_pos.xlsx")
+full_clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
+old_plates <- read_csv("data/cohort_GD1/plates.csv")
+```
+
+```{r}
+#| label: preprocess
+
+clean_glycans <- function(glycans) {
+glycans |> 
+  str_remove_all("\\(|\\)") |> 
+  str_replace(fixed("Hex"), "H") |> 
+  str_replace(fixed("HexNAc"), "N") |> 
+  str_replace(fixed("dHex"), "F") |> 
+  str_replace(fixed("NeuAc[+13.0300]"), "L") |> 
+  str_replace(fixed("NeuAc[+16.0500]"), "E")
+}
+
+raw_abundance <- glyhunter_result |> 
+  pivot_longer(-glycan, names_to = "spectrum", values_to = "area") |> 
+  mutate(glycan = clean_glycans(glycan)) |> 
+  mutate(maldi_pos = str_split_i(spectrum, fixed("_"), 3), .keep = "unused") |> 
+  left_join(maldi_pos, by = "maldi_pos") |> 
+  mutate(group = str_sub(raw_sample, 1, 1)) |> 
+  sjmisc::rec(group, rec = "H=HC;M=CHB;Y=LC;C=HCC;Q=QC", suffix = "") |> 
+  select(sample, group, glycan, area)
+
+glycans_to_keep <- raw_abundance |> 
+  summarise(na_prop = mean(is.na(area)), .by = glycan) |> 
+  filter(na_prop < 0.5) |> 
+  pull(glycan)
+
+abundance <- raw_abundance |> 
+  filter(glycan %in% glycans_to_keep) |> 
+  rename(gid = sample, value = area) |> 
+  glycanr::medianquotientnorm() |> 
+  rename(sample = gid, abundance = value) |> 
+  mutate(abundance = if_else(is.na(abundance), min(abundance, na.rm = TRUE) / 2, abundance)) |> 
+  filter(group != "QC") |> 
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
+
+clinical <- maldi_pos |> 
+  left_join(old_plates |> select(raw_sample, sample), by = "raw_sample", suffix = c("", "_old")) |> 
+  left_join(full_clinical, by = c("sample_old" = "sample")) |> 
+  select(-c(raw_sample, maldi_pos, sample_old))
+
+rm(glyhunter_result, maldi_pos, full_clinical, old_plates, glycans_to_keep, clean_glycans)
+
+# write_csv(abundance, "results/data/sia_iso/abundance.csv")
+```
+
+```{r}
+#| label: calculate-derived-traits
+
+# Convert GlycoCT to WURCS
+convert_ct_to_wurcs <- function(s) {
+  converter_path <- here::here("src/utils/GlycanFormatConverter-cli.jar")
+  ct_path <- withr::local_tempfile(lines = s)
+  output <- system2(
+    "java", args = c(
+      "-jar",
+      converter_path,
+      "-i", "GlycoCT",
+      "-e", "WURCS",
+      "-seq", ct_path
+    ),
+    stdout = TRUE
+  )
+  return(pluck(output, -1))
+}
+
+glycan_properties <- local({
+  db_struc <- read_csv("data/human_serum_glycans.csv") |> 
+    rename(glycoct = structure) |> 
+    mutate(wurcs = map_chr(glycoct, convert_ct_to_wurcs))
+  strucs <- parse_wurcs(db_struc$wurcs)
+  names(strucs) <- db_struc$composition
+  describe_n_glycans(strucs)
+})
+
+sia_derived_traits <- abundance |> 
+  mutate(
+    n_l = as.integer(str_extract(glycan, "L(\\d+)", group = 1)),
+    n_e = as.integer(str_extract(glycan, "E(\\d+)", group = 1)),
+    n_l = replace_na(n_l, 0),
+    n_e = replace_na(n_e, 0),
+    nS = n_l + n_e,
+    pure_comp = if_else(
+      nS == 0,
+      glycan,
+      paste0(str_remove_all(glycan, "[EL]\\d+"), "S", nS)
+    ),
+    ) |> 
+  select(-nS) |> 
+  left_join(
+    glycan_properties |> select(glycan, n_gal), 
+    by = c("pure_comp" = "glycan")
+    ) |> 
+  filter(n_gal > 0) |> 
+  mutate(
+    n_l_per_gal = n_l / n_gal,
+    n_e_per_gal = n_e / n_gal,
+    ) |> 
+  summarise(
+    n_l_per_gal = sum(n_l_per_gal * abundance) / sum(abundance),
+    n_e_per_gal = sum(n_e_per_gal * abundance) / sum(abundance),
+    .by = "sample"
+  ) |> 
+  pivot_longer(-sample, names_to = "trait", values_to = "value") |> 
+  mutate(trait = if_else(trait == "n_l_per_gal", "α2,3 Sialylation", "α2,6 Sialylation")) |> 
+  left_join(abundance |> distinct(sample, group), by = "sample")
+```
+
+```{r}
+#| label: corr-with-liver-function-markers
+
+lf_markers <- c("AST", "ALT", "GGT", "ALB", "TBIL", "TP", "AAR", "ALBI_score")
+cor_with_lf_markers <- sia_derived_traits |> 
+  rename(trait_value = value) |> 
+  left_join(clinical |> select(sample, all_of(lf_markers)), by = "sample") |> 
+  pivot_longer(all_of(lf_markers), names_to = "lf_marker", values_to = "lfm_value") |> 
+  group_by(trait, lf_marker) |> 
+  cor_test(trait_value, lfm_value, method = "spearman")
+# write_csv(cor_with_lf_markers, "results/data/sia_iso/corr_with_liver_function_markers.csv")
+```
+
+```{r}
+#| label: diff-analysis
+
+anova_result <- sia_derived_traits |> 
+  group_by(trait) |> 
+  anova_test(value ~ group)
+
+post_hoc_result <- sia_derived_traits |> 
+  group_by(trait) |> 
+  tukey_hsd(value ~ group)
+```
+
+```{r}
+#| label: boxplot
+
+df_p_value <- post_hoc_result |> 
+  add_xy_position(step.increase = 0.05)
+
+sia_boxplots <- ggplot(sia_derived_traits, aes(group, value)) +
+  geom_boxplot(aes(color = group), fill = "white") +
+  geom_jitter(aes(color = group), width = 0.15) +
+  facet_wrap(~ trait, scales = "free") +
+  add_pvalue(data = df_p_value) +
+  scale_color_manual(values = group_colors) +
+  theme_classic() +
+  theme(
+    strip.background = element_blank()
+  )
+tgutil::ggpreview(sia_boxplots, width = 6, height = 4)
+# ggsave("results/figures/sia_iso/sia_boxplots.pdf", sia_boxplots, width = 6, height = 4)
+```
