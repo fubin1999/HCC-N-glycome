@@ -34,6 +34,37 @@ cli::cat_bullet(c(
 ))
 ```
 
+```{r plot_summary}
+n_summary_plot <- tribble(
+  ~n_type, ~n,
+  "Glycopeptides", n_glycopeptides,
+  "Glycoforms", n_glycoforms,
+  "Glycosites", n_glyosites,
+  "Glycoproteins", n_glycoproteins,
+  "Glycans", n_glycans,
+) |> 
+  ggplot(aes(n, reorder(n_type, n))) +
+  geom_col(fill = "#D6C89B", color = "#88642d") +
+  geom_text(aes(label = n), nudge_x = 120) +
+  ggbreak::scale_x_break(
+    c(600, 2700),
+    expand = expansion(mult = c(0, 0.2))
+    ) +
+  theme_classic() +
+  theme(
+    axis.text.x = element_blank(),
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.title.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.y = element_text(color = "black")
+  )
+
+ggsave("results/figures/glycoproteomics/n_summary_plot.pdf", n_summary_plot, width = 3, height = 2)
+tgutil::ggpreview(plot = n_summary_plot, width = 3, height = 2)
+```
+
 ```{r read_data, include=FALSE}
 data <- read_pglyco3_pglycoquant(
   "data/pooled/glycopeptides.list", 
