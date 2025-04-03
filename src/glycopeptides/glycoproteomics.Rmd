@@ -923,13 +923,21 @@ struc_data <- read_pglyco3_pglycoquant(
     glycosite = if_else(str_detect(proteins, ";"), paste0(glycosite, "*"), glycosite)
   )
 
-struc_df <- struc_data %>% 
+pro_corrected_struc_data <- struc_data |> 
+  inner_join(
+    pro_data |> select(protein, sample, pro_abund = abundance), 
+    by = c("first_protein" = "protein", "sample")
+    ) |> 
+  filter(pro_abund > 0) |> 
+  mutate(value = value / pro_abund, .keep = "unused")
+
+struc_df <- pro_corrected_struc_data %>% 
   distinct(glycan_structure) %>% 
   mutate(glycan_graph = glyparse::parse_pglyco_struc(glycan_structure))
 
 glycan_properties <- glymotif::describe_n_glycans(deframe(struc_df))
 
-prepared_for_decouple <- struc_data %>% 
+prepared_for_decouple <- pro_corrected_struc_data %>% 
   left_join(glycan_properties, by = c("glycan_structure" = "glycan")) %>% 
   filter(glycan_type == "complex", n_antennae >= 2) %>%
   mutate(
@@ -1012,45 +1020,37 @@ ggsave("results/figures/glycoproteomics/nglybai_dotplot.pdf", width = 4, height 
 ```
 
 ```{r}
-nglybai_res %>% 
-  filter(source == "B4GALT") %>% 
-  mutate(score = as.double(scale(score)), .by = glycosite) %>% 
-  filter(!is.na(score)) %>% 
-  mutate(group = str_sub(condition, 1, -2)) %>% 
-  summarise(score = mean(score), .by = c(group, glycosite)) %>% 
-  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
-  ggplot(aes(glycosite, group, fill = score)) +
-  geom_tile(color = "white", linewidth = 1) +
-  coord_equal() +
-  scale_fill_gradient(low = "#EBDAE9", high = "#64529B") +
-  labs(x = "Glycosite", y = "Group", title = "Activity Scores for B4GALT") +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1)
-  )
-tgutil::ggpreview(width = 8, height = 3)
-ggsave("results/figures/glycoproteomics/B4GALT_as_heatmap.pdf", width = 8, height = 3)
-```
+library(ComplexHeatmap)
+library(circlize)
 
-```{r}
-nglybai_res %>% 
+fut8_nglybai_mat <- nglybai_res %>% 
   filter(source == "FUT8") %>% 
   mutate(score = as.double(scale(score)), .by = glycosite) %>% 
   filter(!is.na(score)) %>% 
   mutate(group = str_sub(condition, 1, -2)) %>% 
   summarise(score = mean(score), .by = c(group, glycosite)) %>% 
-  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
-  ggplot(aes(glycosite, group, fill = score)) +
-  geom_tile(color = "white", linewidth = 1) +
-  coord_equal() +
-  scale_fill_gradient(low = "#EBDAE9", high = "#64529B") +
-  labs(x = "Glycosite", y = "Group", title = "Activity Scores for FUT8") +
-  theme_minimal() +
-  theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-  )
-tgutil::ggpreview(width = 16, height = 3)
-ggsave("results/figures/glycoproteomics/FUT8_as_heatmap.pdf", width = 16, height = 3)
+  pivot_wider(names_from = glycosite, values_from = score) %>%
+  column_to_rownames("group") %>%
+  as.matrix()
+fut8_nglybai_mat <- fut8_nglybai_mat[rev(c("HC", "CHB", "LC", "HCC")),]
+
+color_fun <- colorRamp2(c(-2, 2), c("#EBDAE9", "#64529B"))
+ht <- Heatmap(
+  fut8_nglybai_mat,
+  name = "FUT8\nActivity\nScore",
+  col = color_fun,
+  show_column_names = FALSE,
+  row_names_side = "left",
+  cluster_rows = FALSE,
+  row_split = 1:4,
+  row_title = NULL,
+  column_title = "Glycosite",
+  width = unit(15, "cm"),
+  height = unit(3, "cm"),
+)
+
+# pdf("results/figures/glycoproteomics/fut8_nglybai_heatmap.pdf", width = 15, height = 3)
+# draw(ht)
+# dev.off()
 ```
+

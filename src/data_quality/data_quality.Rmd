@@ -110,7 +110,7 @@ ggplot(qc_cv, aes(x = cv, fill = cohort)) +
   theme(
     legend.position.inside = c(0.7, 0.5)
   )
-ggsave("results/figures/data_quality/QC_CV_density.pdf", width = 3, height = 3)
+# ggsave("results/figures/data_quality/QC_CV_density.pdf", width = 3, height = 3)
 tgutil::ggpreview(width = 3, height = 3)
 ```
 

@@ -1,8 +1,8 @@
 library(tidyverse)
 library(broom)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
 
 abundance <- read_csv(snakemake@input[[1]])
 clusters <- read_csv(snakemake@input[[2]])
@@ -17,17 +17,19 @@ pca_fit <- data %>%
 
 plot_data <- pca_fit %>%
   augment(data) %>%
-  select(sample, cluster, PC1 = .fittedPC1, PC2 = .fittedPC2)
+  select(sample, subtype = cluster, PC1 = .fittedPC1, PC2 = .fittedPC2) %>% 
+  mutate(subtype = paste0("S", subtype))
 
 p <- ggplot(plot_data, aes(PC1, PC2)) +
-  geom_point(aes(color = cluster), alpha = 0.5) +
-  stat_ellipse(aes(fill = cluster), geom = "polygon", alpha = 0.1) +
-  scale_fill_manual(values = c(`1` = "#1b9e77", `2` = "#d95f02", `3` = "#7570b3")) +
-  scale_color_manual(values = c(`1` = "#1b9e77", `2` = "#d95f02", `3` = "#7570b3")) +
+  geom_point(aes(fill = subtype), size = 2, shape = 21, color = "black") +
+  labs(fill = NULL) +
+  scale_fill_manual(values = c(S1 = "#1b9e77", S2 = "#d95f02", S3 = "#7570b3")) +
+  guides(fill = guide_legend(position = "inside")) +
   theme_bw() +
   theme(
     panel.grid = element_blank(),
+    legend.position.inside = c(0.16, 0.78)
   )
-tgutil::ggpreview(plot = p, width = 5, height = 4)
+tgutil::ggpreview(plot = p, width = 3, height = 3)
 
-ggsave(snakemake@output[[1]], plot = p, width = 5, height = 4)
+ggsave("results/figures/subtypes/subtype_pca.pdf", plot = p, width = 3, height = 3)

@@ -150,7 +150,18 @@ cor_with_lf_markers <- sia_derived_traits |>
 ```
 
 ```{r}
-#| label: diff-analysis
+#| label: glycan-diff-analysis
+
+glycan_anova_result <- abundance |> 
+  filter(str_detect(glycan, "L|E")) |>
+  mutate(log_abund = log(abundance)) |> 
+  group_by(glycan) |> 
+  kruskal_test(abundance ~ group) |> 
+  adjust_pvalue(method = "BH")
+```
+
+```{r}
+#| label: trait-diff-analysis
 
 anova_result <- sia_derived_traits |> 
   group_by(trait) |> 
