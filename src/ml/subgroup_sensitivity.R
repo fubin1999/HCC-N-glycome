@@ -6,6 +6,13 @@ clinical <- read_csv("results/data/prepared/clinical.csv")
 
 
 AFP_neg_prepared <- preds %>% 
+  mutate(model = case_match(
+    model,
+    "global" ~ "Model 4",
+    "HCC_HC" ~ "Model 1",
+    "HCC_CHB" ~ "Model 2",
+    "HCC_LC" ~ "Model 3",
+  )) |> 
   filter(dataset == "test", true) %>% 
   select(sample, pred, model) %>% 
   left_join(clinical %>% select(sample, AFP), by = "sample") %>% 
@@ -27,7 +34,7 @@ AFP_neg_prepared <- preds %>%
   summarise(sensitivity = sum(pred & AFP_neg) / sum(AFP_neg), .by = c(model, cutoff)) %>% 
   mutate(
     cutoff = factor(as.integer(cutoff), levels = c(10, 20, 100, 200, 400)),
-    model = factor(model, levels = c("HCC_HC", "HCC_CHB", "HCC_LC", "global"))
+    model = factor(model, levels = c("Model 1", "Model 2", "Model 3", "Model 4"))
     )
 
 ggplot(AFP_neg_prepared, aes(model, sensitivity, fill = cutoff)) +
