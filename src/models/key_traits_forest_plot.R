@@ -2,7 +2,7 @@ library(tidyverse)
 library(patchwork)
 
 # Load data-----
-# param_data <- read_csv("results/data/models/trait_parameters.csv")
+param_data <- read_csv("results/data/models/trait_parameters.csv")
 param_data <- read_csv(snakemake@input[[1]])
 
 param_data <- param_data %>%
@@ -49,6 +49,8 @@ plot_df <- param_data %>%
                          "Complex Type", "High-Mannose Type", "Hybrid Type",
                          "Bisecting", "Galactosylation", "Fucosylation", "Sialylation")))
 
-final_p <- reduce(plot_df$plot, `+`) + plot_layout(nrow = 2)
+final_p <- reduce(plot_df$plot, `+`) + 
+  plot_layout(nrow = 3) +
+  plot_annotation(tag_levels = "a")
 # tgutil::ggpreview(final_p, width = 15, height = 6)
-ggsave(snakemake@output[[1]], final_p, width = 15, height = 6)
+ggsave("results/figures/models/key_trait_forest_plot.pdf", final_p, width = 12, height = 9)

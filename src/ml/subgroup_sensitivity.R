@@ -35,7 +35,8 @@ AFP_neg_prepared <- preds %>%
   mutate(
     cutoff = factor(as.integer(cutoff), levels = c(10, 20, 100, 200, 400)),
     model = factor(model, levels = c("Model 1", "Model 2", "Model 3", "Model 4"))
-    )
+    ) |> 
+  filter(model != "Model 4")
 
 ggplot(AFP_neg_prepared, aes(model, sensitivity, fill = cutoff)) +
   geom_col(position = "dodge") +

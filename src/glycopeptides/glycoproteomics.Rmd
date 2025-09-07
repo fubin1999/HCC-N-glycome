@@ -107,7 +107,7 @@ convert <- function(comp) {
   return(comp)
 }
 
-pooled_glycome_data <- read_csv("results/data/glyhunter_results_pooled_serum/summary_area.csv") %>% 
+pooled_glycome_data <- read_csv("results/data/glyhunter_results_pooled/summary_area.csv") %>% 
   mutate(glycan = convert(glycan)) %>% 
   pivot_longer(-glycan, names_to = "sample", values_to = "area") %>% 
   mutate(sample = case_match(

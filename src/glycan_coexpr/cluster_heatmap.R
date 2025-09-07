@@ -3,9 +3,9 @@ library(ComplexHeatmap)
 library(circlize)
 
 # Read data-----
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clusters <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+clusters <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
 
 abundance <- read_csv(snakemake@input[["abundance"]])
 groups <- read_csv(snakemake@input[["groups"]])
