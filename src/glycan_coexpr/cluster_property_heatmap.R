@@ -1,11 +1,8 @@
 library(tidyverse)
 library(ComplexHeatmap)
 
-# clusters <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
-# mp_table <- read_csv("results/data/prepared/meta_properties.csv")
-
-clusters <- read_csv(snakemake@input[[1]])
-mp_table <- read_csv(snakemake@input[[2]])
+clusters <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+mp_table <- read_csv("results/data/prepared/meta_properties.csv")
 
 mp_names <- setdiff(colnames(mp_table), "glycan")
 data <- mp_table %>%
@@ -17,17 +14,7 @@ data <- mp_table %>%
     `Sialylation` = nS > 0,
   ) %>%
   select(-all_of(mp_names)) %>%
-  right_join(clusters, by = "glycan") %>%
-  # Convert glycan names to 4 numbers: H, N, F, S
-  mutate(
-    H = as.integer(str_extract(glycan, "H(\\d+)", group = 1)),
-    N = as.integer(str_extract(glycan, "N(\\d+)", group = 1)),
-    F = as.integer(str_extract(glycan, "F(\\d+)", group = 1)),
-    S = as.integer(str_extract(glycan, "S(\\d+)", group = 1))
-  ) %>%
-  mutate(across(c(H, N, F, S), ~ ifelse(is.na(.), 0, .))) %>%
-  mutate(glycan = paste0(H, N, F, S)) %>%
-  select(-c(H, N, F, S))
+  right_join(clusters, by = "glycan")
 
 mat <- data %>%
   select(-cluster) %>%
@@ -57,6 +44,6 @@ w <- convertX(w, "inch", valueOnly = TRUE)
 h <- ComplexHeatmap:::height(ht)
 h <- convertY(h, "inch", valueOnly = TRUE)
 
-pdf(snakemake@output[[1]], width = w, height = h)
+pdf("results/figures/glycan_coexpr/glycan_property_heatmap.pdf", width = w, height = h)
 draw(ht)
 dev.off()
