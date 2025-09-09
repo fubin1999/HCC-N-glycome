@@ -6,6 +6,7 @@ library(gt)
 
 # Read data-----
 preds <- read_csv("results/data/ml/preds.csv")
+preds_simple <- read_csv("results/data/ml/simple_preds.csv")
 clinical <- read_csv("results/data/prepared/unfiltered_clinical.csv")
 
 preds <- preds %>% 
@@ -18,6 +19,18 @@ preds <- preds %>%
     "global" ~ "HCC vs Rest",
   )) %>% 
   mutate(model = factor(model, levels = c("HCC vs HC", "HCC vs CHB", "HCC vs LC", "HCC vs Rest")))
+
+preds_simple <- preds_simple %>% 
+  mutate(true = factor(true), pred = factor(pred)) %>% 
+  mutate(model = case_match(
+    model, 
+    "HCC_HC" ~ "HCC vs HC",
+    "HCC_CHB" ~ "HCC vs CHB",
+    "HCC_LC" ~ "HCC vs LC",
+    "global" ~ "HCC vs Rest",
+  )) %>% 
+  mutate(model = factor(model, levels = c("HCC vs HC", "HCC vs CHB", "HCC vs LC", "HCC vs Rest")))
+
 
 # Metrics-----
 class_metrics <- metric_set(accuracy, bal_accuracy, f_meas, sensitivity, specificity)
@@ -277,3 +290,65 @@ AFP_roc_plot_df <- prepared_for_delong %>%
 has_AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(has_AFP_ROC_p, width = 12, height = 4)
 ggsave("results/figures/ml/roc_with_and_without_AFP.pdf", has_AFP_ROC_p, width = 12, height = 4)
+
+# Plot ROC comparing simple and full models-----
+combined_preds <- bind_rows(list(
+  simple = preds_simple,
+  full = preds
+), .id = "features")
+
+delong_res <- combined_preds %>%
+  nest_by(model, dataset) %>%
+  mutate(
+    simple_roc = list(pROC::roc(data$true[data$features == "simple"], data$proba[data$features == "simple"])),
+    full_roc = list(pROC::roc(data$true[data$features == "full"], data$proba[data$features == "full"])),
+    roc_test_res = list(pROC::roc.test(simple_roc, full_roc)),
+    delong_p = roc_test_res$p.value
+  ) %>% 
+  select(model, dataset, delong_p)
+
+auc_df <- combined_preds %>%
+  mutate(true = factor(true)) %>% 
+  group_by(model, dataset, features) %>% 
+  roc_auc(true, proba, event_level = "second") %>% 
+  pivot_wider(names_from = features, values_from = .estimate, names_prefix = "auc_") %>% 
+  select(-c(.metric, .estimator))
+
+plot_roc_compared_with_simple <- function(data, auc_simple, auc_full) {
+  data %>%
+    group_by(features) %>%
+    roc_curve(true, proba, event_level = "second") %>%
+    autoplot() +
+    scale_color_manual(
+      values = c(simple = "#3A3D8F", full = "#ED6A5A"),
+      labels = c(
+        simple = str_glue("6 glycans ({sprintf('%.3f', auc_simple)})"), 
+        full = str_glue("26 glycans ({sprintf('%.3f', auc_full)})")
+      )
+    ) +
+    guides(color = guide_legend(title = NULL, position = "inside")) +
+    theme(
+      panel.grid = element_blank(),
+      legend.position.inside = c(0.65, 0.2),
+      plot.title = element_text(hjust = 0.5),
+      plot.subtitle = element_text(hjust = 0.5)
+    )
+}
+
+roc_df <- combined_preds %>%
+  mutate(true = factor(true)) %>% 
+  nest_by(model, dataset) %>%
+  left_join(delong_res, by = c("model", "dataset")) %>%
+  left_join(auc_df, by = c("model", "dataset")) %>%
+  mutate(plot = list(
+    plot_roc_compared_with_simple(data, auc_simple, auc_full) + 
+      ggtitle(model) +
+      labs(subtitle = paste("DeLong p-value:", round(delong_p, 3)))
+  )) %>%
+  arrange(dataset)
+
+roc_p <- reduce(roc_df$plot, `+`) +
+  plot_layout(nrow = 3) +
+  plot_annotation(tag_levels = "a")
+tgutil::ggpreview(roc_p, width = 12, height = 12)
+ggsave("results/figures/ml/roc_compared_with_simple.pdf", roc_p, width = 12, height = 12)
