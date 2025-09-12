@@ -352,3 +352,56 @@ roc_p <- reduce(roc_df$plot, `+`) +
   plot_annotation(tag_levels = "a")
 tgutil::ggpreview(roc_p, width = 12, height = 12)
 ggsave("results/figures/ml/roc_compared_with_simple.pdf", roc_p, width = 12, height = 12)
+
+# Plot ROC of different TNM stages-----
+prepared_for_roc <- preds %>% 
+  filter(dataset == "test") %>% 
+  select(-dataset) %>% 
+  left_join(clinical %>% select(sample, TNM_stage), by = "sample")
+non_hcc_df <- prepared_for_roc %>%
+  filter(true == FALSE)
+prepared_for_roc <- bind_rows(list(
+  prepared_for_roc %>% filter(true == TRUE),
+  non_hcc_df %>% mutate(TNM_stage = "I"),
+  non_hcc_df %>% mutate(TNM_stage = "II"),
+  non_hcc_df %>% mutate(TNM_stage = "III"),
+  non_hcc_df %>% mutate(TNM_stage = "IV")
+)) %>%
+  filter(!is.na(TNM_stage))
+
+auc_df <- prepared_for_roc %>%
+  nest_by(model, TNM_stage) %>%
+  mutate(auc = as.numeric(pROC::auc(data$true, data$proba))) %>%
+  select(model, TNM_stage, auc) %>%
+  pivot_wider(names_from = "TNM_stage", values_from = "auc")
+
+plot_roc <- function(data, auc_I, auc_II, auc_III, auc_IV) {
+  data %>%
+    group_by(TNM_stage) %>%
+    roc_curve(true, proba, event_level = "second") %>%
+    autoplot() +
+    guides(color = guide_legend(
+      title = NULL,
+      position = "inside"
+    )) +
+    scale_color_manual(
+      values = c(I = "#3A3D8F", II = "#5DA5DA", III = "#ED6A5A", IV = "#4CAF50"),
+      labels = c(
+        I = str_glue("I ({sprintf('%.3f', auc_I)})"),
+        II = str_glue("II ({sprintf('%.3f', auc_II)})"),
+        III = str_glue("III ({sprintf('%.3f', auc_III)})"),
+        IV = str_glue("IV ({sprintf('%.3f', auc_IV)})")
+      )
+    ) +
+    theme(panel.grid = element_blank(), legend.position.inside = c(0.75, 0.25))
+}
+
+roc_df <- prepared_for_roc %>%
+  nest_by(model) %>%
+  left_join(auc_df, by = "model") %>%
+  mutate(plot = list(plot_roc(data, I, II, III, IV) + ggtitle(model))) %>%
+  arrange(model)
+
+roc_p <- reduce(roc_df$plot, `+`) + plot_layout(nrow = 1)
+tgutil::ggpreview(roc_p, width = 12, height = 4)
+ggsave("results/figures/ml/roc_TNM_stage.pdf", roc_p, width = 12, height = 4)
