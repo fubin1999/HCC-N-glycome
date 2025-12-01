@@ -1,1 +1,5 @@
-# HCC-N-glycome
+# Large-Scale Serum N-glycomics Tracks N-Glycosylation Dynamics in Hepatocellular Carcinoma Progression and Enables Early Diagnosis
+
+Hepatocellular carcinoma (HCC) is a leading cause of cancer mortality, yet the role of N-glycosylation in its pathogenesis remains unclear. We applied a multicenter, large-cohort N-glycomics strategy combining isomer-specific glycan profiling with multiomics integration to characterize disease-associated glycan alterations and develop serum-based diagnostic models. Serum N-glycomes from 1,074 individuals across health, chronic hepatitis B, cirrhosis, and HCC were analyzed using a high-throughput pipeline of N-glycan release, derivatization, enrichment, and mass spectrometry. HCC progression was marked by pronounced increases in branching and fucosylation, elevated bisecting GlcNAc, and reduced galactosylation. Machine learning models built on these glycan signatures achieved high diagnostic accuracy (AUC 0.84–0.93), significantly outperforming alpha-fetoprotein, with performance validated in two external cohorts. Integrative glycoproteomic and transcriptomic analyses further illuminated the regulatory pathways driving these glycan shifts, highlighting N-glycosylation as a promising axis for mechanistic insight and early HCC detection.
+
+**DOI will be updated once the paper is published.**
