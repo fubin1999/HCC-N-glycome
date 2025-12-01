@@ -62,3 +62,5 @@ ht <- Heatmap(
 )
 ht <- draw(ht, heatmap_legend_side = "bottom")
 dev.off()
+
+write_csv(data, "results/source_data/Figure_3e.csv")

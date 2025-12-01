@@ -2,13 +2,9 @@ library(tidyverse)
 library(ggprism)
 library(patchwork)
 
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-# subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-# post_hoc_result <- read_csv("results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv")
-
-clinical <- read_csv(snakemake@input[[1]])
-subtypes <- read_csv(snakemake@input[[2]])
-post_hoc_result <- read_csv(snakemake@input[[3]])
+clinical <- read_csv("results/data/prepared/clinical.csv")
+subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+post_hoc_result <- read_csv("results/data/subtypes/subtype_with_continous_clinical_post_hoc_result.csv")
 
 variable_info <- tribble(
   ~variable, ~name, ~full_name, ~log_transform,
@@ -85,3 +81,5 @@ final_height <- single_height * (ceiling(nrow(variable_info) / 5))
 # tgutil::ggpreview(p, width = final_width, height = final_height)
 
 ggsave(snakemake@output[[1]], p, width = final_width, height = final_height)
+
+write_csv(plot_data, "results/source_data/Supplementary_Figure_15a.csv")

@@ -3,7 +3,6 @@ library(patchwork)
 
 # Load data-----
 param_data <- read_csv("results/data/models/trait_parameters.csv")
-param_data <- read_csv(snakemake@input[[1]])
 
 param_data <- param_data %>%
   filter(trait %in% c("CA2", "CA3", "CA4", "CG", "TB", "TC", "TM", "THy", "TF", "TS")) %>%
@@ -54,3 +53,13 @@ final_p <- reduce(plot_df$plot, `+`) +
   plot_annotation(tag_levels = "a")
 # tgutil::ggpreview(final_p, width = 15, height = 6)
 ggsave("results/figures/models/key_trait_forest_plot.pdf", final_p, width = 12, height = 9)
+
+source_data_df <- param_data %>%
+  nest_by(trait) %>%
+  ungroup() %>%
+  mutate(
+    tag = letters[1:10],
+    filepath = str_glue("results/source_data/Supplementary_Figure_11{tag}.csv")
+  )
+
+walk2(source_data_df$data, source_data_df$filepath, ~write_csv(.x, .y))

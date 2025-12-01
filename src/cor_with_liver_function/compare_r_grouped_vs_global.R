@@ -47,15 +47,15 @@ p <- reduce(plot_list, `+`) + plot_layout(nrow = 1)
 # tgutil::ggpreview(width = 12, height = 3)
 ggsave(snakemake@output[[1]], p, width = 12, height = 3)
 
-
-ALBI_result %>% 
+parallel_plot_data <- ALBI_result %>% 
   filter(group != "global") %>%
   left_join(
     ALBI_result %>% filter(group == "global") %>% select(feature, cor), 
     by = "feature", suffix = c("", "_global")
-    ) %>% 
-  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC"))) %>% 
-  ggplot(aes(group, cor, color = cor_global)) +
+  ) %>% 
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
+
+ggplot(parallel_plot_data, aes(group, cor, color = cor_global)) +
   geom_line(aes(group = feature)) + 
   geom_point() +
   labs(x = "", y = "Spearman's rho\nin each group", color = "Global\nSpearman's\nrho") +
@@ -67,3 +67,6 @@ ALBI_result %>%
   )
 # tgutil::ggpreview(width = 4, height = 3)
 # ggsave("results/figures/cor_with_liver_function/ALBI_score_parallel_plot.pdf", width = 4, height = 3)
+
+write_csv(parallel_plot_data, "results/source_data/Figure_2e.csv")
+write_csv(plot_data, "results/source_data/Figure_2f.csv")

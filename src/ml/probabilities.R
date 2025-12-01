@@ -195,3 +195,31 @@ subtype_p <- prepared %>%
   theme_classic()
 tgutil::ggpreview(subtype_p, width = 2.5, height = 3)
 ggsave("results/figures/ml/subtype_probabilities.pdf", subtype_p, width = 2.5, height = 3)
+
+# Prepare Source Data-----
+prepared %>%
+  select(sample, group, proba) %>%
+  write_csv("results/source_data/Figure_7g.csv")
+
+prepared %>%
+  select(sample, ALBI_stage, proba) %>%
+  write_csv("results/source_data/Figure_7h.csv")
+
+prepared %>%
+  filter(group == "HCC") %>%
+  select(sample, ALBI_stage, proba) %>%
+  write_csv("results/source_data/Figure_7i.csv")
+
+prepared %>%
+  select(sample, child_pugh, proba) %>%
+  write_csv("results/source_data/Figure_7j.csv")
+
+prepared %>%
+  filter(group == "HCC") %>%
+  select(sample, child_pugh, proba) %>%
+  write_csv("results/source_data/Figure_7k.csv")
+
+prepared %>%
+  filter(group == "HCC") %>%
+  select(sample, TNM_stage, proba) %>%
+  write_csv("results/source_data/Figure_7l.csv")

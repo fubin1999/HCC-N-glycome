@@ -1,15 +1,10 @@
 library(VennDiagram)
 library(tidyverse)
 
-# all_data <- read_csv("results/data/prepared/raw_abundance_full.csv")
-# struc_data <- read_csv("results/data/prepared/raw_abundance.csv")
-# conf_data <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-
-all_data <- read_csv(snakemake@input[[1]])
-struc_data <- read_csv(snakemake@input[[2]])
-conf_data <- read_csv(snakemake@input[[3]])
-groups <- read_csv(snakemake@input[[4]])
+all_data <- read_csv("results/data/prepared/raw_abundance_full.csv")
+struc_data <- read_csv("results/data/prepared/raw_abundance.csv")
+conf_data <- read_csv("results/data/prepared/processed_abundance.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
 
 prepare_venn_data <- function (data) {
   data %>%
@@ -48,3 +43,18 @@ for (i in seq_along(output_files)) {
   grid.draw(p)
   dev.off()
 }
+
+prepare_source_data <- function(venn_data) {
+  enframe(venn_data, "group", "glycan") %>%
+    unnest(glycan)
+}
+
+all_venn_data %>%
+  prepare_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_4b.csv")
+struc_venn_data %>%
+  prepare_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_4c.csv")
+conf_venn_data %>%
+  prepare_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_4d.csv")

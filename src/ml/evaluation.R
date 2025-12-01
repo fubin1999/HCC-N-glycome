@@ -125,6 +125,33 @@ combined_roc <- reduce(roc_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(combined_roc, width = 12, height = 3)
 ggsave("results/figures/ml/roc_curves.pdf", combined_roc, width = 12, height = 3)
 
+prepare_roc_source_data <- function(data) {
+  data %>%
+    group_by(dataset) %>%
+    roc_curve(true, proba, event_level = "second") %>%
+    ungroup()
+}
+
+preds %>%
+  filter(model == "HCC vs HC") %>%
+  prepare_roc_source_data() %>%
+  write_csv("results/source_data/Figure_7c.csv")
+
+preds %>%
+  filter(model == "HCC vs CHB") %>%
+  prepare_roc_source_data() %>%
+  write_csv("results/source_data/Figure_7d.csv")
+
+preds %>%
+  filter(model == "HCC vs LC") %>%
+  prepare_roc_source_data() %>%
+  write_csv("results/source_data/Figure_7e.csv")
+
+preds %>%
+  filter(model == "HCC vs Rest") %>%
+  prepare_roc_source_data() %>%
+  write_csv("results/source_data/Figure_7f.csv")
+
 # Plot PR Curves-----
 plot_pr_curve <- function(data) {
   data %>% 
@@ -151,6 +178,28 @@ combined_pr <- reduce(pr_df$plot, `+`) + plot_layout(nrow = 1)
 
 tgutil::ggpreview(combined_pr, width = 12, height = 3)
 ggsave("results/figures/ml/pr_curves.pdf", combined_pr, width = 12, height = 3)
+
+prepare_pr_source_data <- function(data) {
+  data %>%
+    group_by(dataset) %>%
+    pr_curve(true, proba, event_level = "second") %>%
+    ungroup()
+}
+
+preds %>%
+  filter(model == "HCC vs HC") %>%
+  prepare_pr_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21a_1.csv")
+
+preds %>%
+  filter(model == "HCC vs CHB") %>%
+  prepare_pr_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21a_2.csv")
+
+preds %>%
+  filter(model == "HCC vs LC") %>%
+  prepare_pr_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21a_3.csv")
 
 
 # Plot ROC comparing models and AFP-----
@@ -216,6 +265,34 @@ AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(AFP_ROC_p, width = 12, height = 4)
 ggsave("results/figures/ml/roc_AFP.pdf", AFP_ROC_p, width = 12, height = 4)
 
+prepare_roc_compared_with_AFP_source_data <- function(data) {
+  data %>%
+    select(sample, true, model = proba, AFP) %>%
+    pivot_longer(c(model, AFP), names_to = "predictor", values_to = "value") %>%
+    group_by(predictor) %>%
+    roc_curve(true, value, event_level = "second") %>%
+    ungroup()
+}
+
+prepared_for_delong %>%
+  filter(model == "HCC vs HC") %>%
+  prepare_roc_compared_with_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21c_1.csv")
+
+preds %>%
+  filter(model == "HCC vs CHB") %>%
+  prepare_roc_compared_with_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21c_2.csv")
+
+preds %>%
+  filter(model == "HCC vs LC") %>%
+  prepare_roc_compared_with_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21c_3.csv")
+
+preds %>%
+  filter(model == "HCC vs Rest") %>%
+  prepare_roc_compared_with_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21c_4.csv")
 
 # Plot ROC with and without AFP-----
 preds_with_AFP <- read_csv("results/data/ml/AFP_preds.csv") %>% 
@@ -291,6 +368,34 @@ has_AFP_ROC_p <- reduce(AFP_roc_plot_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(has_AFP_ROC_p, width = 12, height = 4)
 ggsave("results/figures/ml/roc_with_and_without_AFP.pdf", has_AFP_ROC_p, width = 12, height = 4)
 
+prepare_roc_with_and_without_AFP_source_data <- function(data) {
+  data %>%
+    pivot_longer(c(proba_no_AFP, proba_has_AFP), names_to = "predictor", values_to = "value") %>%
+    group_by(predictor) %>%
+    roc_curve(true, value, event_level = "second") %>%
+    ungroup()
+}
+
+prepared_for_delong %>%
+  filter(model == "HCC vs HC") %>%
+  prepare_roc_with_and_without_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21d_1.csv")
+
+prepared_for_delong %>%
+  filter(model == "HCC vs CHB") %>%
+  prepare_roc_with_and_without_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21d_2.csv")
+
+prepared_for_delong %>%
+  filter(model == "HCC vs LC") %>%
+  prepare_roc_with_and_without_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21d_3.csv")
+
+prepared_for_delong %>%
+  filter(model == "HCC vs Rest") %>%
+  prepare_roc_with_and_without_AFP_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21d_4.csv")
+
 # Plot ROC comparing simple and full models-----
 combined_preds <- bind_rows(list(
   simple = preds_simple,
@@ -353,6 +458,39 @@ roc_p <- reduce(roc_df$plot, `+`) +
 tgutil::ggpreview(roc_p, width = 12, height = 12)
 ggsave("results/figures/ml/roc_compared_with_simple.pdf", roc_p, width = 12, height = 12)
 
+prepare_roc_compared_with_simple_source_data <- function(data) {
+  data %>%
+    group_by(features) %>%
+    roc_curve(true, proba, event_level = "second") %>%
+    ungroup()
+}
+
+source_data_grid <- tribble(
+  ~tag, ~model, ~dataset,
+  "a", "HCC vs HC", "test",
+  "b", "HCC vs CHB", "test",
+  "c", "HCC vs LC", "test",
+  "d", "HCC vs Rest", "test",
+  "e", "HCC vs HC", "val1",
+  "f", "HCC vs CHB", "val1",
+  "g", "HCC vs LC", "val1",
+  "h", "HCC vs Rest", "val1",
+  "i", "HCC vs HC", "val2",
+  "j", "HCC vs CHB", "val2",
+  "k", "HCC vs LC", "val2",
+  "l", "HCC vs Rest", "val2",
+)
+
+pwalk(
+  source_data_grid,
+  function(tag, model, dataset) {
+    combined_preds %>%
+      filter(.data$model == .env$model, .data$dataset == .env$dataset) %>%
+      prepare_roc_compared_with_simple_source_data() %>%
+      write_csv(str_glue("results/source_data/Supplementary_Figure_22{tag}.csv"))
+  }
+)
+
 # Plot ROC of different TNM stages-----
 prepared_for_roc <- preds %>% 
   filter(dataset == "test") %>% 
@@ -405,3 +543,31 @@ roc_df <- prepared_for_roc %>%
 roc_p <- reduce(roc_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(roc_p, width = 12, height = 4)
 ggsave("results/figures/ml/roc_TNM_stage.pdf", roc_p, width = 12, height = 4)
+
+prepare_roc_tnm_source_data <- function(data) {
+  data %>%
+    group_by(TNM_stage) %>%
+    roc_curve(true, proba, event_level = "second") %>%
+    ungroup()
+}
+
+# Export TNM stage ROC source data for Supplementary Figure 21e
+prepared_for_roc %>%
+  filter(model == "HCC vs HC") %>%
+  prepare_roc_tnm_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21e_1.csv")
+
+prepared_for_roc %>%
+  filter(model == "HCC vs CHB") %>%
+  prepare_roc_tnm_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21e_2.csv")
+
+prepared_for_roc %>%
+  filter(model == "HCC vs LC") %>%
+  prepare_roc_tnm_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21e_3.csv")
+
+prepared_for_roc %>%
+  filter(model == "HCC vs Rest") %>%
+  prepare_roc_tnm_source_data() %>%
+  write_csv("results/source_data/Supplementary_Figure_21e_4.csv")

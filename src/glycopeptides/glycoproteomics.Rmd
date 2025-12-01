@@ -16,13 +16,12 @@ library(rstatix)
 raw_data <- read_pglyco3_pglycoquant(
   "data/pooled/glycopeptides.list", 
   quant_method = "label-free",
-  quant_aggr_method = "gp"
 ) %>% as_tibble()
 
 n_glycopeptides <- n_distinct(raw_data$peptide, raw_data$peptide_site, raw_data$glycan_composition)
-n_glycoforms <- n_distinct(raw_data$proteins, raw_data$protein_sites, raw_data$glycan_composition)
-n_glyosites <- n_distinct(raw_data$proteins, raw_data$protein_sites)
-n_glycoproteins <- n_distinct(raw_data$proteins)
+n_glycoforms <- n_distinct(raw_data$protein, raw_data$protein_site, raw_data$glycan_composition)
+n_glyosites <- n_distinct(raw_data$protein, raw_data$protein_site)
+n_glycoproteins <- n_distinct(raw_data$protein)
 n_glycans <- n_distinct(raw_data$glycan_composition)
 
 cli::cat_bullet(c(
@@ -63,31 +62,39 @@ n_summary_plot <- tribble(
 
 ggsave("results/figures/glycoproteomics/n_summary_plot.pdf", n_summary_plot, width = 3, height = 2)
 tgutil::ggpreview(plot = n_summary_plot, width = 3, height = 2)
+
+tribble(
+  ~n_type, ~n,
+  "Glycopeptides", n_glycopeptides,
+  "Glycoforms", n_glycoforms,
+  "Glycosites", n_glyosites,
+  "Glycoproteins", n_glycoproteins,
+  "Glycans", n_glycans,
+) %>%
+  write_csv("results/source_data/Supplementary_Figure_16a.csv")
 ```
 
 ```{r read_data, include=FALSE}
 data <- read_pglyco3_pglycoquant(
   "data/pooled/glycopeptides.list", 
   quant_method = "label-free",
-  quant_aggr_method = "gp"
 ) %>% 
   remove_missing_variables(prop = 0) %>% 
-  median_normalize() %>% 
-  sample_min_impute() %>% 
+  normalize_median() %>% 
+  impute_sample_min() %>% 
   as_tibble() %>% 
   mutate(
-    glycan_composition = str_replace(glycan_composition, "A", "S"),
+    glycan_composition = as.character(glycan_composition),
+    glycan_composition = convert(glycan_composition),
     peptide = str_replace(peptide, "J", "N"),
     sample = str_split_i(sample, "-", -1),
     group = str_split_i(sample, "_", 1),
     group = case_match(group, "H" ~ "HC", "M" ~ "CHB", "Y" ~ "LC", "C" ~ "HCC"),
     group = factor(group, levels = c("HC", "CHB", "LC", "HCC")),
     sample = paste0(group, str_split_i(sample, "_", 2)),
-    first_protein = str_split_i(proteins, ";", 1),
-    first_protein = str_extract(first_protein, "sp\\|.*?\\|(.*?)_", group = 1),
-    first_protein_site = str_split_i(protein_sites, ";", 1),
+    first_protein = gene,
+    first_protein_site = protein_site,
     glycosite = str_glue("{first_protein} (N{first_protein_site})"),
-    glycosite = if_else(str_detect(proteins, ";"), paste0(glycosite, "*"), glycosite)
   )
 
 pro_data <- read_csv("data/pooled/proteins.csv") %>% 
@@ -327,14 +334,20 @@ plot_pseudo_glycome <- function(group) {
 }
 
 pseudo_glycome_comparing_p <- map(c("HC", "CHB", "LC", "HCC"), plot_pseudo_glycome) %>% 
-  plot_grid(plotlist = ., ncol = 2)
+  plot_grid(plotlist = ., ncol = 2, labels = "auto")
 tgutil::ggpreview(pseudo_glycome_comparing_p, width = 16, height = 10)
 ggsave("results/figures/glycoproteomics/pseudo_glycome_comparing.pdf", pseudo_glycome_comparing_p, width = 16, height = 10)
+
+pseudo_glycome_plot_data %>%
+  filter(group == "HC") %>%
+  write_csv("results/source_data/Figure_5a.csv")
+
+pseudo_glycome_plot_data %>%
+  write_csv("results/source_data/Supplementary_Figure_17.csv")
 ```
 
 ```{r}
-hole_size <- 1.5
-H5N4S2_donut <- mean_data %>% 
+H5N4S2_donut_data <- mean_data %>% 
   filter(glycan_composition == "H5N4S2", group == "HC") %>% 
   summarise(abundance = sum(abundance), .by = glycosite) %>% 
   mutate(
@@ -349,8 +362,10 @@ H5N4S2_donut <- mean_data %>%
   mutate(
     rela_abundance = abundance / sum(abundance),
     rela_abundance = if_else(rela_abundance < 0.05, NA, rela_abundance)
-    ) %>%
-  ggplot(aes(x = hole_size, y = abundance, fill = glycosite)) +
+    )
+
+hole_size <- 1.5
+H5N4S2_donut <- ggplot(H5N4S2_donut_data, aes(x = hole_size, y = abundance, fill = glycosite)) +
   geom_col() +
   geom_text(
     aes(label = scales::percent(rela_abundance, 0.1)),
@@ -374,11 +389,12 @@ H5N4S2_donut <- ggdraw(H5N4S2_donut) +
   )
 tgutil::ggpreview(H5N4S2_donut, width = 5, height = 4)
 ggsave("results/figures/glycoproteomics/H5N4S2_donut.pdf", H5N4S2_donut, width = 5, height = 4)
+
+write_csv(H5N4S2_donut_data, "results/source_data/Figure_5b.csv")
 ```
 
 ```{r}
-hole_size <- 1.5
-H5N5F1S1_donut <- mean_data %>% 
+H5N5F1S1_donut_data <- mean_data %>% 
   filter(glycan_composition == "H5N5F1S1", group == "HC") %>% 
   summarise(abundance = sum(abundance), .by = glycosite) %>% 
   mutate(
@@ -393,8 +409,10 @@ H5N5F1S1_donut <- mean_data %>%
   mutate(
     rela_abundance = abundance / sum(abundance),
     rela_abundance = if_else(rela_abundance < 0.05, NA, rela_abundance)
-    ) %>%
-  ggplot(aes(x = hole_size, y = abundance, fill = glycosite)) +
+    )
+
+hole_size <- 1.5
+H5N5F1S1_donut <- ggplot(H5N5F1S1_donut_data, aes(x = hole_size, y = abundance, fill = glycosite)) +
   geom_col() +
   geom_text(
     aes(label = scales::percent(rela_abundance, 0.1)),
@@ -418,6 +436,8 @@ H5N5F1S1_donut <- ggdraw(H5N5F1S1_donut) +
   )
 tgutil::ggpreview(H5N5F1S1_donut, width = 5, height = 4)
 ggsave("results/figures/glycoproteomics/H5N5F1S1_donut.pdf", H5N5F1S1_donut, width = 5, height = 4)
+
+write_csv(H5N5F1S1_donut_data, "results/source_data/Figure_5c.csv")
 ```
 
 ```{r}
@@ -426,7 +446,8 @@ relative_contribution <- mean_data %>%
   mutate(rela_contrib = abundance / sum(abundance, na.rm = TRUE), .by = glycan_composition) %>% 
   summarise(rela_contrib = sum(rela_contrib, na.rm = TRUE), .by = glycosite) %>% 
   mutate(rank = rank(-rela_contrib), .keep = "unused")
-glycan_composition_p <- mean_data %>% 
+
+glycan_composition_plot_data <- mean_data %>% 
   filter(group == "HC") %>% 
   left_join(relative_contribution, by = "glycosite") %>%
   mutate(glycosite = if_else(rank <= 10, glycosite, "Others")) %>%
@@ -437,7 +458,9 @@ glycan_composition_p <- mean_data %>%
     setdiff(unique(glycosite), "Others")[1:7],
     "Others",
     setdiff(unique(glycosite), "Others")[8:10]
-  ))) %>%
+  )))
+
+glycan_composition_p <- glycan_composition_plot_data %>%
   ggplot(aes(reorder(glycan_composition, glycan_order), abundance, fill = glycosite)) +
   geom_col(position = "fill") +
   labs(y = "Relative Abundance", glycosite = "Glycosite") +
@@ -455,10 +478,12 @@ glycan_composition_p <- mean_data %>%
   )
 tgutil::ggpreview(glycan_composition_p, width = 13, height = 2.4)
 ggplot2::ggsave("results/figures/glycoproteomics/HC_glycan_composition.pdf", glycan_composition_p, width = 13, height = 2.4)
+
+write_csv(glycan_composition_plot_data, "results/source_data/Figure_5d.csv")
 ```
 
 ```{r}
-plot_bar_for_selected <- function(glycan, n_sites) {
+prepare_bar_for_selected <- function(glycan, n_sites) {
   glycosite_rank <- mean_data %>% 
     filter(glycan_composition == !!glycan) %>% 
     summarise(abundance = sum(abundance), .by = glycosite) %>% 
@@ -472,8 +497,12 @@ plot_bar_for_selected <- function(glycan, n_sites) {
     mutate(
       glycosite = fct_reorder(glycosite, -abundance),
       glycosite = factor(glycosite, levels = c(setdiff(unique(glycosite), "Others"), "Others"))
-      ) %>%
-    ggplot() +
+      )
+}
+
+plot_bar_for_selected <- function(glycan, n_sites) {
+  plot_data <- prepare_bar_for_selected(glycan, n_sites)
+  ggplot() +
     geom_col(aes(x = group, y = abundance, fill = glycosite)) +
     labs(x = "Group", y = "Total Abundance", fill = "Glycosite") +
     scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
@@ -498,6 +527,38 @@ walk(
     )
   }
 )
+```
+
+```{r}
+prepare_bar_for_selected("H5N3S1", 5) %>%
+  write_csv("results/source_data/Figure_5i.csv")
+
+prepare_bar_for_selected("H7N6F1S2", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_18a.csv")
+
+prepare_bar_for_selected("H7N6F1S4", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_18b.csv")
+
+prepare_bar_for_selected("H7N6F1S3", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_18c.csv")
+
+prepare_bar_for_selected("H6N5F1S3", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_24a.csv")
+
+prepare_bar_for_selected("H5N4F1", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_24b.csv")
+
+prepare_bar_for_selected("H3N4F1", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_24c.csv")
+
+prepare_bar_for_selected("H5N2", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_24d.csv")
+
+prepare_bar_for_selected("H6N5S3", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_24e.csv")
+
+prepare_bar_for_selected("H5N4S1", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_24f.csv")
 ```
 
 ```{r}
@@ -543,7 +604,9 @@ pro_dea_result <- local({
       ) %>%
     pivot_wider(id_cols = protein, names_from = sample, values_from = log_abundance) %>% 
     column_to_rownames("protein") %>% 
-    glyclean:::.sample_min_impute()
+    as.matrix() %>%
+    glyclean::impute_sample_min() %>%
+    as.data.frame()
   group <- factor(str_sub(colnames(pro_expr_mat), 1, -2), levels = c("HC", "CHB", "LC", "HCC"))
   
   design <- model.matrix(~ 0 + group)
@@ -651,14 +714,25 @@ double_volcanos <- plot_grid(CHB_HC_double_volcano, LC_HC_double_volcano, HCC_HC
 
 ggsave("results/figures/glycoproteomics/double_volcanos.pdf", double_volcanos, width = 12, height = 4)
 tgutil::ggpreview(width = 12, height = 4)
+
+double_volcano_plot_data %>%
+  filter(contrast == "CHB-HC") %>%
+  write_csv("results/source_data/Figure_5e.csv")
+double_volcano_plot_data %>%
+  filter(contrast == "LC-HC") %>%
+  write_csv("results/source_data/Figure_5f.csv")
+double_volcano_plot_data %>%
+  filter(contrast == "HCC-HC") %>%
+  write_csv("results/source_data/Figure_5g.csv")
 ```
 
 ```{r}
-up_ssg_venn <- double_volcano_plot_data %>% 
+up_ssg_venn_data <- double_volcano_plot_data %>% 
   filter(regulate == "up") %>% 
   select(ssg, contrast) %>% 
   mutate(up = TRUE) %>% 
-  pivot_wider(id_cols = ssg, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  pivot_wider(id_cols = ssg, names_from = contrast, values_from = up, values_fill = FALSE)
+up_ssg_venn <- up_ssg_venn_data %>% 
   ggvenn::ggvenn(
     show_percentage = FALSE, 
     fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
@@ -667,11 +741,12 @@ up_ssg_venn <- double_volcano_plot_data %>%
   ggtitle("Up-regulated SSGs") +
   theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
 
-down_ssg_venn <- double_volcano_plot_data %>% 
+down_ssg_venn_data <- double_volcano_plot_data %>% 
   filter(regulate == "down") %>% 
   select(ssg, contrast) %>% 
   mutate(up = TRUE) %>% 
-  pivot_wider(id_cols = ssg, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  pivot_wider(id_cols = ssg, names_from = contrast, values_from = up, values_fill = FALSE)
+down_ssg_venn <- down_ssg_venn_data %>% 
   ggvenn::ggvenn(
     show_percentage = FALSE, 
     fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
@@ -680,11 +755,13 @@ down_ssg_venn <- double_volcano_plot_data %>%
   ggtitle("Down-regulated SSGs") +
   theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
 
-up_gp_venn <- double_volcano_plot_data %>% 
+up_gp_venn_data <- double_volcano_plot_data %>% 
   filter(regulate == "up") %>% 
   distinct(contrast, protein) %>% 
   mutate(up = TRUE) %>% 
-  pivot_wider(id_cols = protein, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  pivot_wider(id_cols = protein, names_from = contrast, values_from = up, values_fill = FALSE)
+
+up_gp_venn <- up_gp_venn_data %>% 
   ggvenn::ggvenn(
     show_percentage = FALSE, 
     fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
@@ -693,11 +770,13 @@ up_gp_venn <- double_volcano_plot_data %>%
   ggtitle("Up-regulated GPs") +
   theme(plot.title = element_text(size = 18, hjust = 0.5, vjust = 2.5))
 
-down_gp_venn <- double_volcano_plot_data %>% 
+down_gp_venn_data <- double_volcano_plot_data %>% 
   filter(regulate == "down") %>% 
   distinct(contrast, protein) %>% 
   mutate(up = TRUE) %>% 
-  pivot_wider(id_cols = protein, names_from = contrast, values_from = up, values_fill = FALSE) %>% 
+  pivot_wider(id_cols = protein, names_from = contrast, values_from = up, values_fill = FALSE)
+
+down_gp_venn <- down_gp_venn_data %>% 
   ggvenn::ggvenn(
     show_percentage = FALSE, 
     fill_color = c("#A2AFA6", "#FEC37D", "#CC5F5A"),
@@ -710,6 +789,14 @@ dys_regulate_venn <- up_ssg_venn + down_ssg_venn + up_gp_venn + down_gp_venn +
   plot_layout(nrow = 1)
 tgutil::ggpreview(dys_regulate_venn, width = 16, height = 4)
 ggsave("results/figures/glycoproteomics/diff_venn.pdf", dys_regulate_venn, width = 16, height = 4)
+
+write_csv(up_ssg_venn_data, "results/source_data/Figure_5h_1.csv")
+write_csv(down_ssg_venn_data, "results/source_data/Figure_5h_2.csv")
+
+write_csv(up_ssg_venn_data, "results/source_data/Supplementary_Figure_19a.csv")
+write_csv(down_ssg_venn_data, "results/source_data/Supplementary_Figure_19b.csv")
+write_csv(up_gp_venn_data, "results/source_data/Supplementary_Figure_19c.csv")
+write_csv(down_gp_venn_data, "results/source_data/Supplementary_Figure_19d.csv")
 ```
 
 ```{r}
@@ -725,27 +812,20 @@ double_volcano_plot_data %>%
 library(clusterProfiler)
 
 protein_map <- data %>% 
-  mutate(
-    first_protein = str_split_i(proteins, ";", 1),
-    first_gene = str_split_i(genes, ";", 1)
-    ) %>% 
-  distinct(first_protein, first_gene) %>% 
-  separate_wider_delim(first_protein, delim = "|", names = c(NA, "uniprot_id", "uniprot_entry")) %>% 
-  mutate(uniprot_entry = str_split_i(uniprot_entry, "_", 1)) %>% 
-  rename(symbol = first_gene) %>% 
-  mutate(entrez_id = bitr(
-    symbol, 
-    fromType = "SYMBOL", 
-    toType = "ENTREZID", 
+  pull(gene) %>%
+  unique() %>%
+  bitr(
+    fromType = "SYMBOL",
+    toType = "ENTREZID",
     OrgDb = org.Hs.eg.db::org.Hs.eg.db,
     drop = FALSE
-    )$ENTREZID)
+  )
 
 extract_dys_proteins <- function(group, name_type) {
   double_volcano_plot_data %>% 
     filter(contrast == paste0(.env$group, "-HC"), regulate != "no") %>% 
     distinct(protein) %>% 
-    left_join(protein_map, by = c("protein" = "uniprot_entry")) %>% 
+    left_join(protein_map, by = c("protein" = "SYMBOL")) %>% 
     filter(!is.na(all_of(name_type))) %>% 
     pull(all_of(name_type))
 }
@@ -793,6 +873,38 @@ rm(cg)
 ```
 
 ```{r}
+go_bp_res <- read_csv("results/data/glycoproteomics/go_bp_result.csv")
+write_csv(go_bp_res, "results/source_data/Supplementary_Figure_19e.csv")
+
+kegg_res <- read_csv("results/data/glycoproteomics/kegg_result.csv")
+write_csv(kegg_res, "results/source_data/Supplementary_Figure_19f.csv")
+```
+
+```{r}
+prepare_site_pro_dual_ggs <- function(glycosite, n = 5) {
+  protein <- str_extract(glycosite, "(.*) \\(.*\\)", group = 1)
+
+  glycosite_mean_data <- mean_data %>% 
+    filter(glycosite == .env$glycosite) %>% 
+    summarise(abundance = sum(abundance), .by = c(group, glycan_composition))
+  
+  rank <- glycosite_mean_data %>% 
+    summarise(abundance = mean(abundance), .by = glycan_composition) %>% 
+    mutate(rank = rank(-abundance), .keep = "unused")
+  
+  glycosite_mean_data %>%
+    left_join(rank, by = "glycan_composition") %>%
+    mutate(glycan_composition = if_else(rank <= .env$n, glycan_composition, "Others"),) %>% 
+    summarise(abundance = sum(abundance), .by = c(group, glycan_composition)) 
+}
+
+prepare_site_pro_dual_pro <- function(glycosite, n = 5) {
+  protein <- str_extract(glycosite, "(.*) \\(.*\\)", group = 1)
+  pro_data <- pro_data %>% 
+    filter(protein == .env$protein) %>% 
+    summarise(mean = mean(abundance), sd = sd(abundance), .by = group)
+}
+
 plot_site_pro_dual <- function(glycosite, n = 5, sec_axe_scale = 5e3) {
   protein <- str_extract(glycosite, "(.*) \\(.*\\)", group = 1)
   pro_data <- pro_data %>% 
@@ -842,6 +954,15 @@ A1AG1_93_p <- plot_site_pro_dual("A1AG1 (N93)", n = 5, sec_axe_scale = 1e5) +
 tgutil::ggpreview(width = 4, height = 2)
 ggsave("results/figures/glycoproteomics/A2MG_869_p.pdf", A2MG_869_p, width = 4, height = 2)
 ggsave("results/figures/glycoproteomics/A1AG1_93_p.pdf", A1AG1_93_p, width = 4.5, height = 2)
+
+prepare_site_pro_dual_ggs("A2MG (N869)", 5) %>%
+  write_csv("results/source_data/Figure_5j_1.csv")
+prepare_site_pro_dual_pro("A2MG (N869)", 5) %>%
+  write_csv("results/source_data/Figure_5j_2.csv")
+prepare_site_pro_dual_ggs("A1AG1 (N93)", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_18d_1.csv")
+prepare_site_pro_dual_pro("A1AG1 (N93)", 5) %>%
+  write_csv("results/source_data/Supplementary_Figure_18d_2.csv")
 ```
 
 ```{r}

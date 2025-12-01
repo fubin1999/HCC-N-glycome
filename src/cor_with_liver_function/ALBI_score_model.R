@@ -2,13 +2,9 @@ library(tidyverse)
 library(mlr3verse)
 library(patchwork)
 
-# glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-
-glycan_data <- read_csv(snakemake@input[[1]])
-clinical <- read_csv(snakemake@input[[2]])
-groups <- read_csv(snakemake@input[[3]])
+glycan_data <- read_csv("results/data/prepared/processed_abundance.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
 
 data <- glycan_data %>%
   right_join(clinical %>% select(sample, ALBI_score), by = "sample") %>%
@@ -56,3 +52,5 @@ rf_p <- ggplot(rf_preds, aes(truth, response)) +
   theme_minimal()
 
 ggsave(snakemake@output[[2]], rf_p, width = 6, height = 6)
+
+write_csv(rf_preds, "results/source_data/Supplementary_Figure_7b.csv")

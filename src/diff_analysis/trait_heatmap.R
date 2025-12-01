@@ -2,9 +2,9 @@ library(tidyverse)
 library(ComplexHeatmap)
 library(circlize)
 
-trait_data <- read_csv(snakemake@input[[1]])
-groups <- read_csv(snakemake@input[[2]])
-post_hoc_result <- read_csv(snakemake@input[[3]])
+trait_data <- read_csv("results/data/prepared/filtered_derived_traits.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+post_hoc_result <- read_csv("results/data/diff_analysis/trait_post_hoc.csv")
 
 traits_to_show <- post_hoc_result %>%
   distinct(trait) %>%
@@ -69,3 +69,5 @@ h <- convertY(h, "inch", valueOnly = TRUE)
 pdf(snakemake@output[[1]], width = w, height = h)
 draw(ht)
 dev.off()
+
+write_csv(plot_data, "results/source_data/Supplementary_Figure_8.csv")

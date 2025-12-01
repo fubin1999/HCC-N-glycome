@@ -223,6 +223,7 @@ rm(volcano_no_legend, volcano_legend_plot, volcano_legend)
 
 tgutil::ggpreview(volcano, width = 4, height = 3)
 # ggsave("results/figures/gene_expr/volcano.pdf", volcano, width = 4, height = 3)
+write_csv(volcano_data, "results/source_data/Figure_6b.csv")
 ```
 
 ```{r heatmap}
@@ -239,7 +240,7 @@ scaled_expr_mat <- t(apply(expr_mat, 1, function(x) {
 colnames(scaled_expr_mat) <- colnames(expr_mat)
 column_splits <- str_sub(str_split_i(colnames(scaled_expr_mat), fixed("-"), 4L), 1L, -2L)
 column_splits <- if_else(column_splits == "01", "Tumor", "Normal")
-color_fun <- colorRamp2(c(-2, 0, 2), c("green", "black", "red"))
+color_fun <- colorRamp2(c(-2, 0, 2), c("blue", "black", "red"))
 genes_to_label <- dea_result %>% 
   left_join(glyco_proteins, by = "gene") %>%
   filter(FDR < 0.05, abs(logFC) > 1, families == "Glycosyltransferase", key_gene) %>% 
@@ -255,6 +256,7 @@ ht <- Heatmap(
   name = "Gene\nExpression",
   col = color_fun,
   right_annotation = row_anno,
+  column_title_side = "bottom",
   show_column_names = FALSE,
   show_row_names = FALSE,
   show_row_dend = FALSE,
@@ -269,9 +271,11 @@ w = convertX(w, "inch", valueOnly = TRUE)
 h = ComplexHeatmap:::height(ht)
 h = convertY(h, "inch", valueOnly = TRUE)
 
-# pdf("results/figures/gene_expr/heatmap.pdf", width = w, height = h)
+pdf("results/figures/gene_expr/heatmap.pdf", width = w, height = h)
 draw(ht)
-# dev.off()
+dev.off()
+
+write_csv(as.data.frame(scaled_expr_mat), "results/source_data/Figure_6a.csv")
 
 rm(scaled_expr_mat, column_splits, color_fun, genes_to_label, row_anno, w, h)
 ```
@@ -538,6 +542,8 @@ rm(genes_to_show, plot_data, mat, sig_mat, column_split, color)
 # pdf("results/figures/gene_expr/dataset_dea.pdf", width = w, height = h)
 draw(ht)
 # dev.off()
+
+write_csv(plot_data, "results/source_data/Figure_6c.csv")
 ```
 
 ```{r draw-dataset-dea}
@@ -585,6 +591,8 @@ rm(plot_data, mat, sig_mat, column_split, color)
 # pdf("results/figures/gene_expr/dataset_dea_full.pdf", width = w, height = h)
 # draw(ht)
 # dev.off()
+
+write_csv(plot_data, "results/source_data/Supplementary_Figure_20h.csv")
 ```
 
 ```{r geo-volcanos}
@@ -652,6 +660,12 @@ geo_volcano_panel <- plot_grid(plotlist = volcano_plots, ncol = 3, labels = c(le
 
 # ggsave("results/figures/gene_expr/geo_volcanos.pdf", geo_volcano_panel, width = 9, height = 9)
 tgutil::ggpreview(geo_volcano_panel, width = 9, height = 9)
+
+walk2(
+  letters[1:7],
+  geo_volcano_data,
+  ~ write_csv(.y, str_glue("results/source_data/Supplementary_Figure_20{.x}.csv"))
+)
 ```
 
 ```{r survival}
@@ -701,6 +715,8 @@ survival_results %>%
 ```
 
 ```{r KM-plot}
+survival_results <- read_csv("results/data/TCGA/survival_results.csv")
+
 survival_results %>% 
   filter(gene %in% key_genes) %>% 
   filter(p.value < 0.05) %>% 
@@ -727,7 +743,7 @@ draw_KM_for_gene <- function(gene, event) {
   )$plot +
     labs(
       title = paste(gene, event),
-      subtitle = str_glue("HR={round(hr, 2)}, {scales::label_pvalue(add_p = TRUE)(p_value)}"),
+      subtitle = str_glue("HR={round(hr, 2)}, p={scales::scientific(p_value)}"),
       ) +
     guides(color = guide_legend(position = "inside")) +
     theme(
@@ -741,7 +757,23 @@ KM_plots <- map(
   ~ draw_KM_for_gene(.x[[1]], .x[[2]])
   )
 KM_plot_merged <- plot_grid(plotlist = KM_plots, nrow = 1)
-# ggsave("results/figures/gene_expr/KM_plots.pdf", KM_plot_merged, width = 16, height = 4)
+ggsave("results/figures/gene_expr/KM_plots.pdf", KM_plot_merged, width = 16, height = 4)
 tgutil::ggpreview(KM_plot_merged, width = 16, height = 4)
+
+survival_results %>%
+  filter(gene == "B4GALT2", event == "OS") %>%
+  write_csv("results/source_data/Figure_6d.csv")
+
+survival_results %>%
+  filter(gene == "B4GALT2", event == "DSS") %>%
+  write_csv("results/source_data/Figure_6e.csv")
+
+survival_results %>%
+  filter(gene == "B4GALT3", event == "PFI") %>%
+  write_csv("results/source_data/Figure_6f.csv")
+
+survival_results %>%
+  filter(gene == "B4GALT3", event == "DFI") %>%
+  write_csv("results/source_data/Figure_6g.csv")
 ```
 

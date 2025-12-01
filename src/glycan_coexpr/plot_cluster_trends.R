@@ -8,6 +8,11 @@ groups <- read_csv(snakemake@input[[2]]) %>%
   mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
 post_hoc_result <- read_csv(snakemake@input[[3]])
 
+eigen_glycans <- read_csv("results/data/glycan_coexpr/eigen_glycans.csv")
+groups <- read_csv("results/data/prepared/groups.csv") %>%
+  mutate(group = factor(group, levels = c("HC", "CHB", "LC", "HCC")))
+post_hoc_result <- read_csv("results/data/glycan_coexpr/cluster_post_hoc.csv")
+
 data <- eigen_glycans %>%
   left_join(groups, by = "sample") %>%
   filter(group != "QC")
@@ -29,7 +34,7 @@ max_y_pos <- plot_data %>%
   )
 
 p_value_data <- post_hoc_result %>%
-  add_significance("p.adj", output.col = "label") %>%
+  mutate(label = scales::scientific(p.adj)) %>%
   select(cluster, group1, group2, label) %>%
   left_join(max_y_pos, by = "cluster") %>%
   mutate(y.position = case_when(
@@ -53,10 +58,11 @@ plot_trend <- function (data, p_val_df, .title) {
     theme(
       axis.line = element_blank(),
       axis.ticks.x = element_blank(),
-      panel.grid.major.x = element_line(),
+      panel.grid.major.x = element_line(color = "gray90"),
       axis.title.x = element_blank()
     ) +
-    scale_x_discrete(expand = expansion(mult = c(0.01, 0.05)))
+    scale_x_discrete(expand = expansion(mult = c(0.01, 0.05))) +
+    scale_y_continuous(expand = expansion(mult = c(0.01, 0.1)))
 }
 
 plots <- plot_data %>%
@@ -70,4 +76,7 @@ plots <- plot_data %>%
 
 final_p <- reduce(plots$plot, `+`) + plot_layout(nrow = 1)
 # tgutil::ggpreview(plot = final_p, width = 12, height = 3)
-ggsave(snakemake@output[[1]], width = 12, height = 3)
+ggsave("results/figures/glycan_coexpr/glycan_cluster_trends.pdf", width = 12, height = 3)
+
+write_csv(plot_data, "results/source_data/Figure_3f_1.csv")
+write_csv(p_value_data, "results/source_data/Figure_3f_2.csv")

@@ -42,3 +42,19 @@ merged_shap_p <- reduce(plot_df$plot, `+`) +
   theme(legend.position = "bottom")
 tgutil::ggpreview(width = 12, height = 4)
 ggsave("results/figures/ml/shap_beeswarm.pdf", merged_shap_p, width = 12, height = 4)
+
+plot_data %>%
+  filter(model == "HCC_HC") %>%
+  write_csv("results/source_data/Figure_7m.csv")
+
+plot_data %>%
+  filter(model == "HCC_CHB") %>%
+  write_csv("results/source_data/Figure_7n.csv")
+
+plot_data %>%
+  filter(model == "HCC_LC") %>%
+  write_csv("results/source_data/Figure_7o.csv")
+
+plot_data %>%
+  filter(model == "global") %>%
+  write_csv("results/source_data/Figure_7p.csv")

@@ -55,3 +55,5 @@ plot_df <- perm_imp %>%
 final_p <- reduce(plot_df$plot, `+`) + plot_layout(nrow = 1)
 tgutil::ggpreview(final_p, width = 12, height = 4)
 ggsave("results/figures/ml/permumtation_importance.pdf", final_p, width = 12, height = 4)
+
+write_csv(perm_imp, "results/source_data/Supplementary_Figure_21f.csv")

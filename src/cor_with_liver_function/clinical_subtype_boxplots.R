@@ -3,9 +3,9 @@ library(rstatix)
 library(ggsignif)
 library(patchwork)
 
-# traits <- read_csv("results/data/prepared/filtered_derived_traits.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
+traits <- read_csv("results/data/prepared/filtered_derived_traits.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv")
 
 traits <- read_csv(snakemake@input[[1]])
 groups <- read_csv(snakemake@input[[2]])
@@ -82,3 +82,5 @@ p <- reduce(plot_df$plot, `+`) + plot_layout(nrow = n_subtypes, ncol = n_traits)
 
 # tgutil::ggpreview(plot = p, width = plot_width, height = plot_height)
 ggsave(snakemake@output[[1]], plot = p, width = plot_width, height = plot_height)
+
+write_csv(plot_data, "results/source_data/Figure_2c.csv")

@@ -1,7 +1,7 @@
 library(tidyverse)
 library(corrplot)
 
-eigen_glycans <- read_csv(snakemake@input[[1]])
+eigen_glycans <- read_csv("results/data/glycan_coexpr/eigen_glycans.csv")
 
 wider <- eigen_glycans %>%
   pivot_wider(names_from = "cluster", values_from = "eigen_glycan", names_prefix = "GCM") %>%
@@ -25,3 +25,6 @@ corrplot(
   addgrid.col = "grey"
 )
 dev.off()
+
+write_csv(as.data.frame(cor_mat), "results/source_data/Figure_3h_1.csv")
+write_csv(as.data.frame(p_mat), "results/source_data/Figure_3h_2.csv")

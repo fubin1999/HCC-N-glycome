@@ -2,13 +2,9 @@ library(tidyverse)
 library(patchwork)
 library(cowplot)
 
-# clinical <- read_csv("results/data/prepared/clinical.csv")
-# subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-# fisher_result <- read_csv("results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv")
-
-clinical <- read_csv(snakemake@input[["clinical"]])
-subtypes <- read_csv(snakemake@input[["subtypes"]])
-fisher_result <- read_csv(snakemake@input[["fisher_result"]])
+clinical <- read_csv("results/data/prepared/clinical.csv")
+subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+fisher_result <- read_csv("results/data/subtypes/subtype_with_categoric_clinical_fisher_result.csv")
 
 plot_data <- subtypes %>%
   left_join(clinical, by = "sample") %>%
@@ -65,3 +61,5 @@ combined_plot <- plot_grid(plotlist = plots, nrow = 1)
 
 # tgutil::ggpreview(combined_plot, width = 7.5, height = 2.5)
 ggsave(snakemake@output[[1]], combined_plot, width = 7.5, height = 2.5)
+
+write_csv(plot_data, "results/source_data/Supplementary_Figure_15b.csv")

@@ -1,11 +1,8 @@
 library(tidyverse)
 library(yardstick)
 
-# preds <- read_csv("results/data/cor_with_liver_function/ALBI_model_preds.csv")
-# scores <- read_csv("results/data/cor_with_liver_function/ALBI_model_scores.csv")
-
-preds <- read_csv(snakemake@input[[1]])
-scores <- read.csv(snakemake@input[[2]])
+preds <- read_csv("results/data/cor_with_liver_function/ALBI_model_preds.csv")
+scores <- read_csv("results/data/cor_with_liver_function/ALBI_model_scores.csv")
 
 data_for_plot <- bind_rows(list(
   preds %>% mutate(fold = as.character(fold)),
@@ -38,3 +35,4 @@ roc_p <- data_for_plot %>%
 # tgutil::ggpreview(roc_p, width = 5, height = 3)
 
 ggsave(snakemake@output[[1]], roc_p, width = 5, height = 3)
+write_csv(data_for_plot, "results/source_data/Supplementary_Figure_7a.csv")

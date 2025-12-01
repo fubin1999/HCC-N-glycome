@@ -78,3 +78,8 @@ HCC_heatmap <- plot_merged_heatmap(HCC_cor_result, HCC_ttest_result)
 p <- plot_grid(LC_heatmap, HCC_heatmap, ncol = 1, labels = "auto")
 tgutil::ggpreview(p, width = 10, height = 8)
 ggsave("results/figures/cor_with_liver_function/grouped_lft_heatmap.pdf", p, width = 10, height = 8)
+
+write_csv(LC_cor_result, "results/source_data/Supplementary_Figure_6a_1.csv")
+write_csv(LC_ttest_result, "results/source_data/Supplementary_Figure_6a_2.csv")
+write_csv(HCC_cor_result, "results/source_data/Supplementary_Figure_6b_1.csv")
+write_csv(HCC_ttest_result, "results/source_data/Supplementary_Figure_6b_2.csv")

@@ -50,6 +50,8 @@ ggplot(AFP_neg_prepared, aes(model, sensitivity, fill = cutoff)) +
 tgutil::ggpreview(width = 4, height = 3)
 ggsave("results/figures/ml/AFP_neg_sensitivity.pdf", width = 4, height = 3)
 
+write_csv(AFP_neg_prepared, "results/source_data/Supplementary_Figure_21b.csv")
+
 
 TNM_prepared <- preds %>% 
   filter(dataset == "test", true) %>% 

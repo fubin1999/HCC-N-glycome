@@ -1,11 +1,9 @@
 library(tidyverse)
 library(ggrepel)
 
-# fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
+fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
 
-fold_change <- read_csv(snakemake@input[[1]])
-
-p <- fold_change %>%
+plot_data <- fold_change %>%
   mutate(
     logFC = log2(FC),
     comparison = str_c(group1, "vs", group2),
@@ -23,8 +21,9 @@ p <- fold_change %>%
     both_label = if_else(color == "Both", glycan, ""),
     HCC_label = if_else(color == "HCvsHCC", glycan, ""),
     LC_label = if_else(color == "HCvsLC", glycan, "")
-  ) %>%
-  ggplot(aes(HCvsLC, HCvsHCC)) +
+  )
+
+p <- ggplot(plot_data, aes(HCvsLC, HCvsHCC)) +
   geom_vline(xintercept = log2(1.5), linetype = "dashed", color = "grey") +
   geom_hline(yintercept = log2(1.5), linetype = "dashed", color = "grey") +
   geom_point(aes(color = color), size = 4, alpha = 0.5) +
@@ -51,3 +50,5 @@ p <- fold_change %>%
   theme_classic()
 # tgutil::ggpreview(plot = p, width = 4.5, height = 3)
 ggsave(snakemake@output[[1]], plot = p, width = 4.5, height = 3)
+
+write_csv(plot_data, "results/source_data/Figure_4d.csv")

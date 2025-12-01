@@ -4,9 +4,6 @@ library(broom)
 abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
 
-abundance <- read_csv(snakemake@input[[1]])
-clusters <- read_csv(snakemake@input[[2]])
-
 data <- clusters %>%
   mutate(cluster = factor(class), .keep = "unused") %>%
   left_join(abundance, by = "sample")
@@ -33,3 +30,5 @@ p <- ggplot(plot_data, aes(PC1, PC2)) +
 tgutil::ggpreview(plot = p, width = 3, height = 3)
 
 ggsave("results/figures/subtypes/subtype_pca.pdf", plot = p, width = 3, height = 3)
+
+write_csv(plot_data, "results/source_data/Figure_4b.csv")

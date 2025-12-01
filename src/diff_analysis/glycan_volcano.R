@@ -2,13 +2,9 @@ library(tidyverse)
 library(ggrepel)
 library(patchwork)
 
-# ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
-# post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
-# fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
-
-ancova_result <- read_csv(snakemake@input[[1]])
-post_hoc_result <- read_csv(snakemake@input[[2]])
-fold_change <- read_csv(snakemake@input[[3]])
+ancova_result <- read_csv("results/data/diff_analysis/glycan_ancova.csv")
+post_hoc_result <- read_csv("results/data/diff_analysis/glycan_post_hoc.csv")
+fold_change <- read_csv("results/data/diff_analysis/glycan_fold_change.csv")
 
 diff_glycans <- ancova_result %>%
   filter(Effect == "group", p.adj < 0.05) %>%
@@ -72,3 +68,7 @@ p <- reduce(plot_df$plot, `+`) +
 # tgutil::ggpreview(plot = p, width = 12, height = 4)
 
 ggsave(snakemake@output[[1]], plot = p, width = 9, height = 3)
+
+write_csv(plot_data %>% filter(comparison == "CHB vs HC"), "results/source_data/Figure_3a.csv")
+write_csv(plot_data %>% filter(comparison == "LC vs HC"), "results/source_data/Figure_3b.csv")
+write_csv(plot_data %>% filter(comparison == "HCC vs HC"), "results/source_data/Figure_3c.csv")

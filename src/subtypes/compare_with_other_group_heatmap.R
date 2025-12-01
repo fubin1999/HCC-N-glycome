@@ -2,15 +2,11 @@ library(tidyverse)
 library(ComplexHeatmap)
 library(circlize)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# groups <- read_csv("results/data/prepared/groups.csv")
-# subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+groups <- read_csv("results/data/prepared/groups.csv")
+subtypes <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
 
-abundance <- read_csv(snakemake@input[["abundance"]])
-groups <- read_csv(snakemake@input[["groups"]])
-subtypes <- read_csv(snakemake@input[["subtypes"]])
-
-mat <- abundance %>%
+plot_data <- abundance %>%
   pivot_longer(-sample, names_to = "glycan", values_to = "value") %>%
   left_join(groups, by = "sample") %>%
   filter(group != "QC") %>%
@@ -21,7 +17,9 @@ mat <- abundance %>%
   mutate(z_score = log(value) %>% scale() %>% as.double()) %>%
   group_by(glycan, group) %>%
   summarize(mean_z_score = mean(z_score), .groups = "drop") %>%
-  pivot_wider(names_from = group, values_from = mean_z_score) %>%
+  pivot_wider(names_from = group, values_from = mean_z_score)
+
+mat <- plot_data %>%
   column_to_rownames("glycan") %>%
   as.matrix()
 
@@ -47,3 +45,5 @@ h <- convertY(h, "inch", valueOnly = TRUE)
 pdf(snakemake@output[[1]], width = w, height = h)
 draw(ht)
 dev.off()
+
+write_csv(plot_data, "results/source_data/Supplementary_Figure_14.csv")

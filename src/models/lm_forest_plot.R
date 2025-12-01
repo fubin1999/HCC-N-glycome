@@ -2,9 +2,7 @@ library(tidyverse)
 library(patchwork)
 
 # Load data-----
-# param_data <- read_csv("results/data/models/glycan_parameters.csv")
-param_data <- read_csv(snakemake@input[[1]])
-var_name <- snakemake@params[["var_name"]]
+param_data <- read_csv("results/data/models/glycan_parameters.csv")
 
 # Plot-----
 plot_forest <- function(data) {
@@ -42,3 +40,5 @@ final_p <- reduce(plot_list, `+`) +
   xlim(min_x, max_x)
 # tgutil::ggpreview(final_p, width = 8, height = 8)
 ggsave(snakemake@output[[1]], final_p, width = 8, height = 8)
+
+write_csv(plot_data, "results/source_data/Supplementary_Figure_12.csv")

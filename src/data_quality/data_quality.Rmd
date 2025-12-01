@@ -42,7 +42,7 @@ convert_glycan <- function(comp) {
   return(comp)
 }
 
-abundance_2 <- read_csv("results/data/glyhunter_results_GD2/summary_area.csv")
+abundance_2 <- read_csv("results/data/glyhunter_results_GZII/summary_intensity.csv")
 groups_2 <- read_csv("data/cohort_GD2/maldi_pos_and_group.csv")
 
 data_2 <- abundance_2 %>% 
@@ -54,7 +54,7 @@ data_2 <- abundance_2 %>%
   mutate(plate = if_else(str_starts(maldi_pos, "D"), 9, 10)) %>% 
   select(plate, sample, glycan, area)
 
-abundance_3 <- read_csv("results/data/glyhunter_results_SH/summary_area.csv")
+abundance_3 <- read_csv("results/data/glyhunter_results_XZ/summary_intensity.csv")
 groups_3 <- read_csv("data/cohort_SH/maldi_pos_and_group.csv")
 
 data_3 <- abundance_3 %>% 
@@ -92,6 +92,8 @@ top_30_data <- data %>%
 ```{r}
 qc_cv <- top_30_data %>% 
   summarise(cv = sd(abundance, na.rm = TRUE) / mean(abundance, na.rm = TRUE), .by = c(plate, cohort, glycan))
+
+write_csv(qc_cv, "results/source_data/Supplementary_Figure_2a.csv")
 ```
 
 ```{r}
@@ -130,6 +132,8 @@ qc_cor <- qc_cor_mat %>%
     sample2_no = as.integer(str_sub(sample2, start = 2))
   ) %>% 
   filter(sample1_no > sample2_no)
+
+write_csv(qc_cor, "results/source_data/Supplementary_Figure_3.csv")
 ```
 
 ```{r}
@@ -221,4 +225,16 @@ cohort_cor_boxplot <- bind_rows(list(
 cor_boxplots <- plate_cor_boxplot + cohort_cor_boxplot + plot_layout(nrow = 1)
 ggsave("results/figures/data_quality/QC_cor_boxplots.pdf", cor_boxplots, width = 5, height = 3)
 tgutil::ggpreview(cor_boxplots, width = 5, height = 3)
+
+bind_rows(list(
+  `inter-plate` = inter_plate_qc_cor %>% select(sample1, sample2, r),
+  `intra-plate` = intra_plate_qc_cor %>% select(sample1, sample2, r)
+), .id = "type") %>%
+  write_csv("results/source_data/Supplementary_Figure_2b.csv")
+
+cohort_cor_boxplot <- bind_rows(list(
+  `inter-cohort` = inter_cohort_qc_cor %>% select(sample1, sample2, r),
+  `intra-cohort` = intra_cohort_qc_cor %>% select(sample1, sample2, r)
+), .id = "type") %>%
+  write_csv("results/source_data/Supplementary_Figure_2c.csv")
 ```

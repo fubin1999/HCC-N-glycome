@@ -5,10 +5,6 @@ abundance <- read_csv("results/data/prepared/processed_abundance.csv")
 raw_abundance <- read_csv("results/data/prepared/raw_abundance.csv")
 mp_table <- read_csv("results/data/prepared/meta_properties.csv")
 
-abundance <- read_csv(snakemake@input[[1]])
-raw_abundance <- read_csv(snakemake@input[[2]])
-mp_table <- read_csv(snakemake@input[[3]])
-
 mp_names <- setdiff(colnames(mp_table), "glycan")
 
 mean_abundance <- abundance %>%
@@ -77,3 +73,5 @@ Heatmap(
   top_annotation = ha,
 )
 dev.off()
+
+write_csv(data, "results/source_data/Supplementary_Figure_4e.csv")

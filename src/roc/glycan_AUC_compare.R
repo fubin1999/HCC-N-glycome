@@ -1,8 +1,7 @@
 library(tidyverse)
 library(patchwork)
 
-# glycan_aucs <- read_csv("results/data/roc/glycan_auc.csv")
-glycan_aucs <- read_csv(snakemake@input[[1]])
+glycan_aucs <- read_csv("results/data/roc/glycan_auc.csv")
 
 plot_bar <- function(data) {
   ggplot(data, aes(x = auc, y = reorder(glycan, auc))) +
@@ -37,3 +36,5 @@ plot_df <- glycan_aucs %>%
 p <- reduce(plot_df$p, `+`) + plot_layout(nrow = 1, guides = "collect")
 # tgutil::ggpreview(p, width = 8, height = 8)
 ggsave(snakemake@output[[1]], p, width = 8, height = 8)
+
+write_csv(glycan_aucs, "results/source_data/Supplementary_Figure_23.csv")

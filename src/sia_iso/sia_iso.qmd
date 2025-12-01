@@ -7,8 +7,7 @@ format: html
 #| label: load-libraries
 
 library(tidyverse)
-library(glymotif)
-library(glyparse)
+library(glycoverse)
 library(rstatix)
 library(ggprism)
 ```
@@ -77,23 +76,6 @@ rm(glyhunter_result, maldi_pos, full_clinical, old_plates, glycans_to_keep, clea
 ```{r}
 #| label: calculate-derived-traits
 
-# Convert GlycoCT to WURCS
-convert_ct_to_wurcs <- function(s) {
-  converter_path <- here::here("src/utils/GlycanFormatConverter-cli.jar")
-  ct_path <- withr::local_tempfile(lines = s)
-  output <- system2(
-    "java", args = c(
-      "-jar",
-      converter_path,
-      "-i", "GlycoCT",
-      "-e", "WURCS",
-      "-seq", ct_path
-    ),
-    stdout = TRUE
-  )
-  return(pluck(output, -1))
-}
-
 glycan_properties <- local({
   db_struc <- read_csv("data/human_serum_glycans.csv") |> 
     rename(glycoct = structure) |> 
@@ -102,6 +84,12 @@ glycan_properties <- local({
   names(strucs) <- db_struc$composition
   describe_n_glycans(strucs)
 })
+
+glycan_properties <- read_csv("data/human_serum_glycans.csv") |>
+  mutate(structure = parse_glycoct(structure)) |>
+  pull(structure) |>
+  get_meta_properties() |>
+  mutate(glycan = read_csv("data/human_serum_glycans.csv")$composition)
 
 sia_derived_traits <- abundance |> 
   mutate(
@@ -118,7 +106,7 @@ sia_derived_traits <- abundance |>
     ) |> 
   select(-nS) |> 
   left_join(
-    glycan_properties |> select(glycan, n_gal), 
+    glycan_properties |> select(glycan, n_gal = nG), 
     by = c("pure_comp" = "glycan")
     ) |> 
   filter(n_gal > 0) |> 
@@ -190,4 +178,10 @@ sia_boxplots <- ggplot(sia_derived_traits, aes(group, value)) +
   )
 tgutil::ggpreview(sia_boxplots, width = 6, height = 4)
 # ggsave("results/figures/sia_iso/sia_boxplots.pdf", sia_boxplots, width = 6, height = 4)
+```
+
+```{r}
+#| label: source-data
+
+write_csv(post_hoc_result, "results/source_data/Supplementary_Figure_9.csv")
 ```

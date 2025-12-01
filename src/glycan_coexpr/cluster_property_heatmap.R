@@ -47,3 +47,5 @@ h <- convertY(h, "inch", valueOnly = TRUE)
 pdf("results/figures/glycan_coexpr/glycan_property_heatmap.pdf", width = w, height = h)
 draw(ht)
 dev.off()
+
+write_csv(data, "results/source_data/Figure_3g.csv")

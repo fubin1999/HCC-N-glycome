@@ -2,11 +2,11 @@ library(tidyverse)
 library(ComplexHeatmap)
 library(circlize)
 
-# abundance <- read_csv("results/data/prepared/processed_abundance.csv")
-# clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
-# anova_result <- read_csv("results/data/subtypes/subtype_glycan_anova.csv")
-# coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
-# clinical <- read_csv("results/data/prepared/clinical.csv")
+abundance <- read_csv("results/data/prepared/processed_abundance.csv")
+clusters <- read_csv("results/data/subtypes/consensus_cluster_result.csv")
+anova_result <- read_csv("results/data/subtypes/subtype_glycan_anova.csv")
+coexp_modules <- read_csv("results/data/glycan_coexpr/glycan_clusters.csv")
+clinical <- read_csv("results/data/prepared/clinical.csv")
 
 abundance <- read_csv(snakemake@input[["abundance"]])
 clusters <- read_csv(snakemake@input[["clusters"]])
@@ -101,3 +101,5 @@ Heatmap(
   cluster_row_slices = FALSE
 )
 dev.off()
+
+write_csv(data, "results/source_data/Figure_4a.csv")
